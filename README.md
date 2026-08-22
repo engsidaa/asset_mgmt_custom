@@ -1,47 +1,353 @@
-# Asset Management Custom App
+# تطبيق إدارة الأصول المخصص – Asset Management Custom
 
-Custom Frappe app that extends ERPNext Asset & Maintenance modules.
+تطبيق Frappe مستقل يضيف تخصيصات احترافية على موديول الأصول والصيانة في ERPNext،
+دون المساس بكود التطبيق الأصلي.
 
-## What This App Does
+---
 
-### Custom Fields Added
+## جدول المحتويات
 
-| Doctype | Field | Type | Purpose |
-|---------|-------|------|---------|
-| Asset | Sticker Code | Data | كود الستيكر الملصق على الأصل الفعلي |
-| Asset | Asset Condition | Select (New/Used) | حالة الأصل |
-| Asset | Used Depreciation Rate | Percent | نسبة إهلاك خاصة للأصول المستعملة |
-| Location | Cost Center | Link | مركز التكلفة لكل فرع/موقع |
-| Asset Repair | Labor Cost | Currency | تكلفة العمالة |
-| Asset Repair | Technician Name | Data | اسم الفني |
-| Asset Repair | Repair Notes | Long Text | ملاحظات الإصلاح |
-| Asset Repair | Before Repair Image | Attach Image | صورة قبل الإصلاح |
-| Asset Repair | After Repair Image | Attach Image | صورة بعد الإصلاح |
+1. [نظرة عامة](#نظرة-عامة)
+2. [متطلبات التشغيل](#متطلبات-التشغيل)
+3. [التركيب والتثبيت](#التركيب-والتثبيت)
+4. [الإعداد بعد التثبيت](#الإعداد-بعد-التثبيت)
+5. [الحقول المضافة تفصيلاً](#الحقول-المضافة-تفصيلاً)
+6. [آلية عمل الأصول](#آلية-عمل-الأصول)
+7. [آلية عمل الصيانة والإصلاح](#آلية-عمل-الصيانة-والإصلاح)
+8. [آلية نقل الأصول بين الفروع](#آلية-نقل-الأصول-بين-الفروع)
+9. [الإهلاك – كيف يعمل](#الإهلاك--كيف-يعمل)
+10. [الأصول الاحتياطية (Spare)](#الأصول-الاحتياطية-spare)
+11. [سجل نشاط الأصل](#سجل-نشاط-الأصل)
+12. [هيكل الملفات](#هيكل-الملفات)
 
-### Automated Behaviors
+---
 
-1. **Asset Condition = Used** → applies `custom_used_depreciation_rate` to all finance books automatically on save
-2. **Asset Transfer** → updates `cost_center` on the asset to the target location's `custom_cost_center`
-3. **Sticker code warning** → shows a yellow alert on Asset form until sticker code is assigned
+## نظرة عامة
 
-### Workflow: Asset Movement Approval
+هذا التطبيق يُضيف على ERPNext:
 
-```
-Draft → [Submit for Approval] → Pending Approval → [Approve] → Approved (Submitted)
-                                                  → [Reject]  → Rejected → [Resubmit] → Draft
-```
+- **تصنيف الأصل** (جديد / مستعمل) مع تطبيق نسبة إهلاك مختلفة للمستعمل تلقائياً
+- **الأصل الاحتياطي (Spare)** – يجلس في المستودع بدون إهلاك حتى يُفعَّل
+- **كود الستيكر** – يُربط الأصل الرقمي بالأصل الفيزيائي الملصوق عليه الكود
+- **نقل تلقائي لمركز التكلفة** – عند نقل الأصل لفرع جديد ينتقل مصروف الإهلاك تلقائياً
+- **سير عمل موافقة** (Workflow) على تحويل الأصول بين الفروع
+- **توثيق كامل للصيانة** – فني، تكلفة، ملاحظات، صور قبل وبعد
+- **ملخص الصيانة على الأصل** – إجمالي التكلفة وتاريخ آخر صيانة يُحدَّثان تلقائياً
+- **سجل نشاط مفصّل** – كل حدث يُوثَّق تلقائياً
 
-## Installation
+---
+
+## متطلبات التشغيل
+
+| المتطلب | الإصدار |
+|---------|--------|
+| Frappe Framework | v15+ |
+| ERPNext | v15+ |
+| Python | 3.10+ |
+
+---
+
+## التركيب والتثبيت
+
+افتح الـ Terminal من مجلد الـ bench الخاص بك ونفِّذ الأوامر التالية:
 
 ```bash
-# From your bench directory
-bench get-app https://github.com/<your-org>/asset_mgmt_custom
-bench --site <your-site> install-app asset_mgmt_custom
-bench --site <your-site> migrate
+# 1. جلب التطبيق من GitHub
+bench get-app https://github.com/engsidaa/asset_mgmt_custom
+
+# 2. تثبيت التطبيق على الـ site
+bench --site <اسم-الـ-site> install-app asset_mgmt_custom
+
+# 3. تطبيق الـ migrations والـ fixtures (الحقول والـ Workflow)
+bench --site <اسم-الـ-site> migrate
 ```
 
-## After Installation
+> **ملاحظة:** استبدل `<اسم-الـ-site>` باسم الـ site الفعلي لديك، مثل `mycompany.localhost`.
 
-1. Go to **Location** and set the `Cost Center` on each branch/location
-2. When creating an Asset, set `Asset Condition` (New/Used) and `Sticker Code`
-3. Asset Movement now requires approval from **Assets Manager** role before submission
+---
+
+## الإعداد بعد التثبيت
+
+### الخطوة 1 – ربط كل فرع بمركز التكلفة
+
+1. اذهب إلى: **Assets ← Location**
+2. افتح كل موقع/فرع
+3. في حقل **Cost Center** اختر مركز التكلفة المناسب لهذا الفرع
+
+> هذا الإعداد ضروري لكي ينتقل مصروف الإهلاك تلقائياً عند نقل الأصل بين الفروع.
+
+### الخطوة 2 – إعداد صلاحية مدير الأصول
+
+1. اذهب إلى: **HR ← Role**
+2. تأكد من وجود دور **Assets Manager**
+3. عيِّن هذا الدور للمستخدمين الذين يملكون صلاحية الموافقة على تحويل الأصول
+
+### الخطوة 3 – اختبار الـ Workflow
+
+1. أنشئ **Asset Movement** جديد
+2. ستجد زر "Submit for Approval" بدلاً من Submit المباشر
+3. يذهب الطلب لمدير الأصول للموافقة أو الرفض
+
+---
+
+## الحقول المضافة تفصيلاً
+
+### على شاشة الأصل (Asset)
+
+| الحقل | النوع | الغرض | ملاحظات |
+|-------|-------|--------|----------|
+| **Sticker Code** | نص | كود الستيكر الملصق على الأصل | يُبحث به، يظهر في القائمة |
+| **Asset Condition** | قائمة (New / Used) | حالة الأصل عند الشراء | يُغيِّر نسبة الإهلاك تلقائياً |
+| **Used Depreciation Rate (%)** | نسبة مئوية | نسبة إهلاك خاصة للمستعمل | يظهر فقط لو الحالة = Used |
+| **Spare Asset (احتياطي)** | تحديد ✓ | الأصل في المستودع كاحتياطي | يوقف الإهلاك تلقائياً |
+| **Total Maintenance Cost** | عملة | إجمالي تكلفة الإصلاحات | يُحسَب تلقائياً، للقراءة فقط |
+| **Last Maintenance Date** | تاريخ | تاريخ آخر إصلاح مكتمل | يُحدَّث تلقائياً، للقراءة فقط |
+
+### على شاشة الموقع/الفرع (Location)
+
+| الحقل | النوع | الغرض |
+|-------|-------|--------|
+| **Cost Center** | ربط | مركز التكلفة المرتبط بهذا الفرع – يُطبَّق على مصروف الإهلاك |
+
+### على شاشة إصلاح الأصل (Asset Repair)
+
+| الحقل | النوع | الغرض | إلزامي عند الاكتمال؟ |
+|-------|-------|--------|----------------------|
+| **Technician Name** | نص | اسم الفني المنفِّذ | ✅ نعم |
+| **Labor Cost** | عملة | تكلفة العمالة / أجر الزيارة | لا |
+| **Repair Notes** | نص طويل | تفاصيل كل الأعمال المنفَّذة | ✅ نعم |
+| **Before Repair Image** | صورة | صورة الأصل قبل الإصلاح | لا |
+| **After Repair Image** | صورة | صورة الأصل بعد الإصلاح | لا |
+
+---
+
+## آلية عمل الأصول
+
+### إنشاء أصل جديد
+
+```
+1. إنشاء الصنف (Item) في دليل الأصناف كصنف أصل ثابت
+2. عمل فاتورة مشتريات (Purchase Invoice / Purchase Receipt)
+3. النظام ينشئ الأصل تلقائياً
+4. تحديد:
+   ├── Asset Condition: New أو Used
+   ├── Used Rate: لو Used حدد النسبة (مثلاً 15%)
+   └── Is Spare: لو احتياطي ضع علامة ✓
+5. لو كميات متعددة (مثلاً 400 كرسي):
+   └── النظام يولّد 400 أصل منفرد بأكواد تلقائية
+6. بعد لصق الستيكر الفيزيائي:
+   └── ادخل على كل أصل وحدِّث حقل Sticker Code
+```
+
+### حالة الأصل (Condition)
+
+| الحالة | ما يحدث |
+|--------|----------|
+| **New** | تُستخدم نسبة الإهلاك المعيارية من Asset Category |
+| **Used** | تُطبَّق نسبة `Used Depreciation Rate` على جميع finance books تلقائياً عند الحفظ |
+
+---
+
+## آلية عمل الصيانة والإصلاح
+
+### خطوات تسجيل إصلاح
+
+```
+1. افتح الأصل المعطل
+2. اذهب لـ: Asset Repair ← New
+3. حدد:
+   ├── Asset: اسم الأصل
+   ├── Failure Date: وقت العطل
+   ├── Description: وصف العطل
+   └── Repair Status: Pending
+4. مصادر قطع الغيار (اختر واحداً أو أكثر):
+   ├── Stock Consumption ✓ + Stock Items: صرف من المستودع
+   └── Purchase Invoice: شراء من مورد خارجي
+5. عند اكتمال الإصلاح – حدد Repair Status = Completed وأدخل:
+   ├── Technician Name (إلزامي) ✅
+   ├── Repair Notes – تفاصيل الأعمال المنفَّذة (إلزامي) ✅
+   ├── Completion Date (إلزامي) ✅
+   ├── Labor Cost: تكلفة العمالة
+   ├── Before Repair Image: صورة قبل
+   └── After Repair Image: صورة بعد
+6. قدِّم المستند (Submit)
+```
+
+### ما يحدث تلقائياً عند تقديم الإصلاح
+
+```
+✓ يُحدَّث Total Maintenance Cost على الأصل (الإجمالي التراكمي)
+✓ يُحدَّث Last Maintenance Date على الأصل
+✓ يُسجَّل ملخص في Asset Activity:
+  └── "Asset Repair XXX submitted – Status: Completed | Technician: فلان | Total: 500"
+```
+
+### حساب إجمالي التكلفة
+
+```
+Grand Total = repair_cost + custom_labor_cost + stock_items_total
+```
+
+يظهر الإجمالي بشكل واضح أعلى الشاشة أثناء التعديل.
+
+---
+
+## آلية نقل الأصول بين الفروع
+
+### سير العمل (Workflow)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Asset Movement Workflow                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  أي موظف                    مدير الأصول                         │
+│     │                           │                               │
+│  [ينشئ طلب نقل]                 │                               │
+│     │                           │                               │
+│     ↓                           │                               │
+│  [Draft]                        │                               │
+│     │                           │                               │
+│  [Submit for Approval] ─────────→                               │
+│                         [Pending Approval]                      │
+│                              │                                   │
+│                    ┌─────────┴─────────┐                        │
+│                 [Approve]           [Reject]                     │
+│                    │                   │                         │
+│                 [Approved]          [Rejected]                   │
+│               (مُقدَّم ومُنفَّذ)      │                         │
+│                                  [Resubmit]                     │
+│                                        │                        │
+│                                    [Draft]                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### شروط النقل
+
+| الشرط | التفاصيل |
+|-------|----------|
+| **Sticker Code إلزامي** | لا يُمكن نقل أصل لم يُحدَّد له كود ستيكر بعد |
+| **موافقة المدير** | كل تحويل يمر بمرحلة Pending Approval |
+| **تحديث مركز التكلفة** | عند الموافقة والتقديم → cost_center الأصل ينتقل لمركز تكلفة الموقع الجديد |
+
+### أنواع حركات الأصل
+
+| النوع | الوصف |
+|-------|-------|
+| **Transfer** | نقل بين موقعين (يتطلب ستيكر + موافقة) |
+| **Receipt** | استلام في موقع (تفعيل الأصل الاحتياطي) |
+| **Issue** | تسليم لموظف مسؤول (عهدة) |
+
+### ما يحدث تلقائياً عند تقديم سند النقل
+
+```
+✓ يُحدَّث Location على الأصل
+✓ يُحدَّث Cost Center على الأصل من مركز تكلفة الموقع الجديد
+✓ مصروف الإهلاك القادم يُحمَّل على الفرع الجديد
+✓ يُسجَّل في Asset Activity:
+  └── "Cost center updated to X after Transfer to location Y"
+```
+
+---
+
+## الإهلاك – كيف يعمل
+
+### طريقة الحساب المستخدمة
+
+**القسط الثابت (Straight Line)** فقط:
+
+```
+القسط السنوي = (تكلفة الشراء - القيمة التخريدية) × نسبة الإهلاك
+```
+
+### نسبة الإهلاك حسب حالة الأصل
+
+```
+أصل جديد  → النسبة من Asset Category (المعيارية)
+أصل مستعمل → Used Depreciation Rate (مُدخَلة يدوياً)
+               يُطبَّق تلقائياً على جميع finance books عند الحفظ
+```
+
+### متى يبدأ الإهلاك؟
+
+| الحالة | متى يبدأ الإهلاك |
+|--------|-----------------|
+| أصل عادي | من تاريخ **Available for Use Date** |
+| أصل احتياطي | **لا يبدأ** حتى يُستلم في فرع (Receipt) |
+| أصل منقول لفرع جديد | يُحمَّل على مركز تكلفة الفرع الجديد من تاريخ الاستلام |
+
+### أين يظهر في القوائم المالية؟
+
+```
+قائمة الدخل  ← مصروف الإهلاك (Depreciation Expense)
+الميزانية    ← مجمع الإهلاك (Accumulated Depreciation) تحت الأصول الثابتة
+```
+
+---
+
+## الأصول الاحتياطية (Spare)
+
+### ما هو الأصل الاحتياطي؟
+
+أصل مشترى ومخزَّن في المستودع كاحتياطي، لا يعمل فعلياً، فلا يُحتسب عليه إهلاك حتى يُستخدم.
+
+**مثال:** جريل (مولد كهرباء) احتياطي في المستودع جاهز لو المولد الأساسي تعطَّل.
+
+### دورة حياة الأصل الاحتياطي
+
+```
+[شراء الأصل] → [ضع علامة Spare ✓] → يُحفظ في المستودع (لا إهلاك)
+                                              │
+                                   [الحاجة للاستخدام]
+                                              │
+                               [Asset Movement – Receipt]
+                                              │
+                              ↓ يحدث تلقائياً عند التقديم:
+                              - تُزال علامة Spare
+                              - يُضبط Available for Use Date
+                              - يُسجَّل في Activity Log
+                              - يظهر إشعار: "فعِّل الإهلاك من شاشة الأصل"
+                                              │
+                        [مدير الأصول يفعِّل الإهلاك من شاشة الأصل]
+                                              │
+                                   [يبدأ الإهلاك]
+```
+
+---
+
+## سجل نشاط الأصل
+
+كل الأحداث التالية تُوثَّق تلقائياً في **Asset Activity**:
+
+| الحدث | ما يُسجَّل |
+|-------|-----------|
+| تقديم سند نقل | "Asset transferred to Location X – Cost center updated to Y" |
+| تفعيل أصل احتياطي | "Spare asset activated at location X on DD-MM-YYYY" |
+| تقديم إصلاح | "Asset Repair XXX – Status: Completed \| Technician: فلان \| Total: 500" |
+| إلغاء إصلاح | "Asset Repair XXX cancelled – maintenance totals recalculated" |
+| إلغاء سند نقل | "Cost center reverted to X after cancellation" |
+
+للاطلاع على السجل: **افتح الأصل ← تبويب Asset Activity**
+
+---
+
+## هيكل الملفات
+
+```
+asset_mgmt_custom/
+├── asset_mgmt_custom/
+│   ├── hooks.py                    ← نقطة تسجيل جميع الهوكات والـ fixtures
+│   ├── fixtures/
+│   │   ├── custom_field.json       ← تعريف جميع الحقول المضافة
+│   │   └── workflow.json           ← تعريف Workflow موافقة تحويل الأصل
+│   ├── overrides/
+│   │   ├── asset.py                ← Server: قواعد الأصل الاحتياطي + نسبة المستعمل
+│   │   ├── asset_movement.py       ← Server: التحقق + تحديث CC + تفعيل Spare
+│   │   └── asset_repair.py         ← Server: التحقق عند الاكتمال + تحديث الإجماليات
+│   └── public/js/
+│       ├── asset.js                ← Client: Badges + تحذيرات + ملخص الصيانة
+│       ├── asset_repair.js         ← Client: حساب الإجمالي + تنبيهات الاكتمال
+│       └── asset_movement.js       ← Client: فحص الستيكر + عرض CC
+├── pyproject.toml
+└── setup.py
+```
