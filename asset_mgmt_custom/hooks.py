@@ -6,7 +6,7 @@ app_email = ""
 app_license = "MIT"
 
 # ---------------------------------------------------------------------------
-# Fixtures – تُصدَّر/تُستورَد تلقائياً عند bench migrate
+# Fixtures – تُصدَّر وتُستورَد تلقائياً عند bench migrate
 # ---------------------------------------------------------------------------
 fixtures = [
     {
@@ -33,29 +33,36 @@ fixtures = [
             [
                 "workflow_action_name",
                 "in",
-                ["Submit for Approval", "Approve", "Reject"],
+                ["Submit for Approval", "Approve", "Reject", "Resubmit"],
             ]
         ],
     },
 ]
 
 # ---------------------------------------------------------------------------
-# Doc Events – هوكات على doctypes موجودة في ERPNext
+# Doc Events – هوكات server-side على doctypes موجودة في ERPNext
 # ---------------------------------------------------------------------------
 doc_events = {
+    "Asset": {
+        "validate": "asset_mgmt_custom.overrides.asset.validate",
+    },
     "Asset Movement": {
+        "validate": "asset_mgmt_custom.overrides.asset_movement.validate",
         "on_submit": "asset_mgmt_custom.overrides.asset_movement.on_submit",
         "on_cancel": "asset_mgmt_custom.overrides.asset_movement.on_cancel",
     },
-    "Asset": {
-        "validate": "asset_mgmt_custom.overrides.asset.validate",
+    "Asset Repair": {
+        "validate": "asset_mgmt_custom.overrides.asset_repair.validate",
+        "on_submit": "asset_mgmt_custom.overrides.asset_repair.on_submit",
+        "on_cancel": "asset_mgmt_custom.overrides.asset_repair.on_cancel",
     },
 }
 
 # ---------------------------------------------------------------------------
-# Client Scripts – JavaScript مُدرج على الـ Form
+# Client Scripts – JavaScript يُضاف على الـ Form
 # ---------------------------------------------------------------------------
 doctype_js = {
     "Asset": "public/js/asset.js",
     "Asset Repair": "public/js/asset_repair.js",
+    "Asset Movement": "public/js/asset_movement.js",
 }
