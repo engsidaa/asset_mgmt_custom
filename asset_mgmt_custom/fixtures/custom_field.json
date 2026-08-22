@@ -1,0 +1,119 @@
+[
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_sticker_code",
+    "dt": "Asset",
+    "fieldname": "custom_sticker_code",
+    "fieldtype": "Data",
+    "label": "Sticker Code",
+    "insert_after": "asset_name",
+    "description": "كود الستيكر الملصق على الأصل الفعلي",
+    "in_list_view": 1,
+    "search_index": 1,
+    "bold": 0,
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_asset_condition",
+    "dt": "Asset",
+    "fieldname": "custom_asset_condition",
+    "fieldtype": "Select",
+    "label": "Asset Condition",
+    "options": "\nNew\nUsed",
+    "insert_after": "custom_sticker_code",
+    "description": "حالة الأصل: جديد أو مستعمل",
+    "reqd": 0,
+    "in_list_view": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_used_depreciation_rate",
+    "dt": "Asset",
+    "fieldname": "custom_used_depreciation_rate",
+    "fieldtype": "Percent",
+    "label": "Used Asset Depreciation Rate (%)",
+    "insert_after": "custom_asset_condition",
+    "description": "نسبة الإهلاك الخاصة بالأصول المستعملة – تُطبَّق تلقائياً لو حالة الأصل = Used",
+    "depends_on": "eval:doc.custom_asset_condition == 'Used'",
+    "mandatory_depends_on": "eval:doc.custom_asset_condition == 'Used'",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_asset_condition_section",
+    "dt": "Asset",
+    "fieldname": "custom_asset_condition_section",
+    "fieldtype": "Section Break",
+    "label": "Asset Condition & Coding",
+    "insert_after": "item_name",
+    "collapsible": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Location-custom_cost_center",
+    "dt": "Location",
+    "fieldname": "custom_cost_center",
+    "fieldtype": "Link",
+    "options": "Cost Center",
+    "label": "Cost Center",
+    "insert_after": "name",
+    "description": "مركز التكلفة المرتبط بهذا الموقع/الفرع – يُستخدم تلقائياً عند نقل الأصل",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Repair-custom_labor_cost",
+    "dt": "Asset Repair",
+    "fieldname": "custom_labor_cost",
+    "fieldtype": "Currency",
+    "label": "Labor Cost",
+    "insert_after": "repair_cost",
+    "description": "تكلفة العمالة / أجر الزيارة",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Repair-custom_technician_name",
+    "dt": "Asset Repair",
+    "fieldname": "custom_technician_name",
+    "fieldtype": "Data",
+    "label": "Technician Name",
+    "insert_after": "custom_labor_cost",
+    "description": "اسم الفني المسؤول عن الإصلاح",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Repair-custom_repair_notes",
+    "dt": "Asset Repair",
+    "fieldname": "custom_repair_notes",
+    "fieldtype": "Long Text",
+    "label": "Repair Notes",
+    "insert_after": "custom_technician_name",
+    "description": "ملاحظات تفصيلية عن الإصلاح والأعمال المنفذة",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Repair-custom_before_repair_image",
+    "dt": "Asset Repair",
+    "fieldname": "custom_before_repair_image",
+    "fieldtype": "Attach Image",
+    "label": "Before Repair Image",
+    "insert_after": "custom_repair_notes",
+    "description": "صورة الأصل قبل الإصلاح",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Repair-custom_after_repair_image",
+    "dt": "Asset Repair",
+    "fieldname": "custom_after_repair_image",
+    "fieldtype": "Attach Image",
+    "label": "After Repair Image",
+    "insert_after": "custom_before_repair_image",
+    "description": "صورة الأصل بعد الإصلاح",
+    "reqd": 0
+  }
+]
