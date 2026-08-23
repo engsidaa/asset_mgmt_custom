@@ -1,0 +1,75 @@
+{%- set company_name = doc.company -%}
+<div style="font-family: 'Arial', sans-serif; direction: rtl; padding: 20px;">
+  <div style="text-align: center; border-bottom: 2px solid #0E5C78; padding-bottom: 16px; margin-bottom: 20px;">
+    <h2 style="color: #0E5C78; margin: 0;">{{ company_name }}</h2>
+    <h3 style="margin: 8px 0 0 0;">شهادة تسليم واستلام أصل ثابت</h3>
+    <h4 style="font-weight: normal; margin: 4px 0 0 0;">Asset Delivery Certificate</h4>
+  </div>
+
+  <table style="width:100%; margin-bottom: 16px; border-collapse: collapse;">
+    <tr>
+      <td style="width:50%; padding:4px 8px;"><b>رقم المستند / Doc No:</b> {{ doc.name }}</td>
+      <td style="width:50%; padding:4px 8px;"><b>التاريخ / Date:</b> {{ frappe.format(doc.transaction_date, 'Datetime') }}</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px;"><b>الغرض / Purpose:</b> {{ doc.purpose }}</td>
+      <td style="padding:4px 8px;"><b>الشركة / Company:</b> {{ doc.company }}</td>
+    </tr>
+    {%- if doc.custom_driver_name %}
+    <tr>
+      <td style="padding:4px 8px;"><b>السائق / Driver:</b> {{ doc.custom_driver_name }}</td>
+      <td style="padding:4px 8px;"><b>رقم السيارة / Vehicle:</b> {{ doc.custom_vehicle_number or '—' }}</td>
+    </tr>
+    {%- endif %}
+    {%- if doc.custom_expected_arrival %}
+    <tr>
+      <td colspan="2" style="padding:4px 8px;"><b>التوقيت المتوقع للوصول / Expected Arrival:</b> {{ frappe.format(doc.custom_expected_arrival, 'Datetime') }}</td>
+    </tr>
+    {%- endif %}
+  </table>
+
+  <table style="width:100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px;">
+    <thead>
+      <tr style="background:#0E5C78; color:#fff;">
+        <th style="padding:8px; border:1px solid #ccc;">#</th>
+        <th style="padding:8px; border:1px solid #ccc;">كود الأصل</th>
+        <th style="padding:8px; border:1px solid #ccc;">اسم الأصل</th>
+        <th style="padding:8px; border:1px solid #ccc;">من الموقع</th>
+        <th style="padding:8px; border:1px solid #ccc;">إلى الموقع</th>
+        <th style="padding:8px; border:1px solid #ccc;">كود الترميز</th>
+      </tr>
+    </thead>
+    <tbody>
+      {%- for item in doc.assets %}
+      {%- set asset_doc = frappe.get_doc("Asset", item.asset) %}
+      <tr style="background: {{ loop.index % 2 == 0 and '#f9f9f9' or '#fff' }}">
+        <td style="padding:6px 8px; border:1px solid #ddd; text-align:center;">{{ loop.index }}</td>
+        <td style="padding:6px 8px; border:1px solid #ddd;">{{ item.asset }}</td>
+        <td style="padding:6px 8px; border:1px solid #ddd;">{{ item.asset_name or '' }}</td>
+        <td style="padding:6px 8px; border:1px solid #ddd;">{{ item.source_location or '—' }}</td>
+        <td style="padding:6px 8px; border:1px solid #ddd;">{{ item.target_location or item.to_employee or '—' }}</td>
+        <td style="padding:6px 8px; border:1px solid #ddd;">{{ asset_doc.custom_iron_code or asset_doc.custom_sticker_code or '—' }}</td>
+      </tr>
+      {%- endfor %}
+    </tbody>
+  </table>
+
+  <div style="display: flex; gap: 40px; margin-top: 40px;">
+    <div style="flex:1; border-top: 1px solid #333; padding-top: 8px; text-align: center;">
+      <div>المسلِّم / Delivered By</div>
+      <div style="margin-top: 40px; font-size:12px; color:#666;">التوقيع / Signature</div>
+    </div>
+    <div style="flex:1; border-top: 1px solid #333; padding-top: 8px; text-align: center;">
+      <div>السائق / Driver</div>
+      <div style="margin-top: 40px; font-size:12px; color:#666;">التوقيع / Signature</div>
+    </div>
+    <div style="flex:1; border-top: 1px solid #333; padding-top: 8px; text-align: center;">
+      <div>المستلِم / Received By</div>
+      <div style="margin-top: 40px; font-size:12px; color:#666;">التوقيع / Signature</div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:30px; font-size:11px; color:#999; border-top:1px solid #eee; padding-top:8px;">
+    تم إنشاء هذه الوثيقة آلياً من نظام ERP — {{ frappe.utils.now() }}
+  </div>
+</div>

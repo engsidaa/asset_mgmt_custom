@@ -14,6 +14,32 @@ frappe.ui.form.on("Asset Movement", {
 	refresh(frm) {
 		_render_movement_summary(frm);
 		_show_transit_badge(frm);
+
+		// Confirm Receipt button for submitted Transfer movements not yet confirmed
+		if (frm.doc.docstatus === 1 && frm.doc.purpose === "Transfer" && !frm.doc.custom_receipt_confirmed) {
+			frm.add_custom_button(__("Confirm Receipt (تأكيد الاستلام)"), function () {
+				frappe.confirm(
+					__("Confirm that all assets in this movement have been physically received?"),
+					function () {
+						frappe.call({
+							method: "asset_mgmt_custom.overrides.asset_movement.confirm_receipt",
+							args: { movement_name: frm.doc.name },
+							freeze: true,
+							freeze_message: __("Confirming receipt…"),
+							callback(r) {
+								if (r.message && r.message.length) {
+									frappe.show_alert({
+										message: __("{0} asset(s) confirmed as received", [r.message.length]),
+										indicator: "green"
+									});
+									frm.reload_doc();
+								}
+							}
+						});
+					}
+				);
+			}, __("Actions")).addClass("btn-success");
+		}
 	},
 
 	// -----------------------------------------------------------------------

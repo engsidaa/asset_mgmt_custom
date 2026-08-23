@@ -68,5 +68,45 @@
         "condition": ""
       }
     ]
+  },
+  {
+    "doctype": "Workflow",
+    "name": "Asset Requisition Approval",
+    "document_type": "Asset Requisition",
+    "workflow_name": "Asset Requisition Approval",
+    "is_active": 1,
+    "send_email_alert": 0,
+    "states": [
+      {"state": "Draft", "doc_status": "0", "allow_edit": "All", "style": ""},
+      {"state": "Pending Approval", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Warning"},
+      {"state": "Approved", "doc_status": "1", "allow_edit": "Assets Manager", "style": "Success"},
+      {"state": "Rejected", "doc_status": "2", "allow_edit": "Assets Manager", "style": "Danger"}
+    ],
+    "transitions": [
+      {"state": "Draft", "action": "Submit for Approval", "next_state": "Pending Approval", "allowed": "All", "allow_self_approval": 1},
+      {"state": "Pending Approval", "action": "Approve", "next_state": "Approved", "allowed": "Assets Manager", "allow_self_approval": 1},
+      {"state": "Pending Approval", "action": "Reject", "next_state": "Rejected", "allowed": "Assets Manager", "allow_self_approval": 1},
+      {"state": "Rejected", "action": "Resubmit", "next_state": "Draft", "allowed": "All", "allow_self_approval": 1}
+    ]
+  },
+  {
+    "doctype": "Workflow",
+    "name": "Asset Retention Approval",
+    "document_type": "Asset Retention Request",
+    "workflow_name": "Asset Retention Approval",
+    "is_active": 1,
+    "send_email_alert": 0,
+    "states": [
+      {"state": "Draft", "doc_status": "0", "allow_edit": "All", "style": ""},
+      {"state": "Pending Approval", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Warning"},
+      {"state": "Approved", "doc_status": "1", "allow_edit": "Assets Manager", "style": "Success"},
+      {"state": "Rejected", "doc_status": "2", "allow_edit": "Assets Manager", "style": "Danger"}
+    ],
+    "transitions": [
+      {"state": "Draft", "action": "Submit for Approval", "next_state": "Pending Approval", "allowed": "All", "allow_self_approval": 1},
+      {"state": "Pending Approval", "action": "Approve", "next_state": "Approved", "allowed": "Assets Manager", "allow_self_approval": 1},
+      {"state": "Pending Approval", "action": "Reject", "next_state": "Rejected", "allowed": "Assets Manager", "allow_self_approval": 1},
+      {"state": "Rejected", "action": "Resubmit", "next_state": "Draft", "allowed": "All", "allow_self_approval": 1}
+    ]
   }
 ]

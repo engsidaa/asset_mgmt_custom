@@ -41,3 +41,31 @@ class AssetRequisition(Document):
         doc.insert(ignore_permissions=True)
         self.db_set("status", "Fulfilled")
         return doc.name
+
+    @frappe.whitelist()
+    def create_purchase_requisition(self):
+        """Create a Material Request (Purchase) from this requisition when no spare is available."""
+        if self.spare_available:
+            frappe.throw(_("A spare asset is available. Use 'Create Asset Movement' instead."))
+        if self.status != "Approved":
+            frappe.throw(_("Requisition must be Approved before creating a purchase request."))
+
+        mr = frappe.new_doc("Material Request")
+        mr.material_request_type = "Purchase"
+        mr.transaction_date = frappe.utils.today()
+        mr.schedule_date = self.required_by or frappe.utils.add_days(frappe.utils.today(), 30)
+        mr.custom_source_asset_requisition = self.name if frappe.db.exists("Custom Field",
+            "Material Request-custom_source_asset_requisition") else None
+
+        if self.item_code:
+            mr.append("items", {
+                "item_code": self.item_code,
+                "qty": self.quantity or 1,
+                "schedule_date": mr.schedule_date,
+            })
+        else:
+            frappe.throw(_("Please set Item Code on the requisition before creating a purchase request."))
+
+        mr.insert(ignore_permissions=True)
+        self.db_set("status", "Fulfilled")
+        return mr.name

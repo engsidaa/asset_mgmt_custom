@@ -1,0 +1,10 @@
+{
+  "doctype": "Print Format",
+  "name": "Asset Delivery Certificate",
+  "doc_type": "Asset Movement",
+  "module": "Asset Mgmt Custom",
+  "print_format_type": "Jinja",
+  "standard": "No",
+  "disabled": 0,
+  "html": ""
+}

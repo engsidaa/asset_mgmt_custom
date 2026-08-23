@@ -1,0 +1,10 @@
+{
+  "doctype": "Print Format",
+  "name": "Asset Barcode Label",
+  "doc_type": "Asset",
+  "module": "Asset Mgmt Custom",
+  "print_format_type": "Jinja",
+  "standard": "No",
+  "disabled": 0,
+  "html": ""
+}

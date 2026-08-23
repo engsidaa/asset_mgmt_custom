@@ -1,0 +1,16 @@
+<div style="width: 9cm; height: 5cm; border: 1px solid #333; padding: 10px; font-family: Arial, sans-serif; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always;">
+  <div style="text-align: center;">
+    <div style="font-size: 11px; font-weight: bold; color: #0E5C78;">{{ doc.company }}</div>
+    <div style="font-size: 10px; color: #555;">أصول ثابتة / Fixed Assets</div>
+  </div>
+  <div style="text-align: center; margin: 4px 0;">
+    <img src="{{ frappe.utils.get_url() }}/api/method/frappe.utils.weasyprint.get_barcode?value={{ doc.name }}&type=qr&options=%7B%22width%22%3A80%2C%22height%22%3A80%7D" style="width:80px; height:80px;" />
+  </div>
+  <div style="font-size: 10px;">
+    <div><b>{{ doc.name }}</b></div>
+    <div style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">{{ doc.asset_name }}</div>
+    {%- if doc.custom_sticker_code %}<div style="font-size:9px; color:#555;">Sticker: {{ doc.custom_sticker_code }}</div>{%- endif %}
+    {%- if doc.custom_iron_code %}<div style="font-size:9px; color:#555;">Iron: {{ doc.custom_iron_code }}</div>{%- endif %}
+    <div style="font-size:9px; color:#555;">{{ doc.asset_category }}</div>
+  </div>
+</div>

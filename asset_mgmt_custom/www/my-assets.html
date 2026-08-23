@@ -1,0 +1,50 @@
+{% extends "templates/web.html" %}
+{% block title %}{{ _("My Assets") }}{% endblock %}
+{% block page_content %}
+<div class="container my-assets-page" style="direction: rtl; font-family: Arial, sans-serif; padding: 20px 0;">
+  <h2 style="color: #0E5C78; border-bottom: 2px solid #0E5C78; padding-bottom: 10px;">
+    أصولي المُسندة — My Assigned Assets
+  </h2>
+
+  {% if not frappe.session.user or frappe.session.user == "Guest" %}
+    <div class="alert alert-warning">
+      {{ _("Please log in to view your assigned assets.") }}
+    </div>
+  {% elif assets %}
+    <table class="table table-bordered table-hover" style="font-size: 14px;">
+      <thead style="background: #0E5C78; color: #fff;">
+        <tr>
+          <th>{{ _("Asset Code") }}</th>
+          <th>{{ _("Asset Name") }}</th>
+          <th>{{ _("Category") }}</th>
+          <th>{{ _("Location") }}</th>
+          <th>{{ _("Status") }}</th>
+          <th>{{ _("Assigned On") }}</th>
+          <th>{{ _("Tag Code") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in assets %}
+        <tr>
+          <td><a href="/app/asset/{{ a.name }}">{{ a.name }}</a></td>
+          <td>{{ a.asset_name }}</td>
+          <td>{{ a.asset_category or "—" }}</td>
+          <td>{{ a.location or "—" }}</td>
+          <td>
+            <span class="badge" style="background: {{ '#1A6B42' if a.custom_operational_status == 'Operational' else ('#C8941A' if a.custom_operational_status == 'In Transit' else '#9B2C18') }}; color:#fff; padding: 3px 8px;">
+              {{ a.custom_operational_status or a.status }}
+            </span>
+          </td>
+          <td>{{ frappe.format(a.assigned_date, 'Date') if a.assigned_date else "—" }}</td>
+          <td>{{ a.custom_iron_code or a.custom_sticker_code or "—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">
+      {{ _("No assets are currently assigned to you.") }}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

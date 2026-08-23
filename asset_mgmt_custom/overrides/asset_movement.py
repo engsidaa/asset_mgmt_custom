@@ -200,3 +200,36 @@ def _revert_cost_center(item):
         return
     frappe.db.set_value("Asset", item.asset, "cost_center", cost_center, update_modified=False)
     _log_activity(item.asset, "Cost center reverted to {0} after cancellation".format(cost_center))
+
+
+# ---------------------------------------------------------------------------
+# Confirm Receipt (whitelist)
+# ---------------------------------------------------------------------------
+
+@frappe.whitelist()
+def confirm_receipt(movement_name):
+    """
+    Called by the receiving branch manager to confirm physical receipt.
+    Changes each asset from 'In Transit' to 'Operational'.
+    """
+    doc = frappe.get_doc("Asset Movement", movement_name)
+    if doc.purpose != "Transfer":
+        frappe.throw(_("Confirm Receipt is only for Transfer movements."))
+    if doc.docstatus != 1:
+        frappe.throw(_("Movement must be submitted."))
+
+    confirmed = []
+    for item in doc.assets:
+        status = frappe.db.get_value("Asset", item.asset, "custom_operational_status")
+        if status == "In Transit":
+            frappe.db.set_value("Asset", item.asset, {
+                "custom_operational_status": "Operational",
+            }, update_modified=False)
+            _log_activity(item.asset, "Asset receipt confirmed at {0}. Status: Operational.".format(
+                item.target_location or "destination"))
+            confirmed.append(item.asset)
+
+    if confirmed:
+        frappe.db.set_value("Asset Movement", movement_name, "custom_receipt_confirmed", 1, update_modified=False)
+
+    return confirmed

@@ -455,5 +455,16 @@
     "insert_after": "enable_cwip_accounting",
     "description": "أي إصلاح تتجاوز تكلفته هذا المبلغ يُعامَل رأسمالياً تلقائياً",
     "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Movement-custom_receipt_confirmed",
+    "dt": "Asset Movement",
+    "fieldname": "custom_receipt_confirmed",
+    "fieldtype": "Check",
+    "label": "Receipt Confirmed (تأكيد الاستلام)",
+    "insert_after": "custom_expected_arrival",
+    "read_only": 1,
+    "reqd": 0
   }
 ]

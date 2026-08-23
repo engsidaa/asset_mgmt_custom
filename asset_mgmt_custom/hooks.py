@@ -15,7 +15,7 @@ fixtures = [
     },
     {
         "dt": "Workflow",
-        "filters": [["document_type", "=", "Asset Movement"]],
+        "filters": [["document_type", "in", ["Asset Movement", "Asset Requisition", "Asset Retention Request"]]],
     },
     {
         "dt": "Workflow State",
@@ -23,7 +23,7 @@ fixtures = [
             [
                 "workflow_state_name",
                 "in",
-                ["Draft", "Pending Approval", "Approved", "Rejected"],
+                ["Draft", "Pending Approval", "Approved", "Rejected", "Fulfilled"],
             ]
         ],
     },
@@ -36,6 +36,10 @@ fixtures = [
                 ["Submit for Approval", "Approve", "Reject", "Resubmit"],
             ]
         ],
+    },
+    {
+        "dt": "Print Format",
+        "filters": [["module", "=", "Asset Mgmt Custom"]],
     },
 ]
 

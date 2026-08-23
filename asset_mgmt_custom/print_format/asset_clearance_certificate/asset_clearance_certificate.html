@@ -1,0 +1,79 @@
+{%- set employee_doc = frappe.get_doc("Employee", doc.employee) -%}
+<div style="font-family: Arial, sans-serif; direction: rtl; padding: 30px;">
+  <div style="text-align: center; border-bottom: 3px solid #1A6B42; padding-bottom: 20px; margin-bottom: 24px;">
+    <h2 style="color: #1A6B42; margin: 0;">{{ doc.company }}</h2>
+    <h3 style="margin: 10px 0 0 0;">شهادة تصفية أصول موظف</h3>
+    <h4 style="font-weight: normal; margin: 4px 0 0 0; color: #555;">Employee Asset Clearance Certificate</h4>
+  </div>
+
+  <div style="background: #f0faf4; border-right: 4px solid #1A6B42; padding: 16px; margin-bottom: 20px;">
+    <table style="width:100%">
+      <tr>
+        <td><b>الموظف / Employee:</b> {{ employee_doc.employee_name }} ({{ doc.employee }})</td>
+        <td><b>القسم / Department:</b> {{ employee_doc.department or '—' }}</td>
+      </tr>
+      <tr>
+        <td><b>تاريخ الإجراء / Date:</b> {{ frappe.utils.today() }}</td>
+        <td><b>تاريخ نهاية الخدمة / Relieving Date:</b> {{ frappe.format(doc.relieving_date, 'Date') }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <p style="font-size:14px;">
+    يُشهد بموجب هذه الشهادة أن الموظف المذكور أعلاه قد أعاد جميع الأصول الثابتة المُسندة إليه
+    وليس عليه أي التزامات متعلقة بأصول الشركة.
+  </p>
+  <p style="font-size:13px; color:#555; margin-bottom: 20px;">
+    This certificate confirms that the above-named employee has returned all fixed assets
+    assigned to them and has no outstanding asset obligations.
+  </p>
+
+  {%- if doc.assets_allocated %}
+  <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:20px;">
+    <thead>
+      <tr style="background:#1A6B42; color:#fff;">
+        <th style="padding:8px; border:1px solid #ccc;">الأصل</th>
+        <th style="padding:8px; border:1px solid #ccc;">اسم الأصل</th>
+        <th style="padding:8px; border:1px solid #ccc;">تاريخ التسليم</th>
+        <th style="padding:8px; border:1px solid #ccc;">الإجراء</th>
+        <th style="padding:8px; border:1px solid #ccc;">الحالة</th>
+      </tr>
+    </thead>
+    <tbody>
+      {%- for asset in doc.assets_allocated %}
+      <tr>
+        <td style="padding:6px 8px; border:1px solid #ddd;">{{ asset.reference }}</td>
+        <td style="padding:6px 8px; border:1px solid #ddd;">{{ asset.asset_name }}</td>
+        <td style="padding:6px 8px; border:1px solid #ddd;">{{ frappe.format(asset.date, 'Date') if asset.date else '—' }}</td>
+        <td style="padding:6px 8px; border:1px solid #ddd;">{{ asset.action }}</td>
+        <td style="padding:6px 8px; border:1px solid #ddd; color: {{ '#1A6B42' if asset.status != 'Owned' else '#9B2C18' }}">{{ asset.status }}</td>
+      </tr>
+      {%- endfor %}
+    </tbody>
+  </table>
+  {%- else %}
+  <p style="color:#1A6B42;"><b>✓ لا توجد أصول مُسندة للموظف / No assets allocated to this employee.</b></p>
+  {%- endif %}
+
+  <div style="display:flex; gap:40px; margin-top:50px;">
+    <div style="flex:1; border-top:1px solid #333; padding-top:8px; text-align:center;">
+      <div>مدير الموارد البشرية</div>
+      <div style="color:#888; font-size:12px; margin-top:4px;">HR Manager</div>
+      <div style="margin-top:40px; font-size:12px; color:#666;">التوقيع / Signature</div>
+    </div>
+    <div style="flex:1; border-top:1px solid #333; padding-top:8px; text-align:center;">
+      <div>مدير الأصول</div>
+      <div style="color:#888; font-size:12px; margin-top:4px;">Assets Manager</div>
+      <div style="margin-top:40px; font-size:12px; color:#666;">التوقيع / Signature</div>
+    </div>
+    <div style="flex:1; border-top:1px solid #333; padding-top:8px; text-align: center;">
+      <div>الموظف</div>
+      <div style="color:#888; font-size:12px; margin-top:4px;">Employee</div>
+      <div style="margin-top:40px; font-size:12px; color:#666;">التوقيع / Signature</div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:30px; font-size:11px; color:#aaa; border-top:1px solid #eee; padding-top:8px;">
+    {{ doc.company }} — ERP System — {{ frappe.utils.now() }}
+  </div>
+</div>
