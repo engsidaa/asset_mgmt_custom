@@ -2,7 +2,7 @@
 
 frappe.ui.form.on("Asset Requisition", {
 	refresh(frm) {
-		if (frm.doc.docstatus === 1 && frm.doc.status === "Approved" && frm.doc.spare_asset) {
+		if (frm.doc.docstatus === 1 && frm.doc.status === "Approved" && frm.doc.spare_available) {
 			frm.add_custom_button(__("Create Asset Movement"), function () {
 				frappe.call({
 					method: "create_asset_movement",

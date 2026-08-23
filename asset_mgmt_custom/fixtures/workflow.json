@@ -80,7 +80,7 @@
       {"state": "Draft", "doc_status": "0", "allow_edit": "All", "style": ""},
       {"state": "Pending Approval", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Warning"},
       {"state": "Approved", "doc_status": "1", "allow_edit": "Assets Manager", "style": "Success"},
-      {"state": "Rejected", "doc_status": "2", "allow_edit": "Assets Manager", "style": "Danger"}
+      {"state": "Rejected", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Danger"}
     ],
     "transitions": [
       {"state": "Draft", "action": "Submit for Approval", "next_state": "Pending Approval", "allowed": "All", "allow_self_approval": 1},
@@ -100,7 +100,7 @@
       {"state": "Draft", "doc_status": "0", "allow_edit": "All", "style": ""},
       {"state": "Pending Approval", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Warning"},
       {"state": "Approved", "doc_status": "1", "allow_edit": "Assets Manager", "style": "Success"},
-      {"state": "Rejected", "doc_status": "2", "allow_edit": "Assets Manager", "style": "Danger"}
+      {"state": "Rejected", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Danger"}
     ],
     "transitions": [
       {"state": "Draft", "action": "Submit for Approval", "next_state": "Pending Approval", "allowed": "All", "allow_self_approval": 1},
