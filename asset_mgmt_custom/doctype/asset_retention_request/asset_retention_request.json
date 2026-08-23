@@ -1,0 +1,121 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Retention Request",
+  "module": "Asset Mgmt Custom",
+  "autoname": "naming_series:",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Series",
+      "options": "ARR-.YYYY.-",
+      "reqd": 1
+    },
+    {
+      "fieldname": "employee",
+      "fieldtype": "Link",
+      "label": "Employee",
+      "options": "Employee",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Draft\nPending Approval\nApproved\nRejected",
+      "default": "Draft",
+      "read_only": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "travel_start",
+      "fieldtype": "Date",
+      "label": "Travel Start Date",
+      "reqd": 1
+    },
+    {
+      "fieldname": "travel_end",
+      "fieldtype": "Date",
+      "label": "Travel End Date",
+      "reqd": 1
+    },
+    {
+      "fieldname": "destination",
+      "fieldtype": "Data",
+      "label": "Destination"
+    },
+    {
+      "fieldname": "section_justification",
+      "fieldtype": "Section Break",
+      "label": "Justification"
+    },
+    {
+      "fieldname": "justification",
+      "fieldtype": "Text",
+      "label": "Justification",
+      "reqd": 1
+    },
+    {
+      "fieldname": "section_rejection",
+      "fieldtype": "Section Break",
+      "label": "Rejection"
+    },
+    {
+      "fieldname": "rejection_reason",
+      "fieldtype": "Small Text",
+      "label": "Rejection Reason",
+      "read_only": 1
+    },
+    {
+      "fieldname": "amended_from",
+      "fieldtype": "Link",
+      "label": "Amended From",
+      "options": "Asset Retention Request",
+      "read_only": 1,
+      "print_hide": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "submit": 1,
+      "cancel": 1,
+      "amend": 1
+    },
+    {
+      "role": "Assets Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 1,
+      "cancel": 1,
+      "amend": 1
+    },
+    {
+      "role": "Employee",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    }
+  ]
+}

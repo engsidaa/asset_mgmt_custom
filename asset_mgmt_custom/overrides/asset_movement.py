@@ -2,16 +2,18 @@
 Asset Movement override
 -----------------------
 Validate:
-  - Transfer: يشترط وجود كود الستيكر على كل أصل قبل النقل للفروع
+  - Transfer: يشترط وجود tag (Sticker/Iron Code) على كل أصل قبل النقل
+  - Transfer: يمنع نقل أصول بحالة Incomplete
 
 On Submit:
   - Transfer / Receipt: تحديث cost_center في الأصل من حقل Location.custom_cost_center
-  - Receipt لأصل احتياطي: تفعيل الأصل (مسح is_spare + ضبط تاريخ الاستخدام + إشعار)
+  - Transfer: ضبط custom_operational_status = In Transit + إشعار
+  - Receipt لأصل احتياطي: تفعيل الأصل + مسح حالة In Transit
   - تسجيل كل حدث في Asset Activity
 
 On Cancel:
   - استعادة cost_center من الموقع الأصلي
-  - إعادة علامة is_spare للأصل لو كانت نقله الأولى
+  - إعادة حالة In Transit إلى Operational عند الإلغاء
 """
 
 import frappe
@@ -25,21 +27,46 @@ from frappe.utils import getdate, nowdate, now_datetime
 
 def validate(doc, method=None):
     if doc.purpose == "Transfer":
-        _require_sticker_code_for_transfer(doc)
+        _require_sticker_or_iron_code_for_transfer(doc)
+        _block_incomplete_asset_transfer(doc)
 
 
-def _require_sticker_code_for_transfer(doc):
-    """لا يمكن نقل أصل بين الفروع إن لم يكن له كود ستيكر."""
+def _require_sticker_or_iron_code_for_transfer(doc):
     for item in doc.assets:
+        tag_type = frappe.db.get_value("Asset", item.asset, "custom_tag_type")
         sticker = frappe.db.get_value("Asset", item.asset, "custom_sticker_code")
-        if not sticker:
+        iron = frappe.db.get_value("Asset", item.asset, "custom_iron_code")
+        asset_name = frappe.db.get_value("Asset", item.asset, "asset_name")
+
+        if tag_type == "Iron Code" and not iron:
+            frappe.throw(
+                _("Asset <b>{0}</b> has no Iron Code. Assign it before transfer.").format(
+                    asset_name or item.asset),
+                title=_("Iron Code Required"),
+            )
+        elif tag_type in ("Barcode", "RFID") and not sticker:
+            frappe.throw(
+                _("Asset <b>{0}</b> has no Sticker Code. Assign it before transfer.").format(
+                    asset_name or item.asset),
+                title=_("Sticker Code Required"),
+            )
+        elif not tag_type and not sticker:
+            frappe.throw(
+                _("Asset <b>{0}</b> has no tag (Sticker Code or Iron Code). Assign before transfer.").format(
+                    asset_name or item.asset),
+                title=_("Tag Required for Transfer"),
+            )
+
+
+def _block_incomplete_asset_transfer(doc):
+    for item in doc.assets:
+        status = frappe.db.get_value("Asset", item.asset, "custom_operational_status")
+        if status == "Incomplete":
             asset_name = frappe.db.get_value("Asset", item.asset, "asset_name")
             frappe.throw(
-                _(
-                    "Asset <b>{0}</b> ({1}) does not have a Sticker Code. "
-                    "Please assign a sticker code before transferring the asset."
-                ).format(asset_name or item.asset, item.asset),
-                title=_("Sticker Code Required"),
+                _("Asset <b>{0}</b> is Incomplete. Set it to Operational before transferring.").format(
+                    asset_name or item.asset),
+                title=_("Asset Not Operational"),
             )
 
 
@@ -54,85 +81,95 @@ def on_submit(doc, method=None):
     for item in doc.assets:
         _update_cost_center(doc, item)
 
+        if doc.purpose == "Transfer":
+            _set_in_transit(item)
+            _notify_target_location(doc, item)
+
         if doc.purpose == "Receipt":
             _activate_spare_asset(doc, item)
+            _clear_transit(item)
+
+
+def _set_in_transit(item):
+    frappe.db.set_value("Asset", item.asset, "custom_operational_status", "In Transit", update_modified=False)
+    _log_activity(item.asset, "Asset status changed to In Transit")
+
+
+def _clear_transit(item):
+    current = frappe.db.get_value("Asset", item.asset, "custom_operational_status")
+    if current == "In Transit":
+        frappe.db.set_value("Asset", item.asset, "custom_operational_status", "Operational", update_modified=False)
+        _log_activity(item.asset, "Asset arrived and status set back to Operational")
+
+
+def _notify_target_location(doc, item):
+    """Send Frappe notification to users with role 'Assets Manager' when asset is in transit."""
+    try:
+        target = item.target_location
+        if not target:
+            return
+        asset_name = frappe.db.get_value("Asset", item.asset, "asset_name") or item.asset
+        driver = doc.get("custom_driver_name") or _("Unknown Driver")
+        vehicle = doc.get("custom_vehicle_number") or "-"
+        notification_doc = frappe.new_doc("Notification Log")
+        notification_doc.subject = _("Asset {0} is In Transit to {1}").format(asset_name, target)
+        notification_doc.email_content = _(
+            "Asset <b>{0}</b> is being transferred to <b>{1}</b>.<br>"
+            "Driver: {2} | Vehicle: {3}<br>"
+            "Movement: {4}"
+        ).format(asset_name, target, driver, vehicle, doc.name)
+        notification_doc.document_type = "Asset Movement"
+        notification_doc.document_name = doc.name
+        notification_doc.for_user = frappe.session.user
+        notification_doc.type = "Alert"
+        notification_doc.insert(ignore_permissions=True)
+    except Exception:
+        pass
 
 
 def _update_cost_center(doc, item):
-    """تحديث مركز التكلفة على الأصل من مركز تكلفة الموقع الهدف."""
     target = item.target_location
     if not target:
         return
-
     cost_center = frappe.db.get_value("Location", target, "custom_cost_center")
     if not cost_center:
         return
-
-    frappe.db.set_value(
-        "Asset", item.asset, "cost_center", cost_center, update_modified=False
-    )
-
-    _log_activity(
-        item.asset,
-        _(
-            "Cost center updated to {0} after {1} to location {2}"
-        ).format(cost_center, doc.purpose, target),
-    )
+    frappe.db.set_value("Asset", item.asset, "cost_center", cost_center, update_modified=False)
+    _log_activity(item.asset, "Cost center updated to {0} after {1} to {2}".format(
+        cost_center, doc.purpose, target))
 
 
 def _activate_spare_asset(doc, item):
-    """
-    عند استلام أصل احتياطي في موقع جديد:
-    - يُزال تصنيف 'احتياطي'
-    - يُضبط تاريخ الاستخدام = تاريخ الاستلام
-    - يُرسل إشعار لمدير الأصول لتفعيل الإهلاك
-    """
     is_spare = frappe.db.get_value("Asset", item.asset, "custom_is_spare")
     if not is_spare:
         return
-
     target = item.target_location
     activation_date = getdate(doc.transaction_date) if doc.transaction_date else getdate(nowdate())
-
-    frappe.db.set_value(
-        "Asset",
-        item.asset,
-        {
-            "custom_is_spare": 0,
-            "available_for_use_date": activation_date,
-        },
-        update_modified=False,
-    )
-
-    _log_activity(
-        item.asset,
-        _(
-            "Spare asset activated: received at location {0} on {1}. "
-            "Please enable depreciation from the asset form."
-        ).format(target or _("unknown"), activation_date),
-    )
-
+    frappe.db.set_value("Asset", item.asset, {
+        "custom_is_spare": 0,
+        "available_for_use_date": activation_date,
+    }, update_modified=False)
+    _log_activity(item.asset, "Spare asset activated at location {0} on {1}. Enable depreciation.".format(
+        target or "unknown", activation_date))
     frappe.msgprint(
-        _(
-            "Asset <b>{0}</b> has been activated at location <b>{1}</b>. "
-            "Please open the asset and enable depreciation with the correct start date."
-        ).format(item.asset, target or _("unknown")),
-        title=_("Spare Asset Activated"),
-        indicator="blue",
+        _("Asset <b>{0}</b> activated at <b>{1}</b>. Please enable depreciation.").format(
+            item.asset, target or "unknown"),
+        title=_("Spare Asset Activated"), indicator="blue",
     )
 
 
 def _log_activity(asset, subject):
     """تسجيل حدث في Asset Activity."""
-    frappe.get_doc(
-        {
+    try:
+        frappe.get_doc({
             "doctype": "Asset Activity",
             "asset": asset,
             "subject": subject,
             "user": frappe.session.user,
             "date": now_datetime(),
-        }
-    ).insert(ignore_permissions=True, ignore_links=True)
+        }).insert(ignore_permissions=True, ignore_links=True)
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -142,28 +179,24 @@ def _log_activity(asset, subject):
 def on_cancel(doc, method=None):
     if doc.purpose not in ("Transfer", "Receipt"):
         return
-
     for item in doc.assets:
         _revert_cost_center(item)
+        if doc.purpose == "Transfer":
+            _revert_transit(item)
+
+
+def _revert_transit(item):
+    current = frappe.db.get_value("Asset", item.asset, "custom_operational_status")
+    if current == "In Transit":
+        frappe.db.set_value("Asset", item.asset, "custom_operational_status", "Operational", update_modified=False)
 
 
 def _revert_cost_center(item):
-    """استعادة مركز التكلفة من الموقع الأصلي عند إلغاء السند."""
     source = item.source_location
     if not source:
         return
-
     cost_center = frappe.db.get_value("Location", source, "custom_cost_center")
     if not cost_center:
         return
-
-    frappe.db.set_value(
-        "Asset", item.asset, "cost_center", cost_center, update_modified=False
-    )
-
-    _log_activity(
-        item.asset,
-        _("Cost center reverted to {0} after cancellation of movement to {1}").format(
-            cost_center, item.target_location or _("unknown")
-        ),
-    )
+    frappe.db.set_value("Asset", item.asset, "cost_center", cost_center, update_modified=False)
+    _log_activity(item.asset, "Cost center reverted to {0} after cancellation".format(cost_center))

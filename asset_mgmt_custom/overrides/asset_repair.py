@@ -3,6 +3,8 @@ Asset Repair override
 ---------------------
 Validate:
   - عند اكتمال الإصلاح (Completed): يُشترط اسم الفني + ملاحظات الإصلاح + تاريخ الاكتمال
+  - CapEx/OpEx: إذا كان إصلاح ضمان، تُصفَّر التكاليف
+  - CapEx/OpEx: إذا تجاوزت التكلفة حد الرسملة في Asset Category، يُفعَّل capitalize_repair_cost
 
 On Submit:
   - يُحدِّث إجمالي تكلفة الصيانة (custom_total_maintenance_cost) على الأصل
@@ -25,6 +27,7 @@ from frappe.utils import flt, getdate, now_datetime
 def validate(doc, method=None):
     if doc.repair_status == "Completed":
         _validate_completion_requirements(doc)
+    _auto_classify_capex(doc)
 
 
 def _validate_completion_requirements(doc):
@@ -45,6 +48,26 @@ def _validate_completion_requirements(doc):
             "<br>".join(errors),
             title=_("Repair Documentation Incomplete"),
         )
+
+
+def _auto_classify_capex(doc):
+    """If warranty repair, zero out costs. If cost > threshold, auto-set capitalize."""
+    if doc.get("custom_is_warranty_repair"):
+        doc.capitalize_repair_cost = 0
+        return
+
+    if not doc.asset_category:
+        doc.asset_category = frappe.db.get_value("Asset", doc.asset, "asset_category")
+
+    threshold = 0
+    if doc.asset_category:
+        threshold = frappe.db.get_value(
+            "Asset Category", doc.asset_category, "custom_capitalization_threshold"
+        ) or 0
+
+    total = flt(doc.repair_cost) + flt(doc.get("custom_labor_cost"))
+    if threshold and total > flt(threshold):
+        doc.capitalize_repair_cost = 1
 
 
 # ---------------------------------------------------------------------------

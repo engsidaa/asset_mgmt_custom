@@ -2,8 +2,9 @@
 // يتحكم في:
 //   1. حالة الأصل (New/Used) ونسبة إهلاك المستعمل
 //   2. علامة الأصل الاحتياطي (Spare)
-//   3. تحذير كود الستيكر
+//   3. تحذير كود الستيكر / Tag
 //   4. ملخص تكلفة الصيانة
+//   5. زر "Set Operational" للأصول غير المفعَّلة
 
 frappe.ui.form.on("Asset", {
 
@@ -13,8 +14,9 @@ frappe.ui.form.on("Asset", {
 	refresh(frm) {
 		_toggle_used_rate_field(frm);
 		_render_condition_badge(frm);
-		_show_sticker_code_alert(frm);
-		_show_maintenance_summary(frm);
+		_show_sticker_alert(frm);
+		_render_maintenance_summary(frm);
+		_add_set_operational_button(frm);
 	},
 
 	// -----------------------------------------------------------------------
@@ -60,7 +62,11 @@ frappe.ui.form.on("Asset", {
 	// كود الستيكر
 	// -----------------------------------------------------------------------
 	custom_sticker_code(frm) {
-		_show_sticker_code_alert(frm);
+		_show_sticker_alert(frm);
+	},
+
+	custom_tag_type(frm) {
+		_show_sticker_alert(frm);
 	},
 });
 
@@ -78,43 +84,77 @@ function _render_condition_badge(frm) {
 	frm.dashboard.clear_headline();
 	const condition = frm.doc.custom_asset_condition;
 	const is_spare  = frm.doc.custom_is_spare;
-	if (!condition && !is_spare) return;
+	const status    = frm.doc.custom_operational_status;
 
 	const badges = [];
 	if (condition === "New")  badges.push(`<span class="indicator-pill green">${__("New Asset")}</span>`);
 	if (condition === "Used") badges.push(`<span class="indicator-pill orange">${__("Used Asset")}</span>`);
 	if (is_spare)             badges.push(`<span class="indicator-pill blue">${__("Spare / احتياطي")}</span>`);
 
+	const statusColors = { Operational: "green", Incomplete: "red", "In Transit": "orange" };
+	if (status) {
+		const color = statusColors[status] || "gray";
+		badges.push(`<span class="indicator-pill ${color}">${__(status)}</span>`);
+	}
+
 	if (badges.length) frm.dashboard.set_headline(badges.join("&nbsp;"));
 }
 
-function _show_sticker_code_alert(frm) {
+function _show_sticker_alert(frm) {
 	if (frm.is_new()) return;
-	if (!frm.doc.custom_sticker_code) {
-		frm.set_intro(
-			__("<b>Sticker Code not assigned yet.</b> Update this field after placing the physical sticker on the asset."),
-			"yellow"
-		);
+	const tag_type = frm.doc.custom_tag_type;
+	const sticker  = frm.doc.custom_sticker_code;
+	const iron     = frm.doc.custom_iron_code;
+
+	if (tag_type === "Iron Code" && !iron) {
+		frm.dashboard.add_comment(__("Iron Code is missing. Please enter it before activating."), "orange");
+	} else if (!tag_type && !sticker) {
+		frm.dashboard.add_comment(__("No tag assigned. Assign a Sticker Code or Iron Code."), "orange");
 	} else {
 		frm.set_intro("", false);
 	}
 }
 
-function _show_maintenance_summary(frm) {
+function _render_maintenance_summary(frm) {
 	if (frm.is_new()) return;
-	const total     = frm.doc.custom_total_maintenance_cost;
-	const last_date = frm.doc.custom_last_maintenance_date;
-	if (!total && !last_date) return;
+	const cost = frm.doc.custom_total_maintenance_cost;
+	const date = frm.doc.custom_last_maintenance_date;
+	if (!cost && !date) return;
 
 	frm.dashboard.add_comment(
 		__(
 			"Total maintenance cost: <b>{0}</b> | Last maintenance: <b>{1}</b>",
 			[
-				format_currency(total || 0, frappe.defaults.get_default("currency") || ""),
-				last_date ? frappe.datetime.str_to_user(last_date) : __("N/A"),
+				format_currency(cost || 0, frappe.defaults.get_default("currency") || ""),
+				date ? frappe.datetime.str_to_user(date) : __("N/A"),
 			]
 		),
 		"blue",
 		true
 	);
+}
+
+function _add_set_operational_button(frm) {
+	if (frm.doc.docstatus !== 1) return;
+	if (frm.doc.custom_operational_status === "Operational") return;
+
+	frm.add_custom_button(__("Set Operational (تعيين كتشغيلي)"), function () {
+		frappe.confirm(
+			__("Set asset <b>{0}</b> to Operational? Depreciation will start from today.", [frm.doc.asset_name]),
+			function () {
+				frappe.call({
+					method: "asset_mgmt_custom.overrides.asset.set_operational",
+					args: { asset_name: frm.doc.name },
+					freeze: true,
+					freeze_message: __("Setting asset to Operational…"),
+					callback(r) {
+						if (!r.exc) {
+							frappe.show_alert({ message: __("Asset is now Operational"), indicator: "green" });
+							frm.reload_doc();
+						}
+					},
+				});
+			}
+		);
+	}, __("Actions")).addClass("btn-primary");
 }

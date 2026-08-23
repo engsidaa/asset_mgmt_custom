@@ -11,7 +11,7 @@ app_license = "MIT"
 fixtures = [
     {
         "dt": "Custom Field",
-        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location"]]],
+        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Category"]]],
     },
     {
         "dt": "Workflow",
@@ -56,6 +56,9 @@ doc_events = {
         "on_submit": "asset_mgmt_custom.overrides.asset_repair.on_submit",
         "on_cancel": "asset_mgmt_custom.overrides.asset_repair.on_cancel",
     },
+    "Full and Final Statement": {
+        "validate": "asset_mgmt_custom.overrides.full_and_final_statement.validate",
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -65,4 +68,14 @@ doctype_js = {
     "Asset": "public/js/asset.js",
     "Asset Repair": "public/js/asset_repair.js",
     "Asset Movement": "public/js/asset_movement.js",
+    "Asset Requisition": "public/js/asset_requisition.js",
+}
+
+# ---------------------------------------------------------------------------
+# Scheduled Jobs
+# ---------------------------------------------------------------------------
+scheduler_events = {
+    "daily": [
+        "asset_mgmt_custom.tasks.send_incomplete_asset_alerts",
+    ],
 }

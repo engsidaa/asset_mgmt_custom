@@ -1,8 +1,10 @@
 // Client Script – Asset Movement Form
 // يتحكم في:
-//   1. التحقق من كود الستيكر قبل النقل بين الفروع (Transfer)
+//   1. التحقق من Tag (Sticker/Iron Code) قبل النقل بين الفروع (Transfer)
 //   2. عرض مركز التكلفة للموقع الهدف
 //   3. إشعار عند استلام أصل احتياطي
+//   4. عرض تفاصيل السائق والسيارة عند Transfer
+//   5. شارة "In Transit" في رأس النموذج
 
 frappe.ui.form.on("Asset Movement", {
 
@@ -11,6 +13,7 @@ frappe.ui.form.on("Asset Movement", {
 	// -----------------------------------------------------------------------
 	refresh(frm) {
 		_render_movement_summary(frm);
+		_show_transit_badge(frm);
 	},
 
 	// -----------------------------------------------------------------------
@@ -18,6 +21,7 @@ frappe.ui.form.on("Asset Movement", {
 	// -----------------------------------------------------------------------
 	purpose(frm) {
 		_render_movement_summary(frm);
+		_toggle_transit_section(frm);
 	},
 });
 
@@ -30,30 +34,52 @@ frappe.ui.form.on("Asset Movement Item", {
 		const row = frappe.get_doc(cdt, cdn);
 		if (!row.asset) return;
 
-		// التحقق من كود الستيكر لو كانت الحركة "Transfer"
 		if (frm.doc.purpose === "Transfer") {
-			frappe.db.get_value("Asset", row.asset, ["custom_sticker_code", "custom_is_spare", "asset_name"])
-				.then(({ message }) => {
-					if (!message.custom_sticker_code) {
-						frappe.show_alert({
-							message: __(
-								"⚠️ Asset <b>{0}</b> has no Sticker Code. You must assign one before transferring.",
-								[message.asset_name || row.asset]
-							),
-							indicator: "red",
-						}, 8);
-					}
+			frappe.db.get_value("Asset", row.asset, [
+				"custom_sticker_code", "custom_is_spare", "asset_name",
+				"custom_tag_type", "custom_iron_code", "custom_operational_status"
+			]).then(({ message }) => {
+				const tag_type = message.custom_tag_type;
+				const sticker  = message.custom_sticker_code;
+				const iron     = message.custom_iron_code;
+				const op_status = message.custom_operational_status;
 
-					if (message.custom_is_spare) {
-						frappe.show_alert({
-							message: __(
-								"ℹ️ Asset <b>{0}</b> is a Spare asset. Upon receipt it will be automatically activated.",
-								[message.asset_name || row.asset]
-							),
-							indicator: "blue",
-						}, 6);
-					}
-				});
+				if (op_status === "Incomplete") {
+					frappe.show_alert({
+						message: __(
+							"Asset <b>{0}</b> is Incomplete. Activate it before transferring.",
+							[message.asset_name || row.asset]
+						),
+						indicator: "red",
+					}, 8);
+				} else if (tag_type === "Iron Code" && !iron) {
+					frappe.show_alert({
+						message: __(
+							"Asset <b>{0}</b> has no Iron Code. Assign before transfer.",
+							[message.asset_name || row.asset]
+						),
+						indicator: "red",
+					}, 8);
+				} else if (!tag_type && !sticker) {
+					frappe.show_alert({
+						message: __(
+							"Asset <b>{0}</b> has no tag (Sticker Code or Iron Code). Assign before transfer.",
+							[message.asset_name || row.asset]
+						),
+						indicator: "red",
+					}, 8);
+				}
+
+				if (message.custom_is_spare) {
+					frappe.show_alert({
+						message: __(
+							"Asset <b>{0}</b> is a Spare asset. Upon receipt it will be automatically activated.",
+							[message.asset_name || row.asset]
+						),
+						indicator: "blue",
+					}, 6);
+				}
+			});
 		}
 	},
 
@@ -77,7 +103,7 @@ frappe.ui.form.on("Asset Movement Item", {
 				} else {
 					frappe.show_alert({
 						message: __(
-							"⚠️ Location <b>{0}</b> has no Cost Center configured. Depreciation cost center will not be updated.",
+							"Location <b>{0}</b> has no Cost Center configured. Depreciation cost center will not be updated.",
 							[row.target_location]
 						),
 						indicator: "orange",
@@ -104,11 +130,34 @@ function _render_movement_summary(frm) {
 
 	if (purpose === "Transfer") {
 		color = "orange";
-		msg  += " &nbsp;|&nbsp; " + __("Sticker Code required for each asset.");
+		msg  += " &nbsp;|&nbsp; " + __("Tag (Sticker/Iron Code) required for each asset.");
 	} else if (purpose === "Receipt") {
 		color = "green";
 		msg  += " &nbsp;|&nbsp; " + __("Spare assets will be activated automatically upon submission.");
 	}
 
 	frm.dashboard.add_comment(msg, color, true);
+}
+
+function _show_transit_badge(frm) {
+	if (frm.doc.docstatus !== 1 || frm.doc.purpose !== "Transfer") return;
+
+	const in_transit = (frm.doc.assets || []).some(function(row) {
+		return row.asset;
+	});
+
+	if (in_transit) {
+		frm.dashboard.set_headline(
+			`<span class="indicator-pill orange">${__("In Transit")}</span>`
+		);
+	}
+}
+
+function _toggle_transit_section(frm) {
+	const show = frm.doc.purpose === "Transfer";
+	frm.toggle_display("custom_transit_section", show);
+	frm.toggle_display("custom_driver_name", show);
+	frm.toggle_display("custom_transit_col", show);
+	frm.toggle_display("custom_vehicle_number", show);
+	frm.toggle_display("custom_expected_arrival", show);
 }
