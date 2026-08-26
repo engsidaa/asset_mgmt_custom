@@ -1,0 +1,148 @@
+[
+  {
+    "doctype": "Workspace",
+    "name": "Asset Management",
+    "label": "Asset Management",
+    "title": "Asset Management",
+    "module": "Asset Mgmt Custom",
+    "public": 1,
+    "is_hidden": 0,
+    "icon": "assets",
+    "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>KPIs \\u2014 \\u0645\\u0624\\u0634\\u0631\\u0627\\u062a \\u0627\\u0644\\u0623\\u062f\\u0627\\u0621</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Shortcuts</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Requisition\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Retention Request\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Movement\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Warranty Expiry Alerts\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Masters & Reports</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Requests\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Movements\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Custom Reports\", \"col\": 4}}]",
+    "number_cards": [
+      {
+        "card": "Pending Asset Requests"
+      },
+      {
+        "card": "Assets In Transit"
+      },
+      {
+        "card": "Under Warranty Assets"
+      },
+      {
+        "card": "Assets Under Repair"
+      }
+    ],
+    "shortcuts": [
+      {
+        "label": "Asset Requisition",
+        "link_to": "Asset Requisition",
+        "type": "DocType"
+      },
+      {
+        "label": "Asset Retention Request",
+        "link_to": "Asset Retention Request",
+        "type": "DocType"
+      },
+      {
+        "label": "Asset Movement",
+        "link_to": "Asset Movement",
+        "type": "DocType"
+      },
+      {
+        "label": "Warranty Expiry Alerts",
+        "link_to": "Warranty Expiry Alerts",
+        "type": "Report",
+        "report_ref_doctype": "Asset"
+      }
+    ],
+    "links": [
+      {
+        "type": "Card Break",
+        "label": "Asset Requests",
+        "hidden": 0
+      },
+      {
+        "type": "Link",
+        "label": "Asset Requisition",
+        "link_to": "Asset Requisition",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Link",
+        "label": "Asset Retention Request",
+        "link_to": "Asset Retention Request",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Card Break",
+        "label": "Asset Movements",
+        "hidden": 0
+      },
+      {
+        "type": "Link",
+        "label": "Asset Movement",
+        "link_to": "Asset Movement",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Link",
+        "label": "In Transit Assets",
+        "link_to": "In Transit Assets",
+        "link_type": "Report",
+        "is_query_report": 1,
+        "hidden": 0,
+        "onboard": 0
+      },
+      {
+        "type": "Card Break",
+        "label": "Custom Reports",
+        "hidden": 0
+      },
+      {
+        "type": "Link",
+        "label": "Asset Requisition Status",
+        "link_to": "Asset Requisition Status",
+        "link_type": "Report",
+        "is_query_report": 1,
+        "hidden": 0,
+        "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "Incomplete Assets",
+        "link_to": "Incomplete Assets",
+        "link_type": "Report",
+        "is_query_report": 1,
+        "hidden": 0,
+        "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "Maintenance Cost Detail",
+        "link_to": "Maintenance Cost Detail",
+        "link_type": "Report",
+        "is_query_report": 1,
+        "hidden": 0,
+        "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "Warranty Expiry Alerts",
+        "link_to": "Warranty Expiry Alerts",
+        "link_type": "Report",
+        "is_query_report": 1,
+        "hidden": 0,
+        "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "CapEx Capitalization",
+        "link_to": "CapEx Capitalization",
+        "link_type": "Report",
+        "is_query_report": 1,
+        "hidden": 0,
+        "onboard": 0
+      }
+    ]
+  }
+]

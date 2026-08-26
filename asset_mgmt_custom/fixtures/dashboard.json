@@ -1,0 +1,19 @@
+[
+  {
+    "doctype": "Dashboard",
+    "name": "Asset Management",
+    "dashboard_name": "Asset Management",
+    "module": "Asset Mgmt Custom",
+    "is_standard": 1,
+    "is_default": 0,
+    "cards": [
+      {"card": "Pending Asset Requests"},
+      {"card": "Assets In Transit"},
+      {"card": "Under Warranty Assets"},
+      {"card": "Assets Under Repair"}
+    ],
+    "charts": [
+      {"chart": "Asset Value Analytics", "width": "Full"}
+    ]
+  }
+]

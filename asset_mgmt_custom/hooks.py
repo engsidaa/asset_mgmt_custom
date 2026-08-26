@@ -41,6 +41,18 @@ fixtures = [
         "dt": "Print Format",
         "filters": [["module", "=", "Asset Mgmt Custom"]],
     },
+    {
+        "dt": "Number Card",
+        "filters": [["module", "=", "Asset Mgmt Custom"]],
+    },
+    {
+        "dt": "Dashboard",
+        "filters": [["module", "=", "Asset Mgmt Custom"]],
+    },
+    {
+        "dt": "Workspace",
+        "filters": [["module", "=", "Asset Mgmt Custom"]],
+    },
 ]
 
 # ---------------------------------------------------------------------------

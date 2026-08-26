@@ -1,0 +1,17 @@
+{
+  "add_total_row": 1,
+  "disabled": 0,
+  "doctype": "Report",
+  "is_standard": "No",
+  "json": "{}",
+  "module": "Asset Mgmt Custom",
+  "name": "CapEx Capitalization",
+  "ref_doctype": "Asset Repair",
+  "report_name": "CapEx Capitalization",
+  "report_type": "Script Report",
+  "roles": [
+    {"role": "Assets Manager"},
+    {"role": "System Manager"},
+    {"role": "Accounts Manager"}
+  ]
+}

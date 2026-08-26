@@ -1,0 +1,58 @@
+[
+  {
+    "doctype": "Number Card",
+    "name": "Pending Asset Requests",
+    "label": "Pending Asset Requests (طلبات انتظار الموافقة)",
+    "document_type": "Asset Requisition",
+    "filters_json": "[[\"Asset Requisition\",\"status\",\"=\",\"Pending Approval\",false],[\"Asset Requisition\",\"docstatus\",\"<\",2,false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 1,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#f59e0b"
+  },
+  {
+    "doctype": "Number Card",
+    "name": "Assets In Transit",
+    "label": "Assets In Transit (أصول في العبور)",
+    "document_type": "Asset Movement",
+    "filters_json": "[[\"Asset Movement\",\"docstatus\",\"=\",1,false],[\"Asset Movement\",\"custom_approval_status\",\"=\",\"Approved\",false],[\"Asset Movement\",\"custom_receipt_confirmed\",\"=\",0,false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 1,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#3b82f6"
+  },
+  {
+    "doctype": "Number Card",
+    "name": "Under Warranty Assets",
+    "label": "Under Warranty Assets (تحت الضمان)",
+    "document_type": "Asset",
+    "filters_json": "[[\"Asset\",\"custom_under_warranty\",\"=\",1,false],[\"Asset\",\"docstatus\",\"<\",2,false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 1,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#10b981"
+  },
+  {
+    "doctype": "Number Card",
+    "name": "Assets Under Repair",
+    "label": "Assets Under Repair (أصول في الإصلاح)",
+    "document_type": "Asset Repair",
+    "filters_json": "[[\"Asset Repair\",\"docstatus\",\"=\",1,false],[\"Asset Repair\",\"repair_status\",\"=\",\"Pending\",false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 1,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#ef4444"
+  }
+]
