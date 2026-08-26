@@ -466,5 +466,20 @@
     "insert_after": "custom_expected_arrival",
     "read_only": 1,
     "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Movement-custom_approval_status",
+    "dt": "Asset Movement",
+    "fieldname": "custom_approval_status",
+    "fieldtype": "Select",
+    "label": "Approval Status (حالة الموافقة)",
+    "options": "Draft\nPending Approval\nApproved\nRejected",
+    "default": "Draft",
+    "insert_after": "custom_receipt_confirmed",
+    "read_only": 1,
+    "in_list_view": 1,
+    "bold": 1,
+    "reqd": 0
   }
 ]

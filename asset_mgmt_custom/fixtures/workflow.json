@@ -4,6 +4,7 @@
     "name": "Asset Movement Approval",
     "document_type": "Asset Movement",
     "workflow_name": "Asset Movement Approval",
+    "workflow_state_field": "custom_approval_status",
     "is_active": 1,
     "override_status": 0,
     "send_email_alert": 1,
@@ -74,6 +75,7 @@
     "name": "Asset Requisition Approval",
     "document_type": "Asset Requisition",
     "workflow_name": "Asset Requisition Approval",
+    "workflow_state_field": "status",
     "is_active": 1,
     "send_email_alert": 0,
     "states": [
@@ -94,6 +96,7 @@
     "name": "Asset Retention Approval",
     "document_type": "Asset Retention Request",
     "workflow_name": "Asset Retention Approval",
+    "workflow_state_field": "status",
     "is_active": 1,
     "send_email_alert": 0,
     "states": [
