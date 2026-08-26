@@ -102,27 +102,55 @@ def _clear_transit(item):
         _log_activity(item.asset, "Asset arrived and status set back to Operational")
 
 
+def _get_assets_manager_emails():
+    """Return email list of all enabled users holding the 'Assets Manager' role."""
+    user_table = frappe.qb.DocType("User")
+    role_table = frappe.qb.DocType("Has Role")
+    return (
+        frappe.qb.from_(user_table)
+        .inner_join(role_table)
+        .on(user_table.name == role_table.parent)
+        .select(user_table.email)
+        .where(
+            (role_table.role == "Assets Manager")
+            & (user_table.enabled == 1)
+            & (user_table.name.notin(["Administrator", "All", "Guest"]))
+        )
+        .run(pluck="email")
+    )
+
+
 def _notify_target_location(doc, item):
-    """Send Frappe notification to users with role 'Assets Manager' when asset is in transit."""
+    """Notify ALL users with 'Assets Manager' role when an asset enters transit."""
     try:
         target = item.target_location
         if not target:
             return
+
+        recipients = _get_assets_manager_emails()
+        if not recipients:
+            return
+
         asset_name = frappe.db.get_value("Asset", item.asset, "asset_name") or item.asset
         driver = doc.get("custom_driver_name") or _("Unknown Driver")
         vehicle = doc.get("custom_vehicle_number") or "-"
-        notification_doc = frappe.new_doc("Notification Log")
-        notification_doc.subject = _("Asset {0} is In Transit to {1}").format(asset_name, target)
-        notification_doc.email_content = _(
-            "Asset <b>{0}</b> is being transferred to <b>{1}</b>.<br>"
-            "Driver: {2} | Vehicle: {3}<br>"
-            "Movement: {4}"
-        ).format(asset_name, target, driver, vehicle, doc.name)
-        notification_doc.document_type = "Asset Movement"
-        notification_doc.document_name = doc.name
-        notification_doc.for_user = frappe.session.user
-        notification_doc.type = "Alert"
-        notification_doc.insert(ignore_permissions=True)
+
+        from frappe.desk.doctype.notification_log.notification_log import enqueue_create_notification
+        enqueue_create_notification(
+            users=recipients,
+            doc=frappe._dict(
+                subject=_("Asset {0} is In Transit to {1}").format(asset_name, target),
+                email_content=_(
+                    "Asset <b>{0}</b> is being transferred to <b>{1}</b>.<br>"
+                    "Driver: {2} | Vehicle: {3}<br>"
+                    "Movement: {4}"
+                ).format(asset_name, target, driver, vehicle, doc.name),
+                document_type="Asset Movement",
+                document_name=doc.name,
+                from_user=frappe.session.user,
+                type="Alert",
+            ),
+        )
     except Exception:
         pass
 
