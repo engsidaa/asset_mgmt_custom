@@ -1,0 +1,114 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Performance Rating",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "Expression",
+  "autoname": "format:APR-{asset}-{rating_date}",
+  "is_submittable": 0,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "Branch",
+      "options": "Branch",
+      "fetch_from": "asset.custom_branch",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "overall_rating",
+      "fieldtype": "Select",
+      "label": "Overall Rating",
+      "options": "\nExcellent\nGood\nFair\nPoor\nCritical",
+      "reqd": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "sec_break_rating",
+      "fieldtype": "Section Break",
+      "label": "Rating Details"
+    },
+    {
+      "fieldname": "rating_date",
+      "fieldtype": "Date",
+      "label": "Rating Date",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "rated_by",
+      "fieldtype": "Data",
+      "label": "Rated By",
+      "reqd": 1
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "performance_score",
+      "fieldtype": "Float",
+      "label": "Performance Score (1-10)",
+      "reqd": 1,
+      "description": "Score from 1 to 10"
+    },
+    {
+      "fieldname": "reliability_score",
+      "fieldtype": "Float",
+      "label": "Reliability Score (1-10)"
+    },
+    {
+      "fieldname": "efficiency_score",
+      "fieldtype": "Float",
+      "label": "Efficiency Score (1-10)"
+    },
+    {
+      "fieldname": "sec_break_notes",
+      "fieldtype": "Section Break",
+      "label": "Notes & Actions"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Text Editor",
+      "label": "Notes"
+    },
+    {
+      "fieldname": "col_break_3",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "recommended_action",
+      "fieldtype": "Select",
+      "label": "Recommended Action",
+      "options": "\nNo Action Needed\nSchedule Maintenance\nIncrease Monitoring\nPlan Replacement\nImmediate Action Required"
+    }
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1},
+    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
+  ]
+}

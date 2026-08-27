@@ -1,0 +1,122 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Write-off Request",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "By \"Naming Series\" field",
+  "autoname": "naming_series:",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Naming Series",
+      "options": "WO-.YYYY.-",
+      "default": "WO-.YYYY.-"
+    },
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Draft\nPending Approval\nApproved\nRejected",
+      "default": "Draft",
+      "read_only": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "write_off_date",
+      "fieldtype": "Date",
+      "label": "Write-off Date",
+      "reqd": 1
+    },
+    {
+      "fieldname": "sec_break_reason",
+      "fieldtype": "Section Break",
+      "label": "Write-off Details"
+    },
+    {
+      "fieldname": "reason",
+      "fieldtype": "Select",
+      "label": "Reason",
+      "options": "\nLost\nDestroyed\nStolen\nBeyond Economical Repair\nObsolete\nOther",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "police_report_no",
+      "fieldtype": "Data",
+      "label": "Police Report Number",
+      "depends_on": "eval:in_list(['Lost','Stolen'], doc.reason)"
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "estimated_loss_value",
+      "fieldtype": "Currency",
+      "label": "Estimated Loss Value"
+    },
+    {
+      "fieldname": "description",
+      "fieldtype": "Text Editor",
+      "label": "Description",
+      "reqd": 1
+    },
+    {
+      "fieldname": "sec_break_approval",
+      "fieldtype": "Section Break",
+      "label": "Approval"
+    },
+    {
+      "fieldname": "approved_by",
+      "fieldtype": "Data",
+      "label": "Approved By",
+      "read_only": 1
+    },
+    {
+      "fieldname": "approval_date",
+      "fieldtype": "Date",
+      "label": "Approval Date",
+      "read_only": 1
+    },
+    {
+      "fieldname": "col_break_3",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "rejection_reason",
+      "fieldtype": "Text",
+      "label": "Rejection Reason",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
+  ]
+}

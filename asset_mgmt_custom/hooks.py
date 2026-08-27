@@ -112,6 +112,10 @@ scheduler_events = {
         "asset_mgmt_custom.tasks.check_amc_expiry",
         "asset_mgmt_custom.tasks.check_compliance_expiry",
         "asset_mgmt_custom.tasks.check_lease_expiry",
+        "asset_mgmt_custom.tasks.check_overdue_checkouts",
+        "asset_mgmt_custom.tasks.check_open_critical_incidents",
+        "asset_mgmt_custom.tasks.check_missed_cleaning",
+        "asset_mgmt_custom.tasks.check_spare_parts_low",
     ],
     "weekly": [
         "asset_mgmt_custom.tasks.send_warranty_digest_email",

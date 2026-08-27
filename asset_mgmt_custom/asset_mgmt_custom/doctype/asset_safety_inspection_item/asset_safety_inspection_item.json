@@ -1,0 +1,31 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Safety Inspection Item",
+  "module": "Asset Mgmt Custom",
+  "istable": 1,
+  "fields": [
+    {
+      "fieldname": "check_item",
+      "fieldtype": "Data",
+      "label": "Check Item",
+      "reqd": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "result",
+      "fieldtype": "Select",
+      "label": "Result",
+      "options": "\nPass\nFail\nN/A",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "remarks",
+      "fieldtype": "Data",
+      "label": "Remarks",
+      "in_list_view": 1
+    }
+  ],
+  "permissions": []
+}

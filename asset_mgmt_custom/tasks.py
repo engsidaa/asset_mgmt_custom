@@ -462,3 +462,118 @@ def check_lease_expiry():
           AND status = 'Active'
           AND end_date < %(today)s
     """, {"today": today()})
+
+
+# ---------------------------------------------------------------------------
+# Daily: overdue asset checkouts
+# ---------------------------------------------------------------------------
+
+def check_overdue_checkouts():
+    """
+    Daily: notify when an Asset Checkout is overdue (expected_return < now and status = Checked Out).
+    """
+    overdue = frappe.db.sql("""
+        SELECT name, asset, asset_name, checked_out_by, expected_return
+        FROM `tabAsset Checkout`
+        WHERE docstatus = 1
+          AND status = 'Checked Out'
+          AND expected_return < %(now)s
+    """, {"now": now_datetime()}, as_dict=True)
+
+    if not overdue:
+        return
+
+    manager_users = _get_manager_users()
+    for co in overdue:
+        frappe.db.set_value("Asset Checkout", co.name, "status", "Overdue")
+        subject = _("Asset Checkout Overdue: {0}").format(co.asset_name or co.asset)
+        content = _("Asset <b>{0}</b> checked out by <b>{1}</b> was due by <b>{2}</b> "
+                    "and has not been returned.").format(
+            co.asset_name or co.asset, co.checked_out_by, co.expected_return)
+        _create_notification(subject, content, "Asset Checkout", co.name, manager_users)
+
+
+# ---------------------------------------------------------------------------
+# Daily: open critical/high incidents
+# ---------------------------------------------------------------------------
+
+def check_open_critical_incidents():
+    """
+    Daily: notify about open Critical or High severity incidents older than 24 hours.
+    """
+    incidents = frappe.db.sql("""
+        SELECT name, asset, severity, incident_date
+        FROM `tabAsset Incident Report`
+        WHERE docstatus = 1
+          AND status IN ('Open', 'Under Investigation')
+          AND severity IN ('Critical', 'High')
+          AND incident_date < %(cutoff)s
+    """, {"cutoff": add_days(today(), -1)}, as_dict=True)
+
+    if not incidents:
+        return
+
+    manager_users = _get_manager_users()
+    for inc in incidents:
+        subject = _("Open {0} Incident: {1}").format(inc.severity, inc.name)
+        content = _("Incident <b>{0}</b> (Severity: {1}) for asset <b>{2}</b> "
+                    "is still open since <b>{3}</b>.").format(
+            inc.name, inc.severity, inc.asset, inc.incident_date)
+        _create_notification(subject, content, "Asset Incident Report", inc.name, manager_users)
+
+
+# ---------------------------------------------------------------------------
+# Daily: missed cleaning schedules
+# ---------------------------------------------------------------------------
+
+def check_missed_cleaning():
+    """
+    Daily: mark past Scheduled cleaning tasks as Missed and notify.
+    """
+    missed = frappe.db.sql("""
+        SELECT name, asset, asset_name, cleaning_type, scheduled_date, assigned_to
+        FROM `tabAsset Cleaning Schedule`
+        WHERE status = 'Scheduled'
+          AND scheduled_date < %(today)s
+    """, {"today": today()}, as_dict=True)
+
+    if not missed:
+        return
+
+    manager_users = _get_manager_users()
+    for cs in missed:
+        frappe.db.set_value("Asset Cleaning Schedule", cs.name, "status", "Missed")
+        subject = _("Missed Cleaning: {0} - {1}").format(
+            cs.asset_name or cs.asset, cs.cleaning_type)
+        content = _("Cleaning schedule <b>{0}</b> for asset <b>{1}</b> "
+                    "(Type: {2}, Assigned to: {3}) was not completed on <b>{4}</b>.").format(
+            cs.name, cs.asset_name or cs.asset, cs.cleaning_type,
+            cs.assigned_to, cs.scheduled_date)
+        _create_notification(subject, content, "Asset Cleaning Schedule", cs.name, manager_users)
+
+
+# ---------------------------------------------------------------------------
+# Daily: spare parts below minimum quantity
+# ---------------------------------------------------------------------------
+
+def check_spare_parts_low():
+    """
+    Daily: notify when Asset Spare Part quantity is below minimum_qty.
+    """
+    low_parts = frappe.db.sql("""
+        SELECT name, item_name, quantity, minimum_qty, location
+        FROM `tabAsset Spare Part`
+        WHERE minimum_qty > 0 AND quantity < minimum_qty
+    """, as_dict=True)
+
+    if not low_parts:
+        return
+
+    manager_users = _get_manager_users()
+    for part in low_parts:
+        subject = _("Low Spare Part Stock: {0}").format(part.item_name)
+        content = _("Spare part <b>{0}</b> has only <b>{1}</b> units "
+                    "(minimum required: {2}). Location: {3}.").format(
+            part.item_name, part.quantity, part.minimum_qty,
+            part.location or "N/A")
+        _create_notification(subject, content, "Asset Spare Part", part.name, manager_users)

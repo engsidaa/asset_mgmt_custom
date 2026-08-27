@@ -1,0 +1,112 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Cleaning Schedule",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "Expression",
+  "autoname": "format:CLEAN-{asset}-{scheduled_date}",
+  "is_submittable": 0,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "Branch",
+      "options": "Branch",
+      "fetch_from": "asset.custom_branch",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "cleaning_type",
+      "fieldtype": "Select",
+      "label": "Cleaning Type",
+      "options": "\nDaily Clean\nDeep Clean\nSanitization\nDescaling\nFilter Clean\nOther",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "sec_break_schedule",
+      "fieldtype": "Section Break",
+      "label": "Schedule"
+    },
+    {
+      "fieldname": "scheduled_date",
+      "fieldtype": "Date",
+      "label": "Scheduled Date",
+      "reqd": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "assigned_to",
+      "fieldtype": "Data",
+      "label": "Assigned To",
+      "reqd": 1
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Scheduled\nCompleted\nMissed\nSkipped",
+      "default": "Scheduled",
+      "reqd": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "completed_date",
+      "fieldtype": "Date",
+      "label": "Completed Date",
+      "depends_on": "eval:doc.status === 'Completed'"
+    },
+    {
+      "fieldname": "sec_break_notes",
+      "fieldtype": "Section Break",
+      "label": "Notes"
+    },
+    {
+      "fieldname": "cleaning_notes",
+      "fieldtype": "Text",
+      "label": "Cleaning Notes"
+    },
+    {
+      "fieldname": "col_break_3",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "verified_by",
+      "fieldtype": "Data",
+      "label": "Verified By"
+    }
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1},
+    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
+  ]
+}

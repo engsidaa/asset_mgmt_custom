@@ -3,15 +3,14 @@
   "disabled": 0,
   "doctype": "Report",
   "is_standard": "Yes",
-  "json": "{}",
   "module": "Asset Mgmt Custom",
   "name": "Depreciation Forecast",
   "ref_doctype": "Asset",
   "report_name": "Depreciation Forecast",
   "report_type": "Script Report",
-  "roles": [
-    {"role": "Assets Manager"},
-    {"role": "System Manager"},
-    {"role": "Accounts Manager"}
+  "filters": [
+    {"fieldname": "company", "label": "Company", "fieldtype": "Link", "options": "Company", "reqd": 0},
+    {"fieldname": "asset_category", "label": "Asset Category", "fieldtype": "Link", "options": "Asset Category", "reqd": 0},
+    {"fieldname": "forecast_years", "label": "Forecast Years", "fieldtype": "Select", "options": "1\n2\n3\n5", "default": "3", "reqd": 0}
   ]
 }

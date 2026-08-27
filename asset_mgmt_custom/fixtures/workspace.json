@@ -120,6 +120,36 @@
         "label": "Replacement Planning",
         "link_to": "Asset Replacement Planning",
         "type": "Report"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Safety Inspection",
+        "link_to": "Asset Safety Inspection",
+        "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Incident Report",
+        "link_to": "Asset Incident Report",
+        "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Transfer Request",
+        "link_to": "Asset Transfer Request",
+        "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Checkout",
+        "link_to": "Asset Checkout",
+        "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Spare Part",
+        "link_to": "Asset Spare Part",
+        "link_type": "DocType"
       }
     ],
     "links": [
@@ -172,6 +202,12 @@
         "is_query_report": 0,
         "hidden": 0,
         "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "Asset Spare Part",
+        "link_to": "Asset Spare Part",
+        "link_type": "DocType"
       },
       {
         "type": "Card Break",
@@ -236,6 +272,12 @@
         "is_query_report": 1,
         "hidden": 0,
         "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "Asset Transfer Request",
+        "link_to": "Asset Transfer Request",
+        "link_type": "DocType"
       },
       {
         "type": "Link",
@@ -320,6 +362,24 @@
         "link_to": "Asset CapEx Budget"
       },
       {
+        "type": "Link",
+        "label": "Asset Warranty Claim",
+        "link_to": "Asset Warranty Claim",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Write-off Request",
+        "link_to": "Asset Write-off Request",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Energy Log",
+        "link_to": "Asset Energy Log",
+        "link_type": "DocType"
+      },
+      {
         "type": "Card Break",
         "label": "Asset Lifecycle",
         "hidden": 0
@@ -378,6 +438,42 @@
         "type": "Link",
         "label": "Asset Lease",
         "link_to": "Asset Lease"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Safety Inspection",
+        "link_to": "Asset Safety Inspection",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Incident Report",
+        "link_to": "Asset Incident Report",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Checkout",
+        "link_to": "Asset Checkout",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Cleaning Schedule",
+        "link_to": "Asset Cleaning Schedule",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Performance Rating",
+        "link_to": "Asset Performance Rating",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Insurance Renewal",
+        "link_to": "Asset Insurance Renewal",
+        "link_type": "DocType"
       },
       {
         "type": "Card Break",

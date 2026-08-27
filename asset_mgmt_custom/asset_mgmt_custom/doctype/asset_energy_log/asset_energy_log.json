@@ -1,0 +1,105 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Energy Log",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "Expression",
+  "autoname": "format:ENERGY-{asset}-{log_month}",
+  "is_submittable": 0,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "Branch",
+      "options": "Branch",
+      "fetch_from": "asset.custom_branch",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "log_month",
+      "fieldtype": "Data",
+      "label": "Log Month (YYYY-MM)",
+      "reqd": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "meter_number",
+      "fieldtype": "Data",
+      "label": "Meter Number"
+    },
+    {
+      "fieldname": "sec_break_readings",
+      "fieldtype": "Section Break",
+      "label": "Meter Readings"
+    },
+    {
+      "fieldname": "reading_start",
+      "fieldtype": "Float",
+      "label": "Opening Reading (kWh)"
+    },
+    {
+      "fieldname": "reading_end",
+      "fieldtype": "Float",
+      "label": "Closing Reading (kWh)"
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "units_consumed",
+      "fieldtype": "Float",
+      "label": "Units Consumed (kWh)",
+      "read_only": 1
+    },
+    {
+      "fieldname": "unit_rate",
+      "fieldtype": "Currency",
+      "label": "Rate per kWh"
+    },
+    {
+      "fieldname": "total_cost",
+      "fieldtype": "Currency",
+      "label": "Total Cost",
+      "read_only": 1
+    },
+    {
+      "fieldname": "sec_break_notes",
+      "fieldtype": "Section Break",
+      "label": "Notes"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Text",
+      "label": "Notes"
+    }
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1},
+    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
+  ]
+}

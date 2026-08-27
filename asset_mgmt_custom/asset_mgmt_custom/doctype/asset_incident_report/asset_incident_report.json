@@ -1,0 +1,158 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Incident Report",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "By \"Naming Series\" field",
+  "autoname": "naming_series:",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Naming Series",
+      "options": "INCIDENT-.YYYY.-",
+      "default": "INCIDENT-.YYYY.-"
+    },
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "Branch",
+      "options": "Branch",
+      "fetch_from": "asset.custom_branch",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Open\nUnder Investigation\nResolved\nClosed",
+      "default": "Open",
+      "read_only": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "severity",
+      "fieldtype": "Select",
+      "label": "Severity",
+      "options": "\nLow\nMedium\nHigh\nCritical",
+      "reqd": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "sec_break_incident",
+      "fieldtype": "Section Break",
+      "label": "Incident Details"
+    },
+    {
+      "fieldname": "incident_date",
+      "fieldtype": "Datetime",
+      "label": "Incident Date & Time",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "incident_type",
+      "fieldtype": "Select",
+      "label": "Incident Type",
+      "options": "\nAccident\nDamage\nTheft\nFire\nEquipment Failure\nNear Miss\nOther",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "reported_by",
+      "fieldtype": "Data",
+      "label": "Reported By",
+      "reqd": 1
+    },
+    {
+      "fieldname": "injury_involved",
+      "fieldtype": "Check",
+      "label": "Injury Involved"
+    },
+    {
+      "fieldname": "estimated_damage_cost",
+      "fieldtype": "Currency",
+      "label": "Estimated Damage Cost"
+    },
+    {
+      "fieldname": "sec_break_desc",
+      "fieldtype": "Section Break",
+      "label": "Description"
+    },
+    {
+      "fieldname": "incident_description",
+      "fieldtype": "Text Editor",
+      "label": "Incident Description",
+      "reqd": 1
+    },
+    {
+      "fieldname": "sec_break_photos",
+      "fieldtype": "Section Break",
+      "label": "Photos"
+    },
+    {
+      "fieldname": "photo_1",
+      "fieldtype": "Attach Image",
+      "label": "Photo 1"
+    },
+    {
+      "fieldname": "col_break_photos",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "photo_2",
+      "fieldtype": "Attach Image",
+      "label": "Photo 2"
+    },
+    {
+      "fieldname": "sec_break_resolution",
+      "fieldtype": "Section Break",
+      "label": "Resolution"
+    },
+    {
+      "fieldname": "action_taken",
+      "fieldtype": "Text Editor",
+      "label": "Action Taken"
+    },
+    {
+      "fieldname": "col_break_res",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "resolved_date",
+      "fieldtype": "Date",
+      "label": "Resolved Date"
+    },
+    {
+      "fieldname": "resolved_by",
+      "fieldtype": "Data",
+      "label": "Resolved By"
+    }
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
+  ]
+}
