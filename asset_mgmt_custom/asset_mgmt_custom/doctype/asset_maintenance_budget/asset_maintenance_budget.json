@@ -1,0 +1,85 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Maintenance Budget",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "Expression",
+  "autoname": "format:AMB-{fiscal_year}-{branch}",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "fiscal_year",
+      "fieldtype": "Link",
+      "options": "Fiscal Year",
+      "label": "Fiscal Year",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "options": "Branch",
+      "label": "Branch",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1
+    },
+    {
+      "fieldname": "col1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "label": "Company",
+      "reqd": 1,
+      "default": "{frappe.defaults.get_user_default('Company')}"
+    },
+    {
+      "fieldname": "budget_section",
+      "fieldtype": "Section Break",
+      "label": "Budget Allocation"
+    },
+    {
+      "fieldname": "total_budget",
+      "fieldtype": "Currency",
+      "label": "Total Maintenance Budget",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "preventive_budget",
+      "fieldtype": "Currency",
+      "label": "Preventive Maintenance Budget"
+    },
+    {
+      "fieldname": "col2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "corrective_budget",
+      "fieldtype": "Currency",
+      "label": "Corrective / Repair Budget"
+    },
+    {
+      "fieldname": "amc_budget",
+      "fieldtype": "Currency",
+      "label": "AMC Contracts Budget"
+    },
+    {
+      "fieldname": "notes_section",
+      "fieldtype": "Section Break",
+      "label": "Notes"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Small Text",
+      "label": "Notes"
+    }
+  ],
+  "permissions": [
+    {"role": "Assets Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "print": 1},
+    {"role": "Asset User", "read": 1}
+  ]
+}

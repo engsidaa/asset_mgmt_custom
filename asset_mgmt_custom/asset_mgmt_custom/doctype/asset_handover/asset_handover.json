@@ -1,0 +1,131 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Handover",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "Expression",
+  "autoname": "format:AHO-.YYYY.-.#####",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "options": "Branch",
+      "label": "Branch",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1
+    },
+    {
+      "fieldname": "handover_date",
+      "fieldtype": "Date",
+      "label": "Handover Date",
+      "reqd": 1,
+      "default": "Today",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Draft\nPending Signatures\nCompleted",
+      "default": "Draft",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "managers_section",
+      "fieldtype": "Section Break",
+      "label": "Outgoing & Incoming Manager"
+    },
+    {
+      "fieldname": "outgoing_manager",
+      "fieldtype": "Data",
+      "label": "Outgoing Manager",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "outgoing_manager_title",
+      "fieldtype": "Data",
+      "label": "Title / Role (Outgoing)"
+    },
+    {
+      "fieldname": "col2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "incoming_manager",
+      "fieldtype": "Data",
+      "label": "Incoming Manager",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "incoming_manager_title",
+      "fieldtype": "Data",
+      "label": "Title / Role (Incoming)"
+    },
+    {
+      "fieldname": "assets_section",
+      "fieldtype": "Section Break",
+      "label": "Assets"
+    },
+    {
+      "fieldname": "items",
+      "fieldtype": "Table",
+      "label": "Assets",
+      "options": "Asset Handover Item",
+      "reqd": 1
+    },
+    {
+      "fieldname": "summary_section",
+      "fieldtype": "Section Break",
+      "label": "Summary"
+    },
+    {
+      "fieldname": "total_assets",
+      "fieldtype": "Int",
+      "label": "Total Assets",
+      "read_only": 1
+    },
+    {
+      "fieldname": "col3",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "good_count",
+      "fieldtype": "Int",
+      "label": "Good Condition",
+      "read_only": 1
+    },
+    {
+      "fieldname": "col4",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "damaged_count",
+      "fieldtype": "Int",
+      "label": "Damaged / Issues",
+      "read_only": 1
+    },
+    {
+      "fieldname": "notes_section",
+      "fieldtype": "Section Break",
+      "label": "Notes & Remarks"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Text Editor",
+      "label": "Notes"
+    }
+  ],
+  "permissions": [
+    {"role": "Assets Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1, "print": 1},
+    {"role": "Asset User", "read": 1, "print": 1}
+  ]
+}

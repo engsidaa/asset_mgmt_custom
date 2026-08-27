@@ -17,6 +17,7 @@ frappe.ui.form.on("Asset", {
 		_show_sticker_alert(frm);
 		_render_maintenance_summary(frm);
 		_add_set_operational_button(frm);
+		_add_print_tag_button(frm);
 	},
 
 	// -----------------------------------------------------------------------
@@ -157,4 +158,11 @@ function _add_set_operational_button(frm) {
 			}
 		);
 	}, __("Actions")).addClass("btn-primary");
+}
+
+function _add_print_tag_button(frm) {
+	if (frm.doc.__islocal) return;
+	frm.add_custom_button(__("Print Asset Tag"), function () {
+		frappe.utils.print(frm.doctype, frm.docname, "Asset Tag");
+	}, __("Print"));
 }
