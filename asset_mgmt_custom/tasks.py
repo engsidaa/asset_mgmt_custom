@@ -340,3 +340,37 @@ def check_overdue_loans():
             loan.expected_return_date, days)
         _create_notification(subject, content, "Asset Loan", loan.name, manager_users)
         frappe.db.set_value("Asset Loan", loan.name, "status", "Overdue", update_modified=False)
+
+
+# ---------------------------------------------------------------------------
+# Daily: AMC expiry alerts
+# ---------------------------------------------------------------------------
+
+def check_amc_expiry():
+    """
+    Daily: alert when an Asset Maintenance Contract expires in 30, 14, or 7 days,
+    and auto-mark contracts as Expired when past their end date.
+    """
+    for days_ahead in [30, 14, 7]:
+        target = add_days(today(), days_ahead)
+        contracts = frappe.db.sql("""
+            SELECT name, supplier, coverage_type, end_date
+            FROM `tabAsset Maintenance Contract`
+            WHERE status = 'Active'
+              AND end_date = %(target)s
+        """, {"target": target}, as_dict=True)
+
+        manager_users = _get_manager_users()
+        for c in contracts:
+            subject = _("AMC Expiring in {0} days: {1}").format(days_ahead, c.name)
+            content = _("Maintenance Contract <b>{0}</b> with supplier <b>{1}</b> "
+                        "({2}) expires on <b>{3}</b>. Please arrange renewal.").format(
+                c.name, c.supplier, c.coverage_type or "", c.end_date)
+            _create_notification(subject, content, "Asset Maintenance Contract", c.name, manager_users)
+
+    # Auto-expire past contracts
+    frappe.db.sql("""
+        UPDATE `tabAsset Maintenance Contract`
+        SET status = 'Expired', modified = NOW()
+        WHERE status = 'Active' AND end_date < %(today)s
+    """, {"today": today()})

@@ -554,6 +554,59 @@
   },
   {
     "doctype": "Custom Field",
+    "name": "Asset Repair-custom_downtime_section",
+    "dt": "Asset Repair",
+    "fieldname": "custom_downtime_section",
+    "fieldtype": "Section Break",
+    "label": "Downtime Tracking",
+    "insert_after": "failure_date",
+    "collapsible": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Repair-custom_downtime_start",
+    "dt": "Asset Repair",
+    "fieldname": "custom_downtime_start",
+    "fieldtype": "Datetime",
+    "label": "Downtime Start",
+    "insert_after": "custom_downtime_section",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Repair-custom_downtime_end",
+    "dt": "Asset Repair",
+    "fieldname": "custom_downtime_end",
+    "fieldtype": "Datetime",
+    "label": "Downtime End",
+    "insert_after": "custom_downtime_start",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Repair-custom_downtime_hours",
+    "dt": "Asset Repair",
+    "fieldname": "custom_downtime_hours",
+    "fieldtype": "Float",
+    "label": "Downtime Hours",
+    "insert_after": "custom_downtime_end",
+    "read_only": 1,
+    "precision": "2",
+    "description": "Auto-calculated from Downtime Start and End"
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_total_downtime_hours",
+    "dt": "Asset",
+    "fieldname": "custom_total_downtime_hours",
+    "fieldtype": "Float",
+    "label": "Total Downtime Hours",
+    "insert_after": "custom_total_maintenance_cost",
+    "read_only": 1,
+    "precision": "2"
+  },
+  {
+    "doctype": "Custom Field",
     "name": "Asset-custom_branch",
     "dt": "Asset",
     "fieldname": "custom_branch",

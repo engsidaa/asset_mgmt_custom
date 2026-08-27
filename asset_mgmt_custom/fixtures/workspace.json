@@ -20,6 +20,8 @@
       {"label": "Asset Movement", "link_to": "Asset Movement", "type": "DocType"},
       {"label": "Asset Loan", "link_to": "Asset Loan", "type": "DocType"},
       {"label": "Asset Disposal Request", "link_to": "Asset Disposal Request", "type": "DocType"},
+      {"label": "Asset Physical Audit", "link_to": "Asset Physical Audit", "type": "DocType"},
+      {"label": "Asset Maintenance Contract", "link_to": "Asset Maintenance Contract", "type": "DocType"},
       {"label": "Warranty Expiry Alerts", "link_to": "Warranty Expiry Alerts", "type": "Report", "report_ref_doctype": "Asset"},
       {"label": "Upcoming Maintenance", "link_to": "Upcoming Maintenance", "type": "Report", "report_ref_doctype": "Asset Maintenance"},
       {"label": "Asset Condition Assessment", "link_to": "Asset Condition Assessment", "type": "DocType"}
@@ -65,6 +67,8 @@
         "hidden": 0
       },
       {"type": "Link", "label": "Asset Register", "link_to": "Asset Register", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 1},
+      {"type": "Link", "label": "Asset Downtime Analysis", "link_to": "Asset Downtime Analysis", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 0},
+      {"type": "Link", "label": "Branch Asset Handover", "link_to": "Branch Asset Handover", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 0},
       {"type": "Link", "label": "CapEx Capitalization", "link_to": "CapEx Capitalization", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 1},
       {"type": "Link", "label": "Asset Lifecycle Cost", "link_to": "Asset Lifecycle Cost", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 0},
       {"type": "Link", "label": "Department Asset Summary", "link_to": "Department Asset Summary", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 0},

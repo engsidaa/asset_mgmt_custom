@@ -126,3 +126,29 @@ Useful Life (Months),العمر الإنتاجي (شهر)
 Booked Dep. Entries,قيود الإهلاك المرحّلة
 Include Scrapped / Sold,تضمين المخردة والمباعة
 Available-for-use Date,تاريخ بدء الاستخدام
+Asset Maintenance Contract,عقد صيانة الأصول
+Asset Physical Audit,جرد الأصول الفيزيائي
+Asset Downtime Analysis,تحليل توقف الأصول
+Branch Asset Handover,تسليم أصول الفرع
+Downtime Tracking,تتبع وقت التوقف
+Downtime Start,بداية التوقف
+Downtime End,نهاية التوقف
+Downtime Hours,ساعات التوقف
+Total Downtime Hours,إجمالي ساعات التوقف
+Annual Contract Value,قيمة العقد السنوي
+Coverage Type,نوع التغطية
+Comprehensive,شامل
+Parts Only,قطع غيار فقط
+Labor Only,عمالة فقط
+Preventive Only,وقائي فقط
+Covered Assets,الأصول المشمولة
+Audit Status,حالة الجرد
+In Progress,جارٍ
+Found,موجود
+Missing,مفقود
+Damaged,تالف
+Fetch Assets from Branch,جلب أصول الفرع
+Verification Progress,تقدم التحقق
+Outgoing Manager,المدير المغادر
+Incoming Manager,المدير الجديد
+As of Date,حتى تاريخ

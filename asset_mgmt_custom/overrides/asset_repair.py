@@ -17,7 +17,7 @@ On Cancel:
 
 import frappe
 from frappe import _
-from frappe.utils import flt, getdate, now_datetime
+from frappe.utils import flt, getdate, now_datetime, time_diff_in_hours
 
 
 # ---------------------------------------------------------------------------
@@ -28,6 +28,15 @@ def validate(doc, method=None):
     if doc.repair_status == "Completed":
         _validate_completion_requirements(doc)
     _auto_classify_capex(doc)
+    _calculate_downtime(doc)
+
+
+def _calculate_downtime(doc):
+    if doc.get("custom_downtime_start") and doc.get("custom_downtime_end"):
+        hours = time_diff_in_hours(doc.custom_downtime_end, doc.custom_downtime_start)
+        doc.custom_downtime_hours = round(max(hours, 0), 2)
+    else:
+        doc.custom_downtime_hours = 0
 
 
 def _validate_completion_requirements(doc):
@@ -89,7 +98,8 @@ def _update_asset_maintenance_summary(asset_name):
         """
         SELECT
             SUM(total_repair_cost + IFNULL(custom_labor_cost, 0)) AS total_cost,
-            MAX(CASE WHEN repair_status = 'Completed' THEN DATE(completion_date) END) AS last_date
+            MAX(CASE WHEN repair_status = 'Completed' THEN DATE(completion_date) END) AS last_date,
+            SUM(IFNULL(custom_downtime_hours, 0)) AS total_downtime
         FROM `tabAsset Repair`
         WHERE asset = %s AND docstatus = 1
         """,
@@ -99,6 +109,7 @@ def _update_asset_maintenance_summary(asset_name):
 
     total_cost = flt(totals[0].total_cost) if totals else 0.0
     last_date = totals[0].last_date if totals else None
+    total_downtime = flt(totals[0].total_downtime) if totals else 0.0
 
     frappe.db.set_value(
         "Asset",
@@ -106,6 +117,7 @@ def _update_asset_maintenance_summary(asset_name):
         {
             "custom_total_maintenance_cost": total_cost,
             "custom_last_maintenance_date": last_date,
+            "custom_total_downtime_hours": total_downtime,
         },
         update_modified=False,
     )

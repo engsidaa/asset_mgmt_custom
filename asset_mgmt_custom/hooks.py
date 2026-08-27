@@ -11,7 +11,7 @@ app_license = "MIT"
 fixtures = [
     {
         "dt": "Custom Field",
-        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category"]]],
+        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Maintenance Contract"]]],
     },
     {
         "dt": "Workflow",
@@ -89,6 +89,8 @@ doctype_js = {
     "Asset Requisition": "public/js/asset_requisition.js",
     "Asset Loan": "asset_mgmt_custom/doctype/asset_loan/asset_loan.js",
     "Asset Disposal Request": "asset_mgmt_custom/doctype/asset_disposal_request/asset_disposal_request.js",
+    "Asset Maintenance Contract": "asset_mgmt_custom/doctype/asset_maintenance_contract/asset_maintenance_contract.js",
+    "Asset Physical Audit": "asset_mgmt_custom/doctype/asset_physical_audit/asset_physical_audit.js",
 }
 
 # ---------------------------------------------------------------------------
@@ -102,6 +104,7 @@ scheduler_events = {
         "asset_mgmt_custom.tasks.check_requisition_sla",
         "asset_mgmt_custom.tasks.check_insurance_expiry",
         "asset_mgmt_custom.tasks.check_overdue_loans",
+        "asset_mgmt_custom.tasks.check_amc_expiry",
     ],
     "weekly": [
         "asset_mgmt_custom.tasks.send_warranty_digest_email",
