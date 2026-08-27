@@ -2,7 +2,7 @@
   "add_total_row": 1,
   "disabled": 0,
   "doctype": "Report",
-  "is_standard": "No",
+  "is_standard": "Yes",
   "json": "{}",
   "module": "Asset Mgmt Custom",
   "name": "CapEx Capitalization",
