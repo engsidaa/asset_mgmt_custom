@@ -8,7 +8,7 @@
     "public": 1,
     "is_hidden": 0,
     "icon": "assets",
-    "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>KPIs — مؤشرات الأداء</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Shortcuts — اختصارات</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Category\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Repair\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Maintenance\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Requisition\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Movement\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Loan\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Disposal Request\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Maintenance Contract\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Physical Audit\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Condition Assessment\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Value Adjustment\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Masters &amp; Transactions</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Masters\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Requests\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Movements\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Transactions\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Lifecycle\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Reports — تقارير</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Operational Reports\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Financial Reports\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Maintenance Reports\", \"col\": 4}}]",
+    "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>KPIs — مؤشرات الأداء</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Shortcuts — اختصارات</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Category\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Repair\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Maintenance\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Requisition\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Movement\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Loan\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Capitalization\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Maintenance Contract\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Physical Audit\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Condition Assessment\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Disposal Request\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Masters &amp; Transactions</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Masters\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Requests\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Movements\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Transactions\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Lifecycle\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Reports — تقارير</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Operational Reports\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Financial Reports\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Maintenance Reports\", \"col\": 4}}]",
     "number_cards": [
       {
         "number_card_name": "Pending Asset Requests"
@@ -45,8 +45,8 @@
         "type": "DocType"
       },
       {
-        "label": "Asset Value Adjustment",
-        "link_to": "Asset Value Adjustment",
+        "label": "Asset Capitalization",
+        "link_to": "Asset Capitalization",
         "type": "DocType"
       },
       {
@@ -132,8 +132,17 @@
       },
       {
         "type": "Link",
-        "label": "Asset Finance Book",
-        "link_to": "Asset Finance Book",
+        "label": "Finance Book",
+        "link_to": "Finance Book",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "Asset Maintenance Team",
+        "link_to": "Asset Maintenance Team",
         "link_type": "DocType",
         "is_query_report": 0,
         "hidden": 0,
@@ -228,8 +237,26 @@
       },
       {
         "type": "Link",
+        "label": "Asset Capitalization",
+        "link_to": "Asset Capitalization",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Link",
         "label": "Asset Value Adjustment",
         "link_to": "Asset Value Adjustment",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "Asset Shift Allocation",
+        "link_to": "Asset Shift Allocation",
         "link_type": "DocType",
         "is_query_report": 0,
         "hidden": 0,
