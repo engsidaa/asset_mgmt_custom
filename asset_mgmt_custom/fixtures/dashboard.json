@@ -7,10 +7,15 @@
     "is_standard": 0,
     "is_default": 0,
     "cards": [
+      {"card": "Total Active Assets"},
       {"card": "Pending Asset Requests"},
       {"card": "Assets In Transit"},
-      {"card": "Under Warranty Assets"},
-      {"card": "Assets Under Repair"}
+      {"card": "Assets Under Repair"},
+      {"card": "Overdue Checkouts"},
+      {"card": "Open Incidents"},
+      {"card": "Expired Compliance Certs"},
+      {"card": "Low Stock Spare Parts"},
+      {"card": "Under Warranty Assets"}
     ],
     "charts": [
       {"chart": "Asset Value Analytics", "width": "Full"}

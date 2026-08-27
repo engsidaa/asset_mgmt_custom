@@ -1,0 +1,15 @@
+{
+  "doctype": "Report",
+  "name": "Asset Safety Score Report",
+  "report_name": "Asset Safety Score Report",
+  "ref_doctype": "Asset Safety Inspection",
+  "report_type": "Script Report",
+  "is_standard": "Yes",
+  "module": "Asset Mgmt Custom",
+  "filters": [
+    {"fieldname": "branch", "label": "Branch", "fieldtype": "Link", "options": "Branch", "reqd": 0},
+    {"fieldname": "overall_result", "label": "Result", "fieldtype": "Select", "options": "\nPass\nFail\nNeeds Action", "reqd": 0},
+    {"fieldname": "from_date", "label": "From Date", "fieldtype": "Date", "reqd": 0},
+    {"fieldname": "to_date", "label": "To Date", "fieldtype": "Date", "reqd": 0}
+  ]
+}

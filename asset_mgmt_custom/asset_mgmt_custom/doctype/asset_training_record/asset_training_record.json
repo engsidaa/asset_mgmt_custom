@@ -1,0 +1,33 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Training Record",
+  "module": "Asset Mgmt Custom",
+  "autoname": "format:TRAIN-{employee}-{training_date}",
+  "is_submittable": 0,
+  "track_changes": 1,
+  "fields": [
+    {"fieldname": "asset", "fieldtype": "Link", "label": "Asset", "options": "Asset", "reqd": 1, "in_list_view": 1, "search_index": 1, "bold": 1},
+    {"fieldname": "asset_name", "fieldtype": "Data", "label": "Asset Name", "fetch_from": "asset.asset_name", "read_only": 1},
+    {"fieldname": "asset_category", "fieldtype": "Link", "label": "Asset Category", "options": "Asset Category", "fetch_from": "asset.asset_category", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "col_break_1", "fieldtype": "Column Break"},
+    {"fieldname": "employee", "fieldtype": "Link", "label": "Employee", "options": "Employee", "reqd": 1, "in_list_view": 1, "search_index": 1, "bold": 1},
+    {"fieldname": "employee_name", "fieldtype": "Data", "label": "Employee Name", "fetch_from": "employee.employee_name", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "sec_break_training", "fieldtype": "Section Break", "label": "Training Details"},
+    {"fieldname": "training_date", "fieldtype": "Date", "label": "Training Date", "reqd": 1, "in_list_view": 1, "bold": 1},
+    {"fieldname": "training_type", "fieldtype": "Select", "label": "Training Type", "options": "\nInitial\nRefresher\nSafety\nAdvanced\nCertification", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "col_break_2", "fieldtype": "Column Break"},
+    {"fieldname": "trainer", "fieldtype": "Data", "label": "Trainer / Instructor"},
+    {"fieldname": "duration_hours", "fieldtype": "Float", "label": "Duration (Hours)"},
+    {"fieldname": "sec_break_result", "fieldtype": "Section Break", "label": "Result"},
+    {"fieldname": "result", "fieldtype": "Select", "label": "Result", "options": "\nPass\nFail\nPending", "in_list_view": 1, "bold": 1},
+    {"fieldname": "col_break_3", "fieldtype": "Column Break"},
+    {"fieldname": "certificate_attachment", "fieldtype": "Attach", "label": "Training Certificate"},
+    {"fieldname": "sec_break_notes", "fieldtype": "Section Break", "label": "Notes"},
+    {"fieldname": "notes", "fieldtype": "Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1},
+    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
+  ]
+}

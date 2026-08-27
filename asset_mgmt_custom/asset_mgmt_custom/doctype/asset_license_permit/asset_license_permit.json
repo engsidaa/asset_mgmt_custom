@@ -1,0 +1,161 @@
+{
+  "doctype": "DocType",
+  "name": "Asset License Permit",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "By \"Naming Series\" field",
+  "autoname": "naming_series:",
+  "is_submittable": 0,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Series",
+      "options": "PERMIT-.YYYY.-",
+      "default": "PERMIT-.YYYY.-"
+    },
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "options": "Asset",
+      "label": "Asset",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Active\nPending Renewal\nExpired\nCancelled",
+      "default": "Active",
+      "read_only": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "options": "Branch",
+      "label": "Branch",
+      "fetch_from": "asset.custom_branch"
+    },
+    {
+      "fieldname": "sec_break_permit",
+      "fieldtype": "Section Break",
+      "label": "Permit Details"
+    },
+    {
+      "fieldname": "permit_type",
+      "fieldtype": "Select",
+      "label": "Permit Type",
+      "options": "\nVehicle License\nOperating Permit\nMunicipal License\nHealth Certificate\nFire Safety Permit\nOther",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "license_number",
+      "fieldtype": "Data",
+      "label": "License / Permit Number",
+      "reqd": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "issuing_authority",
+      "fieldtype": "Data",
+      "label": "Issuing Authority",
+      "reqd": 1
+    },
+    {
+      "fieldname": "renewal_cost",
+      "fieldtype": "Currency",
+      "label": "Renewal Cost"
+    },
+    {
+      "fieldname": "sec_break_dates",
+      "fieldtype": "Section Break",
+      "label": "Validity"
+    },
+    {
+      "fieldname": "issue_date",
+      "fieldtype": "Date",
+      "label": "Issue Date",
+      "reqd": 1
+    },
+    {
+      "fieldname": "expiry_date",
+      "fieldtype": "Date",
+      "label": "Expiry Date",
+      "reqd": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "col_break_3",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "renewal_reminder_days",
+      "fieldtype": "Int",
+      "label": "Remind Before (days)",
+      "default": "30"
+    },
+    {
+      "fieldname": "sec_break_doc",
+      "fieldtype": "Section Break",
+      "label": "Documents"
+    },
+    {
+      "fieldname": "permit_document",
+      "fieldtype": "Attach",
+      "label": "Permit Document"
+    },
+    {
+      "fieldname": "col_break_4",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Text",
+      "label": "Notes"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    {
+      "role": "Asset Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    },
+    {
+      "role": "Asset User",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    }
+  ]
+}

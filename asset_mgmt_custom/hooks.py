@@ -116,6 +116,9 @@ scheduler_events = {
         "asset_mgmt_custom.tasks.check_open_critical_incidents",
         "asset_mgmt_custom.tasks.check_missed_cleaning",
         "asset_mgmt_custom.tasks.check_spare_parts_low",
+        "asset_mgmt_custom.tasks.check_permit_expiry",
+        "asset_mgmt_custom.tasks.check_calibration_due",
+        "asset_mgmt_custom.tasks.check_overdue_allocations",
     ],
     "weekly": [
         "asset_mgmt_custom.tasks.send_warranty_digest_email",

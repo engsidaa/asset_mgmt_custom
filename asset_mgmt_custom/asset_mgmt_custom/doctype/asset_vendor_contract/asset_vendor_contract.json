@@ -1,0 +1,34 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Vendor Contract",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "By \"Naming Series\" field",
+  "autoname": "naming_series:",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "fields": [
+    {"fieldname": "naming_series", "fieldtype": "Select", "label": "Naming Series", "options": "VCON-.YYYY.-", "default": "VCON-.YYYY.-"},
+    {"fieldname": "supplier", "fieldtype": "Link", "label": "Supplier / Vendor", "options": "Supplier", "reqd": 1, "in_list_view": 1, "search_index": 1, "bold": 1},
+    {"fieldname": "contract_type", "fieldtype": "Select", "label": "Contract Type", "options": "\nAnnual Maintenance Contract\nService Agreement\nWarranty Extension\nSupply Agreement\nOther", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "col_break_1", "fieldtype": "Column Break"},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Active\nExpired\nCancelled\nDraft", "default": "Draft", "read_only": 1, "in_list_view": 1, "bold": 1},
+    {"fieldname": "asset_category", "fieldtype": "Link", "label": "Asset Category", "options": "Asset Category"},
+    {"fieldname": "sec_break_dates", "fieldtype": "Section Break", "label": "Contract Period"},
+    {"fieldname": "start_date", "fieldtype": "Date", "label": "Start Date", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "end_date", "fieldtype": "Date", "label": "End Date", "reqd": 1, "in_list_view": 1, "bold": 1},
+    {"fieldname": "col_break_2", "fieldtype": "Column Break"},
+    {"fieldname": "contract_value", "fieldtype": "Currency", "label": "Contract Value"},
+    {"fieldname": "sla_response_hours", "fieldtype": "Float", "label": "SLA Response Time (Hours)"},
+    {"fieldname": "sec_break_assets", "fieldtype": "Section Break", "label": "Covered Assets"},
+    {"fieldname": "assets", "fieldtype": "Table", "label": "Assets", "options": "Asset Vendor Contract Asset"},
+    {"fieldname": "sec_break_docs", "fieldtype": "Section Break", "label": "Documents & Notes"},
+    {"fieldname": "contract_document", "fieldtype": "Attach", "label": "Contract Document"},
+    {"fieldname": "col_break_3", "fieldtype": "Column Break"},
+    {"fieldname": "notes", "fieldtype": "Text Editor", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
+  ]
+}

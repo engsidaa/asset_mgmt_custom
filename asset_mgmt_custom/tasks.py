@@ -577,3 +577,108 @@ def check_spare_parts_low():
             part.item_name, part.quantity, part.minimum_qty,
             part.location or "N/A")
         _create_notification(subject, content, "Asset Spare Part", part.name, manager_users)
+
+
+# ---------------------------------------------------------------------------
+# Daily: license & permit expiry alerts
+# ---------------------------------------------------------------------------
+
+def check_permit_expiry():
+    """
+    Daily: notify when an Asset License/Permit is expiring in 30, 14, or 7 days.
+    Also auto-expire past permits.
+    """
+    for days_ahead in [30, 14, 7]:
+        target = add_days(today(), days_ahead)
+        permits = frappe.db.sql("""
+            SELECT name, asset, asset_name, permit_type, license_number,
+                   issuing_authority, expiry_date
+            FROM `tabAsset License Permit`
+            WHERE status IN ('Active', 'Pending Renewal')
+              AND expiry_date = %(target)s
+        """, {"target": target}, as_dict=True)
+
+        if not permits:
+            continue
+
+        manager_users = _get_manager_users()
+        for p in permits:
+            subject = _("Permit Expiring in {0} days: {1} ({2})").format(
+                days_ahead, p.permit_type or "Permit", p.asset_name or p.asset)
+            content = _("Asset <b>{0}</b> permit <b>{1}</b> (No: {2}, Authority: {3}) "
+                        "expires on <b>{4}</b>.").format(
+                p.asset_name or p.asset, p.permit_type or "Permit",
+                p.license_number or "N/A", p.issuing_authority or "N/A", p.expiry_date)
+            _create_notification(subject, content, "Asset License Permit", p.name, manager_users)
+
+    # Auto-expire past permits
+    frappe.db.sql("""
+        UPDATE `tabAsset License Permit`
+        SET status = 'Expired', modified = NOW()
+        WHERE status IN ('Active', 'Pending Renewal')
+          AND expiry_date < %(today)s
+    """, {"today": today()})
+
+
+# ---------------------------------------------------------------------------
+# Daily: calibration due alerts
+# ---------------------------------------------------------------------------
+
+def check_calibration_due():
+    """
+    Daily: notify when Asset Calibration is due in 30, 14, or 7 days.
+    """
+    for days_ahead in [30, 14, 7]:
+        target = add_days(today(), days_ahead)
+        records = frappe.db.sql("""
+            SELECT name, asset, asset_name, calibration_date,
+                   next_calibration_date, calibrated_by
+            FROM `tabAsset Calibration Record`
+            WHERE next_calibration_date = %(target)s
+        """, {"target": target}, as_dict=True)
+
+        if not records:
+            continue
+
+        manager_users = _get_manager_users()
+        for r in records:
+            subject = _("Asset Calibration Due in {0} days: {1}").format(
+                days_ahead, r.asset_name or r.asset)
+            content = _("Asset <b>{0}</b> is due for calibration on <b>{1}</b>. "
+                        "Last calibrated by: {2} on {3}.").format(
+                r.asset_name or r.asset, r.next_calibration_date,
+                r.calibrated_by or "N/A", r.calibration_date)
+            _create_notification(subject, content, "Asset Calibration Record", r.name, manager_users)
+
+
+# ---------------------------------------------------------------------------
+# Daily: overdue employee allocations
+# ---------------------------------------------------------------------------
+
+def check_overdue_allocations():
+    """
+    Daily: notify when an Asset Employee Allocation is past expected return date.
+    """
+    overdue = frappe.db.sql("""
+        SELECT name, asset, asset_name, employee, employee_name,
+               allocation_date, expected_return_date
+        FROM `tabAsset Employee Allocation`
+        WHERE docstatus = 1
+          AND status = 'Active'
+          AND expected_return_date IS NOT NULL
+          AND expected_return_date < %(today)s
+    """, {"today": today()}, as_dict=True)
+
+    if not overdue:
+        return
+
+    manager_users = _get_manager_users()
+    for a in overdue:
+        frappe.db.set_value("Asset Employee Allocation", a.name, "status", "Overdue")
+        subject = _("Asset Allocation Overdue: {0} - {1}").format(
+            a.asset_name or a.asset, a.employee_name or a.employee)
+        content = _("Asset <b>{0}</b> allocated to <b>{1}</b> was due for return by "
+                    "<b>{2}</b> and has not been returned yet.").format(
+            a.asset_name or a.asset, a.employee_name or a.employee,
+            a.expected_return_date)
+        _create_notification(subject, content, "Asset Employee Allocation", a.name, manager_users)

@@ -1,0 +1,13 @@
+{
+  "doctype": "Report",
+  "name": "Asset Spare Parts Status",
+  "report_name": "Asset Spare Parts Status",
+  "ref_doctype": "Asset Spare Part",
+  "report_type": "Script Report",
+  "is_standard": "Yes",
+  "module": "Asset Mgmt Custom",
+  "filters": [
+    {"fieldname": "asset_category", "label": "Asset Category", "fieldtype": "Link", "options": "Asset Category", "reqd": 0},
+    {"fieldname": "stock_status", "label": "Stock Status", "fieldtype": "Select", "options": "\nAll\nOK\nLow\nCritical", "reqd": 0}
+  ]
+}

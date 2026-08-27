@@ -150,6 +150,42 @@
         "label": "Asset Spare Part",
         "link_to": "Asset Spare Part",
         "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Fuel Log",
+        "link_to": "Asset Fuel Log",
+        "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset License & Permit",
+        "link_to": "Asset License Permit",
+        "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Employee Allocation",
+        "link_to": "Asset Employee Allocation",
+        "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Complaint",
+        "link_to": "Asset Complaint",
+        "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Vendor Contract",
+        "link_to": "Asset Vendor Contract",
+        "link_type": "DocType"
+      },
+      {
+        "type": "DocType",
+        "label": "Asset Calibration Record",
+        "link_to": "Asset Calibration Record",
+        "link_type": "DocType"
       }
     ],
     "links": [
@@ -207,6 +243,12 @@
         "type": "Link",
         "label": "Asset Spare Part",
         "link_to": "Asset Spare Part",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Vendor Contract",
+        "link_to": "Asset Vendor Contract",
         "link_type": "DocType"
       },
       {
@@ -277,6 +319,12 @@
         "type": "Link",
         "label": "Asset Transfer Request",
         "link_to": "Asset Transfer Request",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Relocation History",
+        "link_to": "Asset Relocation History",
         "link_type": "DocType"
       },
       {
@@ -380,6 +428,24 @@
         "link_type": "DocType"
       },
       {
+        "type": "Link",
+        "label": "Asset Fuel Log",
+        "link_to": "Asset Fuel Log",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Maintenance Log",
+        "link_to": "Asset Maintenance Log Custom",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Disposal Execution",
+        "link_to": "Asset Disposal Execution",
+        "link_type": "DocType"
+      },
+      {
         "type": "Card Break",
         "label": "Asset Lifecycle",
         "hidden": 0
@@ -476,6 +542,36 @@
         "link_type": "DocType"
       },
       {
+        "type": "Link",
+        "label": "Asset License & Permit",
+        "link_to": "Asset License Permit",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Calibration Record",
+        "link_to": "Asset Calibration Record",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Employee Allocation",
+        "link_to": "Asset Employee Allocation",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Complaint",
+        "link_to": "Asset Complaint",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Training Record",
+        "link_to": "Asset Training Record",
+        "link_type": "DocType"
+      },
+      {
         "type": "Card Break",
         "label": "Operational Reports",
         "hidden": 0
@@ -522,6 +618,48 @@
         "link_to": "Asset Replacement Planning",
         "link_type": "Report",
         "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "Asset Insurance Summary",
+        "link_to": "Asset Insurance Summary",
+        "link_type": "Report"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Checkout Status",
+        "link_to": "Asset Checkout Status",
+        "link_type": "Report"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Incident Summary",
+        "link_to": "Asset Incident Summary",
+        "link_type": "Report"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Energy Cost by Branch",
+        "link_to": "Asset Energy Cost by Branch",
+        "link_type": "Report"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Cleaning Compliance",
+        "link_to": "Asset Cleaning Compliance",
+        "link_type": "Report"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Spare Parts Status",
+        "link_to": "Asset Spare Parts Status",
+        "link_type": "Report"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Safety Score Report",
+        "link_to": "Asset Safety Score Report",
+        "link_type": "Report"
       },
       {
         "type": "Card Break",

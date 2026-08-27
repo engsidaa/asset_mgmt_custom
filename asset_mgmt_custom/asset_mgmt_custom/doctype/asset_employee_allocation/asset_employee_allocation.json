@@ -1,0 +1,172 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Employee Allocation",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "By \"Naming Series\" field",
+  "autoname": "naming_series:",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Series",
+      "options": "ALLOC-.YYYY.-",
+      "default": "ALLOC-.YYYY.-"
+    },
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "options": "Asset",
+      "label": "Asset",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Active\nReturned\nOverdue",
+      "default": "Active",
+      "read_only": 1,
+      "in_list_view": 1,
+      "bold": 1
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "options": "Branch",
+      "label": "Branch",
+      "fetch_from": "asset.custom_branch"
+    },
+    {
+      "fieldname": "sec_break_emp",
+      "fieldtype": "Section Break",
+      "label": "Employee Details"
+    },
+    {
+      "fieldname": "employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "label": "Employee",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1
+    },
+    {
+      "fieldname": "employee_name",
+      "fieldtype": "Data",
+      "label": "Employee Name",
+      "fetch_from": "employee.employee_name",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "department",
+      "fieldtype": "Link",
+      "options": "Department",
+      "label": "Department",
+      "fetch_from": "employee.department",
+      "read_only": 1
+    },
+    {
+      "fieldname": "allocation_date",
+      "fieldtype": "Date",
+      "label": "Allocation Date",
+      "reqd": 1
+    },
+    {
+      "fieldname": "sec_break_dates",
+      "fieldtype": "Section Break",
+      "label": "Return Details"
+    },
+    {
+      "fieldname": "expected_return_date",
+      "fieldtype": "Date",
+      "label": "Expected Return Date",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "purpose",
+      "fieldtype": "Text",
+      "label": "Purpose / Reason for Allocation"
+    },
+    {
+      "fieldname": "col_break_3",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "return_date",
+      "fieldtype": "Date",
+      "label": "Return Date",
+      "read_only": 1
+    },
+    {
+      "fieldname": "condition_on_return",
+      "fieldtype": "Select",
+      "label": "Condition on Return",
+      "options": "\nGood\nDamaged\nLost"
+    },
+    {
+      "fieldname": "return_notes",
+      "fieldtype": "Text",
+      "label": "Return Notes",
+      "read_only": 1
+    },
+    {
+      "fieldname": "sec_break_sig",
+      "fieldtype": "Section Break",
+      "label": "Acknowledgement"
+    },
+    {
+      "fieldname": "signature_attachment",
+      "fieldtype": "Attach Image",
+      "label": "Employee Signature / Acknowledgement"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "submit": 1,
+      "cancel": 1,
+      "amend": 1
+    },
+    {
+      "role": "Asset Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 1,
+      "cancel": 1,
+      "amend": 1
+    },
+    {
+      "role": "Asset User",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    }
+  ]
+}

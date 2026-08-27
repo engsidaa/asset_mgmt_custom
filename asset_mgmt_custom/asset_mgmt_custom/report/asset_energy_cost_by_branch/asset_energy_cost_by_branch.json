@@ -1,0 +1,14 @@
+{
+  "doctype": "Report",
+  "name": "Asset Energy Cost by Branch",
+  "report_name": "Asset Energy Cost by Branch",
+  "ref_doctype": "Asset Energy Log",
+  "report_type": "Script Report",
+  "is_standard": "Yes",
+  "module": "Asset Mgmt Custom",
+  "filters": [
+    {"fieldname": "branch", "label": "Branch", "fieldtype": "Link", "options": "Branch", "reqd": 0},
+    {"fieldname": "from_month", "label": "From Month (YYYY-MM)", "fieldtype": "Data", "reqd": 0},
+    {"fieldname": "to_month", "label": "To Month (YYYY-MM)", "fieldtype": "Data", "reqd": 0}
+  ]
+}
