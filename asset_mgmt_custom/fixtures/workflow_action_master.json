@@ -1,18 +1,22 @@
 [
   {
     "doctype": "Workflow Action Master",
+    "name": "Submit for Approval",
     "workflow_action_name": "Submit for Approval"
   },
   {
     "doctype": "Workflow Action Master",
+    "name": "Approve",
     "workflow_action_name": "Approve"
   },
   {
     "doctype": "Workflow Action Master",
+    "name": "Reject",
     "workflow_action_name": "Reject"
   },
   {
     "doctype": "Workflow Action Master",
+    "name": "Resubmit",
     "workflow_action_name": "Resubmit"
   }
 ]
