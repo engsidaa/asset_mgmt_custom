@@ -10,7 +10,7 @@ def execute(filters=None):
         {"label": _("Asset Name"), "fieldname": "asset_name", "fieldtype": "Data", "width": 180},
         {"label": _("Category"), "fieldname": "asset_category", "fieldtype": "Link", "options": "Asset Category", "width": 120},
         {"label": _("Repair No"), "fieldname": "name", "fieldtype": "Link", "options": "Asset Repair", "width": 140},
-        {"label": _("Repair Date"), "fieldname": "repair_date", "fieldtype": "Date", "width": 100},
+        {"label": _("Failure Date"), "fieldname": "failure_date", "fieldtype": "Datetime", "width": 120},
         {"label": _("Status"), "fieldname": "repair_status", "fieldtype": "Data", "width": 100},
         {"label": _("Technician"), "fieldname": "custom_technician_name", "fieldtype": "Data", "width": 120},
         {"label": _("Repair Cost"), "fieldname": "repair_cost", "fieldtype": "Currency", "width": 120},
@@ -24,9 +24,9 @@ def execute(filters=None):
     if filters.get("asset"):
         conditions += " AND ar.asset = %(asset)s"
     if filters.get("from_date"):
-        conditions += " AND ar.repair_date >= %(from_date)s"
+        conditions += " AND DATE(ar.failure_date) >= %(from_date)s"
     if filters.get("to_date"):
-        conditions += " AND ar.repair_date <= %(to_date)s"
+        conditions += " AND DATE(ar.failure_date) <= %(to_date)s"
     if filters.get("asset_category"):
         conditions += " AND a.asset_category = %(asset_category)s"
 
@@ -36,7 +36,7 @@ def execute(filters=None):
             a.asset_name,
             a.asset_category,
             ar.name,
-            ar.repair_date,
+            ar.failure_date,
             ar.repair_status,
             ar.custom_technician_name,
             ar.repair_cost,
@@ -47,7 +47,7 @@ def execute(filters=None):
         FROM `tabAsset Repair` ar
         JOIN `tabAsset` a ON a.name = ar.asset
         {conditions}
-        ORDER BY ar.repair_date DESC
+        ORDER BY ar.failure_date DESC
     """, filters, as_dict=True)
 
     return columns, data
