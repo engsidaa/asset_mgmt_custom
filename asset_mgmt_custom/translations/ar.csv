@@ -116,3 +116,13 @@ Total Cost of Ownership,إجمالي تكلفة الملكية,
 Annual Depreciation,الإهلاك السنوي,
 Asset Count Sheet,كشف جرد الأصول,
 Asset Barcode Label,ملصق باركود الأصل,
+Asset Register,سجل الأصول
+Gross Block,إجمالي التكلفة
+Opening Accum. Dep.,الإهلاك المتراكم الافتتاحي
+Accumulated Depreciation,الإهلاك المتراكم
+Net Book Value,القيمة الدفترية الصافية
+Dep. Method,طريقة الإهلاك
+Useful Life (Months),العمر الإنتاجي (شهر)
+Booked Dep. Entries,قيود الإهلاك المرحّلة
+Include Scrapped / Sold,تضمين المخردة والمباعة
+Available-for-use Date,تاريخ بدء الاستخدام

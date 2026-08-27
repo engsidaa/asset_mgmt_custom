@@ -64,6 +64,7 @@
         "label": "Financial Reports",
         "hidden": 0
       },
+      {"type": "Link", "label": "Asset Register", "link_to": "Asset Register", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 1},
       {"type": "Link", "label": "CapEx Capitalization", "link_to": "CapEx Capitalization", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 1},
       {"type": "Link", "label": "Asset Lifecycle Cost", "link_to": "Asset Lifecycle Cost", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 0},
       {"type": "Link", "label": "Department Asset Summary", "link_to": "Department Asset Summary", "link_type": "Report", "is_query_report": 1, "hidden": 0, "onboard": 0},
