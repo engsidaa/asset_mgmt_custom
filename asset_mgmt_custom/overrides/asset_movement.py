@@ -80,6 +80,7 @@ def on_submit(doc, method=None):
 
     for item in doc.assets:
         _update_cost_center(doc, item)
+        _update_branch(item)
 
         if doc.purpose == "Transfer":
             _set_in_transit(item)
@@ -160,6 +161,14 @@ def _update_cost_center(doc, item):
     frappe.db.set_value("Asset", item.asset, "cost_center", cost_center, update_modified=False)
     _log_activity(item.asset, "Cost center updated to {0} after {1} to {2}".format(
         cost_center, doc.purpose, target))
+
+
+def _update_branch(item):
+    branch = item.get("custom_target_branch")
+    if not branch:
+        return
+    frappe.db.set_value("Asset", item.asset, "custom_branch", branch, update_modified=False)
+    _log_activity(item.asset, "Branch updated to {0}".format(branch))
 
 
 def _activate_spare_asset(doc, item):

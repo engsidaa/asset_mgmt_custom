@@ -554,6 +554,32 @@
   },
   {
     "doctype": "Custom Field",
+    "name": "Asset-custom_branch",
+    "dt": "Asset",
+    "fieldname": "custom_branch",
+    "fieldtype": "Link",
+    "label": "Branch",
+    "options": "Branch",
+    "insert_after": "location",
+    "in_standard_filter": 1,
+    "search_index": 1,
+    "bold": 0,
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Movement Item-custom_target_branch",
+    "dt": "Asset Movement Item",
+    "fieldname": "custom_target_branch",
+    "fieldtype": "Link",
+    "label": "Target Branch",
+    "options": "Branch",
+    "insert_after": "target_location",
+    "in_list_view": 1,
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
     "name": "Asset-custom_next_maintenance_date",
     "dt": "Asset",
     "fieldname": "custom_next_maintenance_date",
