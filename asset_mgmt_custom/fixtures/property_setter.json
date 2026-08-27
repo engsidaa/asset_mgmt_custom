@@ -1,0 +1,12 @@
+[
+  {
+    "doctype": "Property Setter",
+    "name": "Asset Repair-downtime-hidden",
+    "doc_type": "Asset Repair",
+    "field_name": "downtime",
+    "property": "hidden",
+    "value": "1",
+    "property_type": "Check",
+    "doctype_or_field": "DocField"
+  }
+]

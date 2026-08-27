@@ -1,0 +1,127 @@
+{
+  "doctype": "DocType",
+  "name": "Asset CapEx Budget",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "Expression",
+  "autoname": "format:CAPEX-{fiscal_year}-{branch}",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "fiscal_year",
+      "fieldtype": "Link",
+      "label": "Fiscal Year",
+      "options": "Fiscal Year",
+      "reqd": 1,
+      "in_list_view": 1,
+      "bold": 1,
+      "search_index": 1
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "Branch",
+      "options": "Branch",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1
+    },
+    {
+      "fieldname": "col1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "company",
+      "fieldtype": "Link",
+      "label": "Company",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Draft\nApproved\nClosed",
+      "default": "Draft",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "section_totals",
+      "fieldtype": "Section Break",
+      "label": "Budget Totals"
+    },
+    {
+      "fieldname": "total_capex_budget",
+      "fieldtype": "Currency",
+      "label": "Total CapEx Budget",
+      "reqd": 1,
+      "bold": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "new_acquisition_budget",
+      "fieldtype": "Currency",
+      "label": "New Acquisition Budget"
+    },
+    {
+      "fieldname": "col2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "replacement_budget",
+      "fieldtype": "Currency",
+      "label": "Replacement Budget"
+    },
+    {
+      "fieldname": "upgrade_budget",
+      "fieldtype": "Currency",
+      "label": "Upgrade / Refurbishment Budget"
+    },
+    {
+      "fieldname": "section_items",
+      "fieldtype": "Section Break",
+      "label": "Planned CapEx Items"
+    },
+    {
+      "fieldname": "items",
+      "fieldtype": "Table",
+      "label": "CapEx Items",
+      "options": "Asset CapEx Budget Item"
+    },
+    {
+      "fieldname": "section_notes",
+      "fieldtype": "Section Break",
+      "label": "Notes",
+      "collapsible": 1
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Text Editor",
+      "label": "Notes"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "Assets Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0,
+      "submit": 1,
+      "cancel": 1
+    },
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "submit": 1,
+      "cancel": 1
+    }
+  ],
+  "search_fields": "fiscal_year, branch",
+  "sort_field": "fiscal_year",
+  "sort_order": "DESC"
+}

@@ -8,7 +8,7 @@
     "public": 1,
     "is_hidden": 0,
     "icon": "assets",
-    "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>KPIs — مؤشرات الأداء</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Shortcuts — اختصارات</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Category\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Repair\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Maintenance\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Requisition\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Movement\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Loan\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Capitalization\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Maintenance Contract\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Physical Audit\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Handover\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Disposal Request\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Masters &amp; Transactions</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Masters\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Requests\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Movements\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Transactions\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Lifecycle\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Reports — تقارير</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Operational Reports\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Financial Reports\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Maintenance Reports\", \"col\": 4}}]",
+    "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>KPIs \\u2014 \\u0645\\u0624\\u0634\\u0631\\u0627\\u062a \\u0627\\u0644\\u0623\\u062f\\u0627\\u0621</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Shortcuts \\u2014 \\u0627\\u062e\\u062a\\u0635\\u0627\\u0631\\u0627\\u062a</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Category\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Repair\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Maintenance\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Requisition\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Movement\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Loan\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Capitalization\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Maintenance Contract\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Physical Audit\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Handover\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset Disposal Request\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"label\": \"Compliance Certificate\", \"link_to\": \"Asset Compliance Certificate\", \"type\": \"DocType\", \"color\": \"Green\", \"icon\": \"octicon octicon-shield\"}}, {\"type\": \"shortcut\", \"data\": {\"label\": \"Asset Lease\", \"link_to\": \"Asset Lease\", \"type\": \"DocType\", \"color\": \"Blue\", \"icon\": \"octicon octicon-key\"}}, {\"type\": \"shortcut\", \"data\": {\"label\": \"CapEx Budget\", \"link_to\": \"Asset CapEx Budget\", \"type\": \"DocType\", \"color\": \"Orange\", \"icon\": \"octicon octicon-credit-card\"}}, {\"type\": \"shortcut\", \"data\": {\"label\": \"Replacement Planning\", \"link_to\": \"Asset Replacement Planning\", \"type\": \"Report\", \"color\": \"Red\", \"icon\": \"octicon octicon-graph\"}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Masters &amp; Transactions</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Masters\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Requests\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Movements\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Transactions\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Asset Lifecycle\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Reports \\u2014 \\u062a\\u0642\\u0627\\u0631\\u064a\\u0631</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Operational Reports\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Financial Reports\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Maintenance Reports\", \"col\": 4}}]",
     "number_cards": [
       {
         "number_card_name": "Pending Asset Requests"
@@ -100,6 +100,26 @@
         "label": "Asset Condition Assessment",
         "link_to": "Asset Condition Assessment",
         "type": "DocType"
+      },
+      {
+        "label": "Compliance Certificate",
+        "link_to": "Asset Compliance Certificate",
+        "type": "DocType"
+      },
+      {
+        "label": "Asset Lease",
+        "link_to": "Asset Lease",
+        "type": "DocType"
+      },
+      {
+        "label": "CapEx Budget",
+        "link_to": "Asset CapEx Budget",
+        "type": "DocType"
+      },
+      {
+        "label": "Replacement Planning",
+        "link_to": "Asset Replacement Planning",
+        "type": "Report"
       }
     ],
     "links": [
@@ -295,6 +315,11 @@
         "onboard": 0
       },
       {
+        "type": "Link",
+        "label": "Asset CapEx Budget",
+        "link_to": "Asset CapEx Budget"
+      },
+      {
         "type": "Card Break",
         "label": "Asset Lifecycle",
         "hidden": 0
@@ -345,6 +370,16 @@
         "onboard": 1
       },
       {
+        "type": "Link",
+        "label": "Asset Compliance Certificate",
+        "link_to": "Asset Compliance Certificate"
+      },
+      {
+        "type": "Link",
+        "label": "Asset Lease",
+        "link_to": "Asset Lease"
+      },
+      {
         "type": "Card Break",
         "label": "Operational Reports",
         "hidden": 0
@@ -383,6 +418,13 @@
         "link_type": "Report",
         "is_query_report": 1,
         "hidden": 0,
+        "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "Asset Replacement Planning",
+        "link_to": "Asset Replacement Planning",
+        "link_type": "Report",
         "onboard": 0
       },
       {
@@ -433,6 +475,13 @@
         "link_type": "Report",
         "is_query_report": 1,
         "hidden": 0,
+        "onboard": 0
+      },
+      {
+        "type": "Link",
+        "label": "CapEx Budget vs Actual",
+        "link_to": "CapEx Budget vs Actual",
+        "link_type": "Report",
         "onboard": 0
       },
       {

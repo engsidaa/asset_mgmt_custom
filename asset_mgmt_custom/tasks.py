@@ -285,16 +285,16 @@ def send_warranty_digest_email():
 def check_insurance_expiry():
     """
     Daily: notify when asset insurance is expiring in 30, 14, or 7 days.
+    Uses standard ERPNext fields: insurer, policy_number, insurance_end_date.
     """
     for days_ahead in [30, 14, 7]:
         target = add_days(today(), days_ahead)
         assets = frappe.db.sql("""
-            SELECT name, asset_name, custom_insurance_provider,
-                   custom_insurance_policy_no, custom_insurance_expiry
+            SELECT name, asset_name, insurer, policy_number, insurance_end_date
             FROM `tabAsset`
             WHERE docstatus < 2
-              AND custom_insurance_expiry IS NOT NULL
-              AND custom_insurance_expiry = %(target)s
+              AND insurance_end_date IS NOT NULL
+              AND insurance_end_date = %(target)s
         """, {"target": target}, as_dict=True)
 
         if not assets:
@@ -305,8 +305,8 @@ def check_insurance_expiry():
             subject = _("Insurance Expiring in {0} days: {1}").format(days_ahead, a.asset_name)
             content = _("Asset <b>{0}</b> insurance (Policy: {1}, Provider: {2}) "
                         "expires on <b>{3}</b>.").format(
-                a.asset_name, a.custom_insurance_policy_no or "N/A",
-                a.custom_insurance_provider or "N/A", a.custom_insurance_expiry)
+                a.asset_name, a.policy_number or "N/A",
+                a.insurer or "N/A", a.insurance_end_date)
             _create_notification(subject, content, "Asset", a.name, manager_users)
 
 
@@ -373,4 +373,92 @@ def check_amc_expiry():
         UPDATE `tabAsset Maintenance Contract`
         SET status = 'Expired', modified = NOW()
         WHERE status = 'Active' AND end_date < %(today)s
+    """, {"today": today()})
+
+
+# ---------------------------------------------------------------------------
+# Daily: compliance certificate expiry alerts
+# ---------------------------------------------------------------------------
+
+def check_compliance_expiry():
+    """
+    Daily: notify when a compliance/safety certificate is expiring soon.
+    """
+    for days_ahead in [30, 14, 7]:
+        target = add_days(today(), days_ahead)
+        certs = frappe.db.sql("""
+            SELECT name, certificate_number, certificate_type, asset, asset_name,
+                   issuing_authority, expiry_date
+            FROM `tabAsset Compliance Certificate`
+            WHERE status IN ('Active', 'Pending Renewal')
+              AND expiry_date = %(target)s
+        """, {"target": target}, as_dict=True)
+
+        if not certs:
+            continue
+
+        manager_users = _get_manager_users()
+        for c in certs:
+            subject = _("Compliance Certificate Expiring in {0} days: {1}").format(
+                days_ahead, c.certificate_number)
+            content = _("{0} certificate <b>{1}</b> for asset <b>{2}</b> "
+                        "(issued by {3}) expires on <b>{4}</b>. Please arrange renewal.").format(
+                c.certificate_type or "Compliance",
+                c.certificate_number, c.asset_name or c.asset,
+                c.issuing_authority or "N/A", c.expiry_date)
+            _create_notification(
+                subject, content,
+                "Asset Compliance Certificate", c.name,
+                manager_users
+            )
+
+    # Auto-update status on expired certs
+    frappe.db.sql("""
+        UPDATE `tabAsset Compliance Certificate`
+        SET status = 'Expired', modified = NOW()
+        WHERE status IN ('Active', 'Pending Renewal')
+          AND expiry_date < %(today)s
+    """, {"today": today()})
+
+
+# ---------------------------------------------------------------------------
+# Daily: lease expiry alerts
+# ---------------------------------------------------------------------------
+
+def check_lease_expiry():
+    """
+    Daily: notify when an asset lease is expiring in 30, 14, or 7 days.
+    Also auto-expire past leases.
+    """
+    for days_ahead in [30, 14, 7]:
+        target = add_days(today(), days_ahead)
+        leases = frappe.db.sql("""
+            SELECT name, asset, asset_name, lessee_name, lease_type, end_date
+            FROM `tabAsset Lease`
+            WHERE docstatus = 1
+              AND status = 'Active'
+              AND end_date = %(target)s
+        """, {"target": target}, as_dict=True)
+
+        if not leases:
+            continue
+
+        manager_users = _get_manager_users()
+        for lease in leases:
+            subject = _("Asset Lease Expiring in {0} days: {1}").format(
+                days_ahead, lease.asset_name or lease.asset)
+            content = _("{0} lease for asset <b>{1}</b> with lessee <b>{2}</b> "
+                        "expires on <b>{3}</b>.").format(
+                lease.lease_type or "Lease",
+                lease.asset_name or lease.asset,
+                lease.lessee_name or "N/A", lease.end_date)
+            _create_notification(subject, content, "Asset Lease", lease.name, manager_users)
+
+    # Auto-expire past leases
+    frappe.db.sql("""
+        UPDATE `tabAsset Lease`
+        SET status = 'Expired', modified = NOW()
+        WHERE docstatus = 1
+          AND status = 'Active'
+          AND end_date < %(today)s
     """, {"today": today()})

@@ -1,0 +1,64 @@
+{
+  "doctype": "DocType",
+  "name": "Asset CapEx Budget Item",
+  "module": "Asset Mgmt Custom",
+  "istable": 1,
+  "editable_grid": 1,
+  "track_changes": 0,
+  "fields": [
+    {
+      "fieldname": "asset_category",
+      "fieldtype": "Link",
+      "label": "Asset Category",
+      "options": "Asset Category",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "description",
+      "fieldtype": "Data",
+      "label": "Description",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "capex_type",
+      "fieldtype": "Select",
+      "label": "CapEx Type",
+      "options": "\nNew Acquisition\nReplacement\nUpgrade",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "quantity",
+      "fieldtype": "Int",
+      "label": "Qty",
+      "default": "1",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "unit_cost",
+      "fieldtype": "Currency",
+      "label": "Unit Cost",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "total_cost",
+      "fieldtype": "Currency",
+      "label": "Total Cost",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "priority",
+      "fieldtype": "Select",
+      "label": "Priority",
+      "options": "\nHigh\nMedium\nLow"
+    },
+    {
+      "fieldname": "planned_quarter",
+      "fieldtype": "Select",
+      "label": "Planned Quarter",
+      "options": "\nQ1\nQ2\nQ3\nQ4"
+    }
+  ],
+  "permissions": []
+}

@@ -1,0 +1,32 @@
+{
+  "doctype": "Report",
+  "name": "CapEx Budget vs Actual",
+  "report_name": "CapEx Budget vs Actual",
+  "ref_doctype": "Asset CapEx Budget",
+  "report_type": "Script Report",
+  "is_standard": "Yes",
+  "module": "Asset Mgmt Custom",
+  "filters": [
+    {
+      "fieldname": "fiscal_year",
+      "label": "Fiscal Year",
+      "fieldtype": "Link",
+      "options": "Fiscal Year",
+      "reqd": 1
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 0
+    },
+    {
+      "fieldname": "branch",
+      "label": "Branch",
+      "fieldtype": "Link",
+      "options": "Branch",
+      "reqd": 0
+    }
+  ]
+}

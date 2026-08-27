@@ -14,6 +14,10 @@ fixtures = [
         "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Maintenance Contract"]]],
     },
     {
+        "dt": "Property Setter",
+        "filters": [["doc_type", "=", "Asset Repair"], ["field_name", "=", "downtime"]],
+    },
+    {
         "dt": "Workflow",
         "filters": [["document_type", "in", ["Asset Movement", "Asset Requisition", "Asset Retention Request"]]],
     },
@@ -106,6 +110,8 @@ scheduler_events = {
         "asset_mgmt_custom.tasks.check_insurance_expiry",
         "asset_mgmt_custom.tasks.check_overdue_loans",
         "asset_mgmt_custom.tasks.check_amc_expiry",
+        "asset_mgmt_custom.tasks.check_compliance_expiry",
+        "asset_mgmt_custom.tasks.check_lease_expiry",
     ],
     "weekly": [
         "asset_mgmt_custom.tasks.send_warranty_digest_email",
