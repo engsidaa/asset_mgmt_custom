@@ -61,6 +61,7 @@ fixtures = [
 doc_events = {
     "Asset": {
         "validate": "asset_mgmt_custom.overrides.asset.validate",
+        "after_insert": "asset_mgmt_custom.overrides.asset.after_insert",
     },
     "Asset Movement": {
         "validate": "asset_mgmt_custom.overrides.asset_movement.validate",
@@ -74,6 +75,7 @@ doc_events = {
     },
     "Full and Final Statement": {
         "validate": "asset_mgmt_custom.overrides.full_and_final_statement.validate",
+        "on_submit": "asset_mgmt_custom.overrides.full_and_final_statement.on_submit",
     },
 }
 
@@ -85,6 +87,8 @@ doctype_js = {
     "Asset Repair": "public/js/asset_repair.js",
     "Asset Movement": "public/js/asset_movement.js",
     "Asset Requisition": "public/js/asset_requisition.js",
+    "Asset Loan": "asset_mgmt_custom/doctype/asset_loan/asset_loan.js",
+    "Asset Disposal Request": "asset_mgmt_custom/doctype/asset_disposal_request/asset_disposal_request.js",
 }
 
 # ---------------------------------------------------------------------------
@@ -93,5 +97,13 @@ doctype_js = {
 scheduler_events = {
     "daily": [
         "asset_mgmt_custom.tasks.send_incomplete_asset_alerts",
+        "asset_mgmt_custom.tasks.send_maintenance_due_alerts",
+        "asset_mgmt_custom.tasks.check_overdue_transit",
+        "asset_mgmt_custom.tasks.check_requisition_sla",
+        "asset_mgmt_custom.tasks.check_insurance_expiry",
+        "asset_mgmt_custom.tasks.check_overdue_loans",
+    ],
+    "weekly": [
+        "asset_mgmt_custom.tasks.send_warranty_digest_email",
     ],
 }

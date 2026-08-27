@@ -28,6 +28,24 @@ def validate(doc, method=None):
     _auto_set_incomplete_status(doc)
 
 
+def after_insert(doc, method=None):
+    _set_maintenance_schedule_from_category(doc)
+
+
+def _set_maintenance_schedule_from_category(doc):
+    """Auto-set next maintenance date from Asset Category default frequency."""
+    if not doc.asset_category:
+        return
+    freq_days = frappe.db.get_value(
+        "Asset Category", doc.asset_category, "custom_maintenance_frequency_days"
+    )
+    if not freq_days:
+        return
+    from frappe.utils import add_days, today
+    next_date = add_days(today(), int(freq_days))
+    frappe.db.set_value("Asset", doc.name, "custom_next_maintenance_date", next_date, update_modified=False)
+
+
 def _auto_set_incomplete_status(doc):
     """نضمن أن الأصل الجديد يبدأ بحالة Incomplete إن لم تُضبط."""
     if not doc.custom_operational_status:

@@ -1,0 +1,17 @@
+{
+  "add_total_row": 1,
+  "disabled": 0,
+  "doctype": "Report",
+  "is_standard": "Yes",
+  "json": "{}",
+  "module": "Asset Mgmt Custom",
+  "name": "Asset Age Analysis",
+  "ref_doctype": "Asset",
+  "report_name": "Asset Age Analysis",
+  "report_type": "Script Report",
+  "roles": [
+    {"role": "Assets Manager"},
+    {"role": "System Manager"},
+    {"role": "Accounts Manager"}
+  ]
+}

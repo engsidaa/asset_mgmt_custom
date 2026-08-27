@@ -1,0 +1,33 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Condition Assessment",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "Expression",
+  "autoname": "format:COND-{asset}-{assessment_date}",
+  "track_changes": 1,
+  "fields": [
+    {"fieldname": "asset", "fieldtype": "Link", "options": "Asset", "label": "Asset", "reqd": 1, "in_list_view": 1, "search_index": 1},
+    {"fieldname": "asset_name", "fieldtype": "Data", "label": "Asset Name", "fetch_from": "asset.asset_name", "read_only": 1},
+    {"fieldname": "col1", "fieldtype": "Column Break"},
+    {"fieldname": "assessment_date", "fieldtype": "Date", "label": "Assessment Date", "reqd": 1, "default": "Today", "in_list_view": 1},
+    {"fieldname": "assessed_by", "fieldtype": "Link", "options": "User", "label": "Assessed By", "default": "__user", "reqd": 1},
+    {"fieldname": "condition_section", "fieldtype": "Section Break", "label": "Condition Rating"},
+    {"fieldname": "condition_rating", "fieldtype": "Select", "label": "Condition Rating", "options": "Excellent\nGood\nFair\nPoor\nCritical", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "col2", "fieldtype": "Column Break"},
+    {"fieldname": "condition_score", "fieldtype": "Int", "label": "Score (1-10)", "description": "1 = critical, 10 = perfect"},
+    {"fieldname": "notes_section", "fieldtype": "Section Break", "label": "Findings"},
+    {"fieldname": "findings", "fieldtype": "Long Text", "label": "Findings / ملاحظات"},
+    {"fieldname": "col3", "fieldtype": "Column Break"},
+    {"fieldname": "recommended_action", "fieldtype": "Select", "label": "Recommended Action", "options": "\nNo Action\nSchedule Maintenance\nRepair\nReplace\nDispose"},
+    {"fieldname": "photos_section", "fieldtype": "Section Break", "label": "Photos"},
+    {"fieldname": "photo_1", "fieldtype": "Attach Image", "label": "Photo 1"},
+    {"fieldname": "col4", "fieldtype": "Column Break"},
+    {"fieldname": "photo_2", "fieldtype": "Attach Image", "label": "Photo 2"}
+  ],
+  "permissions": [
+    {"role": "Assets Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1}
+  ],
+  "links": [],
+  "actions": []
+}

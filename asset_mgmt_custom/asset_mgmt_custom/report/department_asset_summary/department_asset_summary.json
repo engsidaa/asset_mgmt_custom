@@ -1,0 +1,17 @@
+{
+  "add_total_row": 1,
+  "disabled": 0,
+  "doctype": "Report",
+  "is_standard": "Yes",
+  "json": "{}",
+  "module": "Asset Mgmt Custom",
+  "name": "Department Asset Summary",
+  "ref_doctype": "Asset",
+  "report_name": "Department Asset Summary",
+  "report_type": "Script Report",
+  "roles": [
+    {"role": "Assets Manager"},
+    {"role": "System Manager"},
+    {"role": "Accounts Manager"}
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Loan",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "Expression",
+  "autoname": "format:LOAN-{asset}-{#####}",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "fields": [
+    {"fieldname": "asset", "fieldtype": "Link", "options": "Asset", "label": "Asset", "reqd": 1, "in_list_view": 1, "search_index": 1},
+    {"fieldname": "asset_name", "fieldtype": "Data", "label": "Asset Name", "fetch_from": "asset.asset_name", "read_only": 1},
+    {"fieldname": "col1", "fieldtype": "Column Break"},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Active\nReturned\nOverdue", "default": "Active", "in_list_view": 1, "read_only": 1},
+    {"fieldname": "loan_details_section", "fieldtype": "Section Break", "label": "Loan Details"},
+    {"fieldname": "loaned_to", "fieldtype": "Link", "options": "Employee", "label": "Loaned To (Employee)", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "loaned_to_name", "fieldtype": "Data", "label": "Employee Name", "fetch_from": "loaned_to.employee_name", "read_only": 1},
+    {"fieldname": "col2", "fieldtype": "Column Break"},
+    {"fieldname": "loan_date", "fieldtype": "Date", "label": "Loan Date", "reqd": 1, "default": "Today"},
+    {"fieldname": "expected_return_date", "fieldtype": "Date", "label": "Expected Return Date", "reqd": 1},
+    {"fieldname": "purpose_section", "fieldtype": "Section Break", "label": "Purpose & Notes"},
+    {"fieldname": "purpose", "fieldtype": "Data", "label": "Purpose / Project"},
+    {"fieldname": "col3", "fieldtype": "Column Break"},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"},
+    {"fieldname": "return_section", "fieldtype": "Section Break", "label": "Return Information"},
+    {"fieldname": "actual_return_date", "fieldtype": "Date", "label": "Actual Return Date"},
+    {"fieldname": "col4", "fieldtype": "Column Break"},
+    {"fieldname": "return_condition", "fieldtype": "Select", "label": "Return Condition", "options": "\nGood\nDamaged\nLost"},
+    {"fieldname": "original_custodian", "fieldtype": "Link", "options": "Employee", "label": "Original Custodian (to Restore)", "hidden": 1}
+  ],
+  "permissions": [
+    {"role": "Assets Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1},
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1}
+  ],
+  "links": [],
+  "actions": []
+}

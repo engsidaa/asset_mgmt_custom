@@ -481,5 +481,86 @@
     "in_list_view": 1,
     "bold": 1,
     "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_insurance_section",
+    "dt": "Asset",
+    "fieldname": "custom_insurance_section",
+    "fieldtype": "Section Break",
+    "label": "Insurance (التأمين)",
+    "insert_after": "custom_warranty_expiry",
+    "collapsible": 1
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_insurance_provider",
+    "dt": "Asset",
+    "fieldname": "custom_insurance_provider",
+    "fieldtype": "Data",
+    "label": "Insurance Provider (شركة التأمين)",
+    "insert_after": "custom_insurance_section",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_insurance_policy_no",
+    "dt": "Asset",
+    "fieldname": "custom_insurance_policy_no",
+    "fieldtype": "Data",
+    "label": "Policy Number (رقم الوثيقة)",
+    "insert_after": "custom_insurance_provider",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_insurance_col",
+    "dt": "Asset",
+    "fieldname": "custom_insurance_col",
+    "fieldtype": "Column Break",
+    "insert_after": "custom_insurance_policy_no"
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_insurance_value",
+    "dt": "Asset",
+    "fieldname": "custom_insurance_value",
+    "fieldtype": "Currency",
+    "label": "Insured Value (قيمة التأمين)",
+    "insert_after": "custom_insurance_col",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_insurance_expiry",
+    "dt": "Asset",
+    "fieldname": "custom_insurance_expiry",
+    "fieldtype": "Date",
+    "label": "Insurance Expiry Date (تاريخ انتهاء التأمين)",
+    "insert_after": "custom_insurance_value",
+    "reqd": 0,
+    "bold": 1
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset Category-custom_maintenance_frequency_days",
+    "dt": "Asset Category",
+    "fieldname": "custom_maintenance_frequency_days",
+    "fieldtype": "Int",
+    "label": "Default Maintenance Frequency (Days)",
+    "insert_after": "custom_capitalization_threshold",
+    "description": "عدد الأيام بين كل صيانة دورية — يُطبَّق تلقائياً عند إنشاء أصل جديد من هذه الفئة",
+    "reqd": 0
+  },
+  {
+    "doctype": "Custom Field",
+    "name": "Asset-custom_next_maintenance_date",
+    "dt": "Asset",
+    "fieldname": "custom_next_maintenance_date",
+    "fieldtype": "Date",
+    "label": "Next Maintenance Date (تاريخ الصيانة القادمة)",
+    "insert_after": "custom_last_maintenance_date",
+    "read_only": 1,
+    "reqd": 0
   }
 ]
