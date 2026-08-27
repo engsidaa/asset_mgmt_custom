@@ -73,18 +73,14 @@ def _create_asset_return_requests(doc):
     if not allocated:
         return
 
-    from frappe.qb import DocType
     from frappe.desk.doctype.notification_log.notification_log import enqueue_create_notification
 
-    User = DocType("User")
-    HasRole = DocType("Has Role")
-    managers = (
-        frappe.qb.from_(User)
-        .inner_join(HasRole).on(User.name == HasRole.parent)
-        .select(User.name)
-        .where((HasRole.role == "Assets Manager") & (User.enabled == 1))
-        .run(pluck="name")
-    )
+    managers = [r[0] for r in frappe.db.sql("""
+        SELECT u.name
+        FROM `tabUser` u
+        JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
+        WHERE hr.role = 'Assets Manager' AND u.enabled = 1
+    """)]
 
     asset_list = ", ".join(f"<b>{a.asset_name or a.asset}</b>" for a in allocated)
     enqueue_create_notification(

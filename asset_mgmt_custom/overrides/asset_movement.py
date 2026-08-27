@@ -104,20 +104,15 @@ def _clear_transit(item):
 
 def _get_assets_manager_emails():
     """Return email list of all enabled users holding the 'Assets Manager' role."""
-    user_table = frappe.qb.DocType("User")
-    role_table = frappe.qb.DocType("Has Role")
-    return (
-        frappe.qb.from_(user_table)
-        .inner_join(role_table)
-        .on(user_table.name == role_table.parent)
-        .select(user_table.email)
-        .where(
-            (role_table.role == "Assets Manager")
-            & (user_table.enabled == 1)
-            & (user_table.name.notin(["Administrator", "All", "Guest"]))
-        )
-        .run(pluck="email")
-    )
+    return [r[0] for r in frappe.db.sql("""
+        SELECT u.email
+        FROM `tabUser` u
+        JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
+        WHERE hr.role = 'Assets Manager'
+          AND u.enabled = 1
+          AND u.name NOT IN ('Administrator', 'All', 'Guest')
+          AND u.email IS NOT NULL AND u.email != ''
+    """)]
 
 
 def _notify_target_location(doc, item):

@@ -2,7 +2,6 @@
 import frappe
 from frappe import _
 from frappe.utils import date_diff, today, add_days, now_datetime
-from frappe.qb import DocType
 
 
 # ---------------------------------------------------------------------------
@@ -10,31 +9,24 @@ from frappe.qb import DocType
 # ---------------------------------------------------------------------------
 
 def _get_manager_users():
-    User = DocType("User")
-    HasRole = DocType("Has Role")
-    return (
-        frappe.qb.from_(User)
-        .inner_join(HasRole).on(User.name == HasRole.parent)
-        .select(User.name)
-        .where((HasRole.role == "Assets Manager") & (User.enabled == 1))
-        .run(pluck="name")
-    )
+    return [r[0] for r in frappe.db.sql("""
+        SELECT u.name
+        FROM `tabUser` u
+        JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
+        WHERE hr.role = 'Assets Manager' AND u.enabled = 1
+    """)]
 
 
 def _get_manager_emails():
-    User = DocType("User")
-    HasRole = DocType("Has Role")
-    return (
-        frappe.qb.from_(User)
-        .inner_join(HasRole).on(User.name == HasRole.parent)
-        .select(User.email)
-        .where(
-            (HasRole.role == "Assets Manager")
-            & (User.enabled == 1)
-            & (User.name.notin(["Administrator", "All", "Guest"]))
-        )
-        .run(pluck="email")
-    )
+    return [r[0] for r in frappe.db.sql("""
+        SELECT u.email
+        FROM `tabUser` u
+        JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
+        WHERE hr.role = 'Assets Manager'
+          AND u.enabled = 1
+          AND u.name NOT IN ('Administrator', 'All', 'Guest')
+          AND u.email IS NOT NULL AND u.email != ''
+    """)]
 
 
 def _create_notification(subject, content, doc_type, doc_name, users):
@@ -104,7 +96,7 @@ def send_incomplete_asset_alerts():
 
 def send_maintenance_due_alerts():
     """
-    Daily: notify Assets Managers of maintenance tasks due in ≤ 7 days or overdue.
+    Daily: notify Assets Managers of maintenance tasks due in <= 7 days or overdue.
     """
     cutoff = add_days(today(), 7)
 
@@ -215,7 +207,7 @@ def check_requisition_sla(sla_hours=48):
 
 def send_warranty_digest_email():
     """
-    Weekly: send a summary email of assets with warranty expiring in ≤ 30 days.
+    Weekly: send a summary email of assets with warranty expiring in <= 30 days.
     """
     cutoff = add_days(today(), 30)
 
@@ -240,43 +232,42 @@ def send_warranty_digest_email():
     if not recipient_emails:
         return
 
-    # Build HTML table
     rows_html = ""
     for a in assets:
         d = a.days_remaining or 0
         color = "#ef4444" if d <= 14 else "#f59e0b" if d <= 21 else "#10b981"
-        rows_html += f"""<tr>
-            <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;">{a.name}</td>
-            <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;">{a.asset_name}</td>
-            <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;">{a.asset_category or ''}</td>
-            <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;">{a.location or ''}</td>
-            <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;">{a.custom_warranty_expiry}</td>
-            <td style="padding:6px 10px;border-bottom:1px solid #e5e7eb;color:{color};font-weight:bold;">{d} days</td>
-        </tr>"""
+        rows_html += (
+            "<tr>"
+            f"<td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;'>{a.name}</td>"
+            f"<td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;'>{a.asset_name}</td>"
+            f"<td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;'>{a.asset_category or ''}</td>"
+            f"<td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;'>{a.location or ''}</td>"
+            f"<td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;'>{a.custom_warranty_expiry}</td>"
+            f"<td style='padding:6px 10px;border-bottom:1px solid #e5e7eb;"
+            f"color:{color};font-weight:bold;'>{d} days</td>"
+            "</tr>"
+        )
 
-    html = f"""
-    <div style="font-family:Arial,sans-serif;max-width:800px;">
-      <h2 style="color:#1e3a5f;">Warranty Expiry Digest — تنبيه انتهاء الضمان</h2>
-      <p style="color:#64748b;">Assets with warranty expiring within <b>30 days</b> as of {today()}:</p>
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead>
-          <tr style="background:#1e3a5f;color:#fff;">
-            <th style="padding:8px 10px;text-align:left;">Asset</th>
-            <th style="padding:8px 10px;text-align:left;">Name</th>
-            <th style="padding:8px 10px;text-align:left;">Category</th>
-            <th style="padding:8px 10px;text-align:left;">Location</th>
-            <th style="padding:8px 10px;text-align:left;">Expiry Date</th>
-            <th style="padding:8px 10px;text-align:left;">Days Left</th>
-          </tr>
-        </thead>
-        <tbody>{rows_html}</tbody>
-      </table>
-      <p style="margin-top:20px;font-size:11px;color:#94a3b8;">
-        This is an automated weekly digest from Asset Management Custom.<br>
-        بريد تلقائي أسبوعي من نظام إدارة الأصول.
-      </p>
-    </div>
-    """
+    html = (
+        "<div style='font-family:Arial,sans-serif;max-width:800px;'>"
+        "<h2 style='color:#1e3a5f;'>Warranty Expiry Digest — تنبيه انتهاء الضمان</h2>"
+        f"<p style='color:#64748b;'>Assets with warranty expiring within <b>30 days</b> as of {today()}:</p>"
+        "<table style='width:100%;border-collapse:collapse;font-size:13px;'>"
+        "<thead><tr style='background:#1e3a5f;color:#fff;'>"
+        "<th style='padding:8px 10px;text-align:left;'>Asset</th>"
+        "<th style='padding:8px 10px;text-align:left;'>Name</th>"
+        "<th style='padding:8px 10px;text-align:left;'>Category</th>"
+        "<th style='padding:8px 10px;text-align:left;'>Location</th>"
+        "<th style='padding:8px 10px;text-align:left;'>Expiry Date</th>"
+        "<th style='padding:8px 10px;text-align:left;'>Days Left</th>"
+        "</tr></thead>"
+        f"<tbody>{rows_html}</tbody>"
+        "</table>"
+        "<p style='margin-top:20px;font-size:11px;color:#94a3b8;'>"
+        "This is an automated weekly digest from Asset Management Custom.<br>"
+        "بريد تلقائي أسبوعي من نظام إدارة الأصول.</p>"
+        "</div>"
+    )
 
     subject = _("[Weekly Digest] {0} Assets with Warranty Expiring Soon").format(len(assets))
     frappe.sendmail(
@@ -348,5 +339,4 @@ def check_overdue_loans():
             loan.asset_name, loan.loaned_to_name or loan.loaned_to,
             loan.expected_return_date, days)
         _create_notification(subject, content, "Asset Loan", loan.name, manager_users)
-        # Update status
         frappe.db.set_value("Asset Loan", loan.name, "status", "Overdue", update_modified=False)
