@@ -224,15 +224,6 @@
    },
    {
     "type": "Link",
-    "label": "فريق صيانة الأصول",
-    "link_to": "Asset Maintenance Team",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
     "label": "دفتر مالي",
     "link_to": "Finance Book",
     "link_type": "DocType",
@@ -406,8 +397,10 @@
    },
    {
     "type": "Card Break",
-    "label": "الصيانة والإصلاح",
-    "hidden": 0
+    "label": "الصيانة (شامل)",
+    "hidden": 0,
+    "link_count": 19,
+    "onboard": 0
    },
    {
     "type": "Link",
@@ -435,6 +428,15 @@
     "is_query_report": 0,
     "hidden": 0,
     "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "فريق صيانة الأصول",
+    "link_to": "Asset Maintenance Team",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
    },
    {
     "type": "Link",
@@ -478,6 +480,98 @@
     "link_to": "Asset Warranty Claim",
     "link_type": "DocType",
     "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "أمر العمل",
+    "link_to": "Asset Work Order",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "قراءة العداد",
+    "link_to": "Asset Meter Reading",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "الصيانة القادمة",
+    "link_to": "Upcoming Maintenance",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "امتثال التنظيف",
+    "link_to": "Asset Cleaning Compliance",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "تحليل MTBF / MTTR",
+    "link_count": 0,
+    "link_to": "Asset MTBF MTTR Analysis",
+    "link_type": "Report",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "فعالية المعدات OEE",
+    "link_count": 0,
+    "link_to": "Asset OEE Report",
+    "link_type": "Report",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "type": "Link",
+    "label": "تفاصيل تكلفة الصيانة",
+    "link_to": "Maintenance Cost Detail",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "نسبة تكلفة الصيانة",
+    "link_to": "Maintenance Cost Ratio",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تحليل التوقف عن العمل",
+    "link_to": "Asset Downtime Analysis",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "ميزانية الصيانة مقابل الفعلي",
+    "link_to": "Maintenance Budget vs Actual",
+    "link_type": "Report",
+    "is_query_report": 1,
     "hidden": 0,
     "onboard": 0
    },
@@ -798,26 +892,8 @@
    },
    {
     "type": "Link",
-    "label": "أمر العمل",
-    "link_to": "Asset Work Order",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 1
-   },
-   {
-    "type": "Link",
     "label": "تصريح العمل",
     "link_to": "Asset Work Permit",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 1
-   },
-   {
-    "type": "Link",
-    "label": "قراءة العداد",
-    "link_to": "Asset Meter Reading",
     "link_type": "DocType",
     "is_query_report": 0,
     "hidden": 0,
@@ -880,15 +956,6 @@
    },
    {
     "type": "Link",
-    "label": "الصيانة القادمة",
-    "link_to": "Upcoming Maintenance",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 1
-   },
-   {
-    "type": "Link",
     "label": "الأصول غير المكتملة",
     "link_to": "Incomplete Assets",
     "link_type": "Report",
@@ -900,15 +967,6 @@
     "type": "Link",
     "label": "تحليل أعمار الأصول",
     "link_to": "Asset Age Analysis",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "تخطيط استبدال الأصول",
-    "link_to": "Asset Replacement Planning",
     "link_type": "Report",
     "is_query_report": 1,
     "hidden": 0,
@@ -952,15 +1010,6 @@
    },
    {
     "type": "Link",
-    "label": "امتثال التنظيف",
-    "link_to": "Asset Cleaning Compliance",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
     "label": "حالة قطع الغيار",
     "link_to": "Asset Spare Parts Status",
     "link_type": "Report",
@@ -976,26 +1025,6 @@
     "is_query_report": 1,
     "hidden": 0,
     "onboard": 0
-   },
-   {
-    "hidden": 0,
-    "is_query_report": 0,
-    "label": "تحليل MTBF / MTTR",
-    "link_count": 0,
-    "link_to": "Asset MTBF MTTR Analysis",
-    "link_type": "Report",
-    "onboard": 0,
-    "type": "Link"
-   },
-   {
-    "hidden": 0,
-    "is_query_report": 0,
-    "label": "فعالية المعدات OEE",
-    "link_count": 0,
-    "link_to": "Asset OEE Report",
-    "link_type": "Report",
-    "onboard": 0,
-    "type": "Link"
    },
    {
     "type": "Card Break",
@@ -1074,47 +1103,6 @@
     "link_type": "Report",
     "onboard": 0,
     "type": "Link"
-   },
-   {
-    "type": "Card Break",
-    "label": "تقارير الصيانة",
-    "hidden": 0
-   },
-   {
-    "type": "Link",
-    "label": "تفاصيل تكلفة الصيانة",
-    "link_to": "Maintenance Cost Detail",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "نسبة تكلفة الصيانة",
-    "link_to": "Maintenance Cost Ratio",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "تحليل التوقف عن العمل",
-    "link_to": "Asset Downtime Analysis",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "ميزانية الصيانة مقابل الفعلي",
-    "link_to": "Maintenance Budget vs Actual",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
    },
    {
     "type": "Card Break",
