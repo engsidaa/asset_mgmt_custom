@@ -3,3 +3,4 @@ asset_mgmt_custom.patches.v1_remove_pm_schedule_doctype
 asset_mgmt_custom.patches.v2_fix_workspace_pm_links
 asset_mgmt_custom.patches.v3_cleanup_stale_pm_references
 asset_mgmt_custom.patches.v4_fix_workspace_number_cards
+asset_mgmt_custom.patches.v5_recreate_workspace_from_fixture
