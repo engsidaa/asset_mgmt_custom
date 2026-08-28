@@ -8,7 +8,7 @@
   "public": 1,
   "is_hidden": 0,
   "icon": "assets",
-  "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>مؤشرات الأداء الرئيسية</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Active Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue Checkouts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Incidents\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Expired Compliance Certs\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Low Stock Spare Parts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Bookings\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Software Licenses Expiring\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Asset Repairs\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Critical Assets\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>اختصارات سريعة</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب أصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حركة الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تسليم الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إصلاح الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"صيانة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة الوقائية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حجز الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"استعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"فحص السلامة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقييم الحالة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"التدقيق المادي\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"شهادة الامتثال\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"عقد الصيانة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ميزانية رأسمالية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب قطعة غيار\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ترخيص برمجيات\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب التخلص\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"رسملة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تنبيهات الضمان\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة القادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقرير الأصول المتقادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"سجل الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"أمر العمل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تصريح العمل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقييم المخاطر\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تحليل أسباب العطل\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>الأصول والمعاملات</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الأصول الرئيسية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"طلبات الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"نقل وتسليم الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الصيانة والإصلاح\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحجوزات والاستعارات\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"السلامة والحوادث\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"العقود والتأمين\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"المالية والميزانية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحالة والأداء\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"البيئة والطاقة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"إخراج الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الوثائق والبيانات\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"أوامر العمل والتصاريح\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التحليل والتخطيط\", \"col\": 4}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>التقارير</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير التشغيل\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المالية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير الصيانة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المتقدمة\", \"col\": 4}}]",
+  "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0645\\u0624\\u0634\\u0631\\u0627\\u062a \\u0627\\u0644\\u0623\\u062f\\u0627\\u0621 \\u0627\\u0644\\u0631\\u0626\\u064a\\u0633\\u064a\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Active Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue Checkouts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Incidents\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Expired Compliance Certs\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Low Stock Spare Parts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Bookings\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Software Licenses Expiring\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Critical Assets\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0627\\u062e\\u062a\\u0635\\u0627\\u0631\\u0627\\u062a \\u0633\\u0631\\u064a\\u0639\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0627\\u0644\\u0623\\u0635\\u0648\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0637\\u0644\\u0628 \\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062d\\u0631\\u0643\\u0629 \\u0627\\u0644\\u0623\\u0635\\u0648\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062a\\u0633\\u0644\\u064a\\u0645 \\u0627\\u0644\\u0623\\u0635\\u0648\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062d\\u062c\\u0632 \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0627\\u0633\\u062a\\u0639\\u0627\\u0631\\u0629 \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0641\\u062d\\u0635 \\u0627\\u0644\\u0633\\u0644\\u0627\\u0645\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062a\\u0642\\u064a\\u064a\\u0645 \\u0627\\u0644\\u062d\\u0627\\u0644\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0627\\u0644\\u062a\\u062f\\u0642\\u064a\\u0642 \\u0627\\u0644\\u0645\\u0627\\u062f\\u064a\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0634\\u0647\\u0627\\u062f\\u0629 \\u0627\\u0644\\u0627\\u0645\\u062a\\u062b\\u0627\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0645\\u064a\\u0632\\u0627\\u0646\\u064a\\u0629 \\u0631\\u0623\\u0633\\u0645\\u0627\\u0644\\u064a\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0637\\u0644\\u0628 \\u0642\\u0637\\u0639\\u0629 \\u063a\\u064a\\u0627\\u0631\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0625\\u0639\\u0627\\u0631\\u0629 \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062a\\u0631\\u062e\\u064a\\u0635 \\u0628\\u0631\\u0645\\u062c\\u064a\\u0627\\u062a\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0637\\u0644\\u0628 \\u0627\\u0644\\u062a\\u062e\\u0644\\u0635\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0631\\u0633\\u0645\\u0644\\u0629 \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062a\\u0646\\u0628\\u064a\\u0647\\u0627\\u062a \\u0627\\u0644\\u0636\\u0645\\u0627\\u0646\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062a\\u0642\\u0631\\u064a\\u0631 \\u0627\\u0644\\u0623\\u0635\\u0648\\u0644 \\u0627\\u0644\\u0645\\u062a\\u0642\\u0627\\u062f\\u0645\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0633\\u062c\\u0644 \\u0627\\u0644\\u0623\\u0635\\u0648\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062a\\u0635\\u0631\\u064a\\u062d \\u0627\\u0644\\u0639\\u0645\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062a\\u0642\\u064a\\u064a\\u0645 \\u0627\\u0644\\u0645\\u062e\\u0627\\u0637\\u0631\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u062a\\u062d\\u0644\\u064a\\u0644 \\u0623\\u0633\\u0628\\u0627\\u0628 \\u0627\\u0644\\u0639\\u0637\\u0644\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0627\\u0644\\u0623\\u0635\\u0648\\u0644 \\u0648\\u0627\\u0644\\u0645\\u0639\\u0627\\u0645\\u0644\\u0627\\u062a</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0623\\u0635\\u0648\\u0644 \\u0627\\u0644\\u0631\\u0626\\u064a\\u0633\\u064a\\u0629\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0637\\u0644\\u0628\\u0627\\u062a \\u0627\\u0644\\u0623\\u0635\\u0648\\u0644\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0646\\u0642\\u0644 \\u0648\\u062a\\u0633\\u0644\\u064a\\u0645 \\u0627\\u0644\\u0623\\u0635\\u0648\\u0644\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u062d\\u062c\\u0648\\u0632\\u0627\\u062a \\u0648\\u0627\\u0644\\u0627\\u0633\\u062a\\u0639\\u0627\\u0631\\u0627\\u062a\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0633\\u0644\\u0627\\u0645\\u0629 \\u0648\\u0627\\u0644\\u062d\\u0648\\u0627\\u062f\\u062b\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0639\\u0642\\u0648\\u062f \\u0648\\u0627\\u0644\\u062a\\u0623\\u0645\\u064a\\u0646\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0645\\u0627\\u0644\\u064a\\u0629 \\u0648\\u0627\\u0644\\u0645\\u064a\\u0632\\u0627\\u0646\\u064a\\u0629\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u062d\\u0627\\u0644\\u0629 \\u0648\\u0627\\u0644\\u0623\\u062f\\u0627\\u0621\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0628\\u064a\\u0626\\u0629 \\u0648\\u0627\\u0644\\u0637\\u0627\\u0642\\u0629\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0625\\u062e\\u0631\\u0627\\u062c \\u0627\\u0644\\u0623\\u0635\\u0648\\u0644\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0648\\u062b\\u0627\\u0626\\u0642 \\u0648\\u0627\\u0644\\u0628\\u064a\\u0627\\u0646\\u0627\\u062a\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0623\\u0648\\u0627\\u0645\\u0631 \\u0627\\u0644\\u0639\\u0645\\u0644 \\u0648\\u0627\\u0644\\u062a\\u0635\\u0627\\u0631\\u064a\\u062d\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u062a\\u062d\\u0644\\u064a\\u0644 \\u0648\\u0627\\u0644\\u062a\\u062e\\u0637\\u064a\\u0637\", \"col\": 4}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0627\\u0644\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631 \\u0627\\u0644\\u062a\\u0634\\u063a\\u064a\\u0644\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631 \\u0627\\u0644\\u0645\\u0627\\u0644\\u064a\\u0629\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631 \\u0627\\u0644\\u0645\\u062a\\u0642\\u062f\\u0645\\u0629\", \"col\": 4}}]",
   "number_cards": [
    {
     "number_card_name": "Total Active Assets"
@@ -18,9 +18,6 @@
    },
    {
     "number_card_name": "Assets In Transit"
-   },
-   {
-    "number_card_name": "Assets Under Repair"
    },
    {
     "number_card_name": "Overdue Checkouts"
@@ -42,9 +39,6 @@
    },
    {
     "number_card_name": "Software Licenses Expiring"
-   },
-   {
-    "number_card_name": "Open Asset Repairs"
    },
    {
     "number_card_name": "Critical Assets"
@@ -69,16 +63,6 @@
    {
     "label": "تسليم الأصول",
     "link_to": "Asset Handover",
-    "type": "DocType"
-   },
-   {
-    "label": "إصلاح الأصل",
-    "link_to": "Asset Repair",
-    "type": "DocType"
-   },
-   {
-    "label": "صيانة الأصل",
-    "link_to": "Asset Maintenance",
     "type": "DocType"
    },
    {
@@ -109,11 +93,6 @@
    {
     "label": "شهادة الامتثال",
     "link_to": "Asset Compliance Certificate",
-    "type": "DocType"
-   },
-   {
-    "label": "عقد الصيانة",
-    "link_to": "Asset Maintenance Contract",
     "type": "DocType"
    },
    {
@@ -153,12 +132,6 @@
     "report_ref_doctype": "Asset"
    },
    {
-    "label": "الصيانة القادمة",
-    "link_to": "Upcoming Maintenance",
-    "type": "Report",
-    "report_ref_doctype": "Asset Maintenance"
-   },
-   {
     "label": "تقرير الأصول المتقادمة",
     "link_to": "Asset Aging Report",
     "type": "Report"
@@ -167,11 +140,6 @@
     "label": "سجل الأصول",
     "link_to": "Asset Register",
     "type": "Report"
-   },
-   {
-    "label": "أمر العمل",
-    "link_to": "Asset Work Order",
-    "type": "DocType"
    },
    {
     "label": "تصريح العمل",
@@ -390,186 +358,6 @@
     "type": "Link",
     "label": "خريطة مواقع الأصول",
     "link_to": "Asset Location Map",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Card Break",
-    "label": "الصيانة (شامل)",
-    "hidden": 0,
-    "link_count": 19,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "إصلاح الأصل",
-    "link_to": "Asset Repair",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 1
-   },
-   {
-    "type": "Link",
-    "label": "صيانة الأصل",
-    "link_to": "Asset Maintenance",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 1
-   },
-   {
-    "type": "Link",
-    "label": "عقد الصيانة",
-    "link_to": "Asset Maintenance Contract",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 1
-   },
-   {
-    "type": "Link",
-    "label": "فريق صيانة الأصول",
-    "link_to": "Asset Maintenance Team",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "ميزانية الصيانة",
-    "link_to": "Asset Maintenance Budget",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "سجل الصيانة",
-    "link_to": "Asset Maintenance Log Custom",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "سجل المعايرة",
-    "link_to": "Asset Calibration Record",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "جدول التنظيف",
-    "link_to": "Asset Cleaning Schedule",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "مطالبة بالضمان",
-    "link_to": "Asset Warranty Claim",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "أمر العمل",
-    "link_to": "Asset Work Order",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 1
-   },
-   {
-    "type": "Link",
-    "label": "قراءة العداد",
-    "link_to": "Asset Meter Reading",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 1
-   },
-   {
-    "type": "Link",
-    "label": "الصيانة القادمة",
-    "link_to": "Upcoming Maintenance",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 1
-   },
-   {
-    "type": "Link",
-    "label": "امتثال التنظيف",
-    "link_to": "Asset Cleaning Compliance",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "hidden": 0,
-    "is_query_report": 0,
-    "label": "تحليل MTBF / MTTR",
-    "link_count": 0,
-    "link_to": "Asset MTBF MTTR Analysis",
-    "link_type": "Report",
-    "onboard": 0,
-    "type": "Link"
-   },
-   {
-    "hidden": 0,
-    "is_query_report": 0,
-    "label": "فعالية المعدات OEE",
-    "link_count": 0,
-    "link_to": "Asset OEE Report",
-    "link_type": "Report",
-    "onboard": 0,
-    "type": "Link"
-   },
-   {
-    "type": "Link",
-    "label": "تفاصيل تكلفة الصيانة",
-    "link_to": "Maintenance Cost Detail",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "نسبة تكلفة الصيانة",
-    "link_to": "Maintenance Cost Ratio",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "تحليل التوقف عن العمل",
-    "link_to": "Asset Downtime Analysis",
-    "link_type": "Report",
-    "is_query_report": 1,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
-    "type": "Link",
-    "label": "ميزانية الصيانة مقابل الفعلي",
-    "link_to": "Maintenance Budget vs Actual",
     "link_type": "Report",
     "is_query_report": 1,
     "hidden": 0,
@@ -1158,6 +946,249 @@
     "type": "Link",
     "label": "تقرير استبدال الأصول",
     "link_to": "Asset Replacement Planning",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   }
+  ]
+ },
+ {
+  "doctype": "Workspace",
+  "name": "الصيانة",
+  "label": "الصيانة",
+  "title": "الصيانة",
+  "module": "Asset Mgmt Custom",
+  "public": 1,
+  "is_hidden": 0,
+  "icon": "tool",
+  "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0646\\u0638\\u0631\\u0629 \\u0639\\u0627\\u0645\\u0629 \\u0639\\u0644\\u0649 \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Asset Repairs\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0627\\u062e\\u062a\\u0635\\u0627\\u0631\\u0627\\u062a \\u0633\\u0631\\u064a\\u0639\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0625\\u0635\\u0644\\u0627\\u062d \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0635\\u064a\\u0627\\u0646\\u0629 \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0639\\u0642\\u062f \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629 \\u0627\\u0644\\u0642\\u0627\\u062f\\u0645\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0623\\u0645\\u0631 \\u0627\\u0644\\u0639\\u0645\\u0644\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0623\\u062f\\u0648\\u0627\\u062a \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0639\\u0645\\u0644\\u064a\\u0627\\u062a \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629\", \"col\": 6}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0645\\u064a\\u0632\\u0627\\u0646\\u064a\\u0629 \\u0648\\u0627\\u0644\\u062a\\u0648\\u062b\\u064a\\u0642\", \"col\": 6}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0627\\u0644\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631 \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629\", \"col\": 6}}]",
+  "number_cards": [
+   {
+    "number_card_name": "Assets Under Repair"
+   },
+   {
+    "number_card_name": "Open Asset Repairs"
+   }
+  ],
+  "shortcuts": [
+   {
+    "label": "إصلاح الأصل",
+    "link_to": "Asset Repair",
+    "type": "DocType"
+   },
+   {
+    "label": "صيانة الأصل",
+    "link_to": "Asset Maintenance",
+    "type": "DocType"
+   },
+   {
+    "label": "عقد الصيانة",
+    "link_to": "Asset Maintenance Contract",
+    "type": "DocType"
+   },
+   {
+    "label": "الصيانة القادمة",
+    "link_to": "Upcoming Maintenance",
+    "type": "Report",
+    "report_ref_doctype": "Asset Maintenance"
+   },
+   {
+    "label": "أمر العمل",
+    "link_to": "Asset Work Order",
+    "type": "DocType"
+   }
+  ],
+  "links": [
+   {
+    "type": "Card Break",
+    "label": "عمليات الصيانة",
+    "hidden": 0,
+    "link_count": 6,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "إصلاح الأصل",
+    "link_to": "Asset Repair",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "صيانة الأصل",
+    "link_to": "Asset Maintenance",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "عقد الصيانة",
+    "link_to": "Asset Maintenance Contract",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "فريق صيانة الأصول",
+    "link_to": "Asset Maintenance Team",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "أمر العمل",
+    "link_to": "Asset Work Order",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "قراءة العداد",
+    "link_to": "Asset Meter Reading",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Card Break",
+    "label": "الميزانية والتوثيق",
+    "hidden": 0,
+    "link_count": 5,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "ميزانية الصيانة",
+    "link_to": "Asset Maintenance Budget",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "سجل الصيانة",
+    "link_to": "Asset Maintenance Log Custom",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "سجل المعايرة",
+    "link_to": "Asset Calibration Record",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "جدول التنظيف",
+    "link_to": "Asset Cleaning Schedule",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "مطالبة بالضمان",
+    "link_to": "Asset Warranty Claim",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "تقارير الصيانة",
+    "hidden": 0,
+    "link_count": 8,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "الصيانة القادمة",
+    "link_to": "Upcoming Maintenance",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "امتثال التنظيف",
+    "link_to": "Asset Cleaning Compliance",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "تحليل MTBF / MTTR",
+    "link_count": 0,
+    "link_to": "Asset MTBF MTTR Analysis",
+    "link_type": "Report",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "فعالية المعدات OEE",
+    "link_count": 0,
+    "link_to": "Asset OEE Report",
+    "link_type": "Report",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "type": "Link",
+    "label": "تفاصيل تكلفة الصيانة",
+    "link_to": "Maintenance Cost Detail",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "نسبة تكلفة الصيانة",
+    "link_to": "Maintenance Cost Ratio",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تحليل التوقف عن العمل",
+    "link_to": "Asset Downtime Analysis",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "ميزانية الصيانة مقابل الفعلي",
+    "link_to": "Maintenance Budget vs Actual",
     "link_type": "Report",
     "is_query_report": 1,
     "hidden": 0,
