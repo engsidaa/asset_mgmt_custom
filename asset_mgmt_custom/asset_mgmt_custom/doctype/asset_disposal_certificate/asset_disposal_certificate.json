@@ -1,0 +1,104 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Disposal Certificate",
+  "module": "Asset Mgmt Custom",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "autoname": "naming_series:",
+  "naming_series": "DCERT-.YYYY.-",
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Series",
+      "options": "DCERT-.YYYY.-"
+    },
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1
+    },
+    {
+      "fieldname": "asset_category",
+      "fieldtype": "Link",
+      "label": "Asset Category",
+      "options": "Asset Category",
+      "fetch_from": "asset.asset_category",
+      "read_only": 1
+    },
+    {
+      "fieldname": "disposal_date",
+      "fieldtype": "Date",
+      "label": "Disposal Date",
+      "reqd": 1
+    },
+    {
+      "fieldname": "disposal_method",
+      "fieldtype": "Select",
+      "label": "Disposal Method",
+      "options": "Sold\nScrapped\nDonated\nTransferred\nDestroyed",
+      "reqd": 1
+    },
+    {
+      "fieldname": "disposal_value",
+      "fieldtype": "Currency",
+      "label": "Disposal/Salvage Value"
+    },
+    {
+      "fieldname": "disposed_by",
+      "fieldtype": "Link",
+      "label": "Disposed By",
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "authorized_by",
+      "fieldtype": "Link",
+      "label": "Authorized By",
+      "options": "User",
+      "reqd": 1
+    },
+    {
+      "fieldname": "buyer_name",
+      "fieldtype": "Data",
+      "label": "Buyer/Recipient Name",
+      "depends_on": "eval:in_list(['Sold','Donated','Transferred'], doc.disposal_method)"
+    },
+    {
+      "fieldname": "certificate_number",
+      "fieldtype": "Data",
+      "label": "Certificate Number",
+      "read_only": 1
+    },
+    {
+      "fieldname": "remarks",
+      "fieldtype": "Small Text",
+      "label": "Remarks"
+    },
+    {
+      "fieldname": "attachment",
+      "fieldtype": "Attach",
+      "label": "Supporting Document"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 1,
+      "cancel": 1,
+      "delete": 1
+    }
+  ]
+}

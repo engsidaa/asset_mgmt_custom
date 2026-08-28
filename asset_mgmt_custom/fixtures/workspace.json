@@ -186,6 +186,41 @@
         "label": "Asset Calibration Record",
         "link_to": "Asset Calibration Record",
         "link_type": "DocType"
+      },
+      {
+        "label": "Asset Booking",
+        "link_to": "Asset Booking",
+        "type": "DocType"
+      },
+      {
+        "label": "Condition Assessment",
+        "link_to": "Asset Condition Assessment",
+        "type": "DocType"
+      },
+      {
+        "label": "Software License",
+        "link_to": "Asset Software License",
+        "type": "DocType"
+      },
+      {
+        "label": "PM Schedule",
+        "link_to": "Asset Preventive Maintenance Schedule",
+        "type": "DocType"
+      },
+      {
+        "label": "Aging Report",
+        "link_to": "Asset Aging Report",
+        "type": "Report"
+      },
+      {
+        "label": "TCO Report",
+        "link_to": "Asset Total Cost of Ownership",
+        "type": "Report"
+      },
+      {
+        "label": "Booking Calendar",
+        "link_to": "Asset Booking Calendar",
+        "type": "Report"
       }
     ],
     "links": [
@@ -758,6 +793,260 @@
         "is_query_report": 1,
         "hidden": 0,
         "onboard": 0
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Bookings & Scheduling",
+        "link_count": 0,
+        "onboard": 0,
+        "type": "Card Break"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Booking",
+        "link_count": 0,
+        "link_to": "Asset Booking",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Booking Calendar",
+        "link_count": 0,
+        "link_to": "Asset Booking Calendar",
+        "link_type": "Report",
+        "onboard": 0,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Condition & Criticality",
+        "link_count": 0,
+        "onboard": 0,
+        "type": "Card Break"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Condition Assessment",
+        "link_count": 0,
+        "link_to": "Asset Condition Assessment",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Criticality Matrix",
+        "link_count": 0,
+        "link_to": "Asset Criticality Matrix",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset KPI Target",
+        "link_count": 0,
+        "link_to": "Asset KPI Target",
+        "link_type": "DocType",
+        "onboard": 0,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Software & Licenses",
+        "link_count": 0,
+        "onboard": 0,
+        "type": "Card Break"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Software License",
+        "link_count": 0,
+        "link_to": "Asset Software License",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Document Vault",
+        "link_count": 0,
+        "link_to": "Asset Document Vault",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Requests & Returns",
+        "link_count": 0,
+        "onboard": 0,
+        "type": "Card Break"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Spare Part Request",
+        "link_count": 0,
+        "link_to": "Asset Spare Part Request",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Return Request",
+        "link_count": 0,
+        "link_to": "Asset Return Request",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Life Extension Request",
+        "link_count": 0,
+        "link_to": "Asset Life Extension Request",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Preventive Maintenance",
+        "link_count": 0,
+        "onboard": 0,
+        "type": "Card Break"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Preventive Maintenance Schedule",
+        "link_count": 0,
+        "link_to": "Asset Preventive Maintenance Schedule",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Environmental & Utilization",
+        "link_count": 0,
+        "onboard": 0,
+        "type": "Card Break"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Utilization Log",
+        "link_count": 0,
+        "link_to": "Asset Utilization Log",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Environmental Log",
+        "link_count": 0,
+        "link_to": "Asset Environmental Log",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Disposal & Certificates",
+        "link_count": 0,
+        "onboard": 0,
+        "type": "Card Break"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Asset Disposal Certificate",
+        "link_count": 0,
+        "link_to": "Asset Disposal Certificate",
+        "link_type": "DocType",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 0,
+        "label": "Advanced Reports",
+        "link_count": 0,
+        "onboard": 0,
+        "type": "Card Break"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 1,
+        "label": "Asset Aging Report",
+        "link_count": 0,
+        "link_to": "Asset Aging Report",
+        "link_type": "Report",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 1,
+        "label": "Asset Utilization Report",
+        "link_count": 0,
+        "link_to": "Asset Utilization Report",
+        "link_type": "Report",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 1,
+        "label": "Asset Total Cost of Ownership",
+        "link_count": 0,
+        "link_to": "Asset Total Cost of Ownership",
+        "link_type": "Report",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 1,
+        "label": "Asset Lifecycle Report",
+        "link_count": 0,
+        "link_to": "Asset Lifecycle Report",
+        "link_type": "Report",
+        "onboard": 1,
+        "type": "Link"
+      },
+      {
+        "hidden": 0,
+        "is_query_report": 1,
+        "label": "Asset Budget vs Actual",
+        "link_count": 0,
+        "link_to": "Asset Budget vs Actual",
+        "link_type": "Report",
+        "onboard": 0,
+        "type": "Link"
       }
     ]
   }

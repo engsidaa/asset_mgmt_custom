@@ -1,0 +1,30 @@
+{
+  "doctype": "Report",
+  "name": "Asset Lifecycle Report",
+  "report_name": "Asset Lifecycle Report",
+  "ref_doctype": "Asset",
+  "report_type": "Script Report",
+  "is_standard": "Yes",
+  "module": "Asset Mgmt Custom",
+  "disabled": 0,
+  "filters": [
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company"
+    },
+    {
+      "fieldname": "asset_category",
+      "label": "Asset Category",
+      "fieldtype": "Link",
+      "options": "Asset Category"
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "\nIn Location\nIssued\nScrapped\nDisposed of"
+    }
+  ]
+}

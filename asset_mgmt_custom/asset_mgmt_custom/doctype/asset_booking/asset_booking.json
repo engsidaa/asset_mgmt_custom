@@ -1,0 +1,27 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Booking",
+  "module": "Asset Mgmt Custom",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "naming_rule": "By \"Naming Series\" field",
+  "fields": [
+    {"fieldname": "naming_series", "fieldtype": "Select", "label": "Series", "options": "BOOK-.YYYY.-"},
+    {"fieldname": "asset", "fieldtype": "Link", "options": "Asset", "label": "Asset", "reqd": 1},
+    {"fieldname": "asset_name", "fieldtype": "Data", "label": "Asset Name", "fetch_from": "asset.asset_name", "read_only": 1},
+    {"fieldname": "asset_category", "fieldtype": "Link", "options": "Asset Category", "label": "Asset Category", "fetch_from": "asset.asset_category", "read_only": 1},
+    {"fieldname": "booked_by", "fieldtype": "Link", "options": "Employee", "label": "Booked By", "reqd": 1},
+    {"fieldname": "department", "fieldtype": "Link", "options": "Department", "label": "Department", "fetch_from": "booked_by.department", "read_only": 1},
+    {"fieldname": "booking_date", "fieldtype": "Date", "label": "Booking Date", "reqd": 1},
+    {"fieldname": "from_datetime", "fieldtype": "Datetime", "label": "From", "reqd": 1},
+    {"fieldname": "to_datetime", "fieldtype": "Datetime", "label": "To", "reqd": 1},
+    {"fieldname": "purpose", "fieldtype": "Small Text", "label": "Purpose"},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Pending\nApproved\nRejected\nCompleted\nCancelled", "default": "Pending"},
+    {"fieldname": "approved_by", "fieldtype": "Link", "options": "User", "label": "Approved By", "read_only": 1},
+    {"fieldname": "approval_date", "fieldtype": "Date", "label": "Approval Date", "read_only": 1},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "delete": 0}
+  ]
+}

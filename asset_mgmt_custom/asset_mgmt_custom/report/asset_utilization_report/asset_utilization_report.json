@@ -1,0 +1,38 @@
+{
+  "doctype": "Report",
+  "name": "Asset Utilization Report",
+  "report_name": "Asset Utilization Report",
+  "ref_doctype": "Asset Utilization Log",
+  "report_type": "Script Report",
+  "is_standard": "Yes",
+  "module": "Asset Mgmt Custom",
+  "disabled": 0,
+  "filters": [
+    {
+      "fieldname": "branch",
+      "label": "Branch",
+      "fieldtype": "Link",
+      "options": "Branch"
+    },
+    {
+      "fieldname": "asset_category",
+      "label": "Asset Category",
+      "fieldtype": "Link",
+      "options": "Asset Category"
+    },
+    {
+      "fieldname": "from_date",
+      "label": "From Date",
+      "fieldtype": "Date",
+      "reqd": 1,
+      "default": "eval:frappe.datetime.month_start()"
+    },
+    {
+      "fieldname": "to_date",
+      "label": "To Date",
+      "fieldtype": "Date",
+      "reqd": 1,
+      "default": "Today"
+    }
+  ]
+}

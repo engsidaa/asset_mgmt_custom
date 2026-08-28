@@ -1,0 +1,30 @@
+{
+  "doctype": "Report",
+  "name": "Asset Aging Report",
+  "report_name": "Asset Aging Report",
+  "ref_doctype": "Asset",
+  "report_type": "Script Report",
+  "is_standard": "Yes",
+  "module": "Asset Mgmt Custom",
+  "disabled": 0,
+  "filters": [
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company"
+    },
+    {
+      "fieldname": "asset_category",
+      "label": "Asset Category",
+      "fieldtype": "Link",
+      "options": "Asset Category"
+    },
+    {
+      "fieldname": "age_bucket",
+      "label": "Age Bucket",
+      "fieldtype": "Select",
+      "options": "All\n0-1 Year\n1-3 Years\n3-5 Years\n5-10 Years\n10+ Years"
+    }
+  ]
+}

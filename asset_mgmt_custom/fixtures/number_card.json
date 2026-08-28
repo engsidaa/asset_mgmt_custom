@@ -124,5 +124,61 @@
     "show_percentage_stats": 0,
     "type": "Document Type",
     "color": "#0891b2"
+  },
+  {
+    "doctype": "Number Card",
+    "name": "Active Bookings",
+    "label": "Active Bookings (حجوزات نشطة)",
+    "document_type": "Asset Booking",
+    "filters_json": "[[\"Asset Booking\",\"status\",\"=\",\"Approved\",false],[\"Asset Booking\",\"docstatus\",\"=\",1,false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 0,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#0ea5e9"
+  },
+  {
+    "doctype": "Number Card",
+    "name": "Software Licenses Expiring",
+    "label": "Software Licenses Expiring (تراخيص منتهية قريباً)",
+    "document_type": "Asset Software License",
+    "filters_json": "[[\"Asset Software License\",\"status\",\"in\",\"Expiring Soon,Expired\",false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 0,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#d97706"
+  },
+  {
+    "doctype": "Number Card",
+    "name": "Overdue PM Schedules",
+    "label": "Overdue PM Schedules (صيانة وقائية متأخرة)",
+    "document_type": "Asset Preventive Maintenance Schedule",
+    "filters_json": "[[\"Asset Preventive Maintenance Schedule\",\"status\",\"=\",\"Overdue\",false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 0,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#dc2626"
+  },
+  {
+    "doctype": "Number Card",
+    "name": "Critical Assets",
+    "label": "Critical Assets (أصول حرجة)",
+    "document_type": "Asset Criticality Matrix",
+    "filters_json": "[[\"Asset Criticality Matrix\",\"criticality_level\",\"=\",\"Critical\",false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 0,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#7f1d1d"
   }
 ]

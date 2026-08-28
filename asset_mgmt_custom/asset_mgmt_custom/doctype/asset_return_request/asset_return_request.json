@@ -1,0 +1,25 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Return Request",
+  "module": "Asset Mgmt Custom",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "naming_rule": "By \"Naming Series\" field",
+  "fields": [
+    {"fieldname": "naming_series", "fieldtype": "Select", "label": "Series", "options": "ARR-.YYYY.-"},
+    {"fieldname": "asset", "fieldtype": "Link", "options": "Asset", "label": "Asset", "reqd": 1},
+    {"fieldname": "asset_name", "fieldtype": "Data", "label": "Asset Name", "fetch_from": "asset.asset_name", "read_only": 1},
+    {"fieldname": "current_custodian", "fieldtype": "Link", "options": "Employee", "label": "Current Custodian", "reqd": 1},
+    {"fieldname": "department", "fieldtype": "Link", "options": "Department", "label": "Department", "fetch_from": "current_custodian.department", "read_only": 1},
+    {"fieldname": "return_reason", "fieldtype": "Select", "label": "Return Reason", "options": "End of Use\nDamaged\nTransferred\nEmployee Exit\nUpgrade\nOther", "reqd": 1},
+    {"fieldname": "request_date", "fieldtype": "Date", "label": "Request Date", "reqd": 1, "default": "Today"},
+    {"fieldname": "expected_return_date", "fieldtype": "Date", "label": "Expected Return Date"},
+    {"fieldname": "actual_return_date", "fieldtype": "Date", "label": "Actual Return Date", "read_only": 1},
+    {"fieldname": "condition_at_return", "fieldtype": "Select", "label": "Condition at Return", "options": "Excellent\nGood\nFair\nDamaged\nBeyond Repair"},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Pending\nApproved\nReturned\nRejected", "default": "Pending"},
+    {"fieldname": "remarks", "fieldtype": "Small Text", "label": "Remarks"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "delete": 0}
+  ]
+}

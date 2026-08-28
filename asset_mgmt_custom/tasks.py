@@ -682,3 +682,99 @@ def check_overdue_allocations():
             a.asset_name or a.asset, a.employee_name or a.employee,
             a.expected_return_date)
         _create_notification(subject, content, "Asset Employee Allocation", a.name, manager_users)
+
+
+# ---------------------------------------------------------------------------
+# Daily: software license expiry alerts
+# ---------------------------------------------------------------------------
+
+def check_software_license_expiry():
+    """Daily: notify when software licenses are expiring in 30, 14, or 7 days."""
+    for days_ahead in [30, 14, 7]:
+        target = add_days(today(), days_ahead)
+        records = frappe.db.sql("""
+            SELECT name, software_name, asset, asset_name, license_type,
+                   expiry_date, vendor
+            FROM `tabAsset Software License`
+            WHERE expiry_date = %(target)s
+              AND status NOT IN ('Expired', 'Terminated')
+        """, {"target": target}, as_dict=True)
+
+        if not records:
+            continue
+
+        manager_users = _get_manager_users()
+        for r in records:
+            subject = _("Software License Expiring in {0} days: {1}").format(
+                days_ahead, r.software_name)
+            content = _("Software license <b>{0}</b> ({1}) linked to asset "
+                        "<b>{2}</b> will expire on <b>{3}</b>.").format(
+                r.software_name, r.license_type or "N/A",
+                r.asset_name or r.asset or "N/A", r.expiry_date)
+            _create_notification(subject, content, "Asset Software License", r.name, manager_users)
+
+    # Auto-expire past due licenses
+    frappe.db.sql("""
+        UPDATE `tabAsset Software License`
+        SET status = 'Expired'
+        WHERE expiry_date < %(today)s
+          AND status NOT IN ('Expired', 'Terminated')
+    """, {"today": today()})
+
+
+# ---------------------------------------------------------------------------
+# Daily: preventive maintenance schedule due alerts
+# ---------------------------------------------------------------------------
+
+def check_pm_schedule_due():
+    """Daily: notify when preventive maintenance is due and auto-mark overdue."""
+    for days_ahead in [7, 3, 1]:
+        target = add_days(today(), days_ahead)
+        records = frappe.db.sql("""
+            SELECT name, asset, asset_name, maintenance_type,
+                   maintenance_task, next_due_date, assigned_to
+            FROM `tabAsset Preventive Maintenance Schedule`
+            WHERE next_due_date = %(target)s
+              AND status = 'Active'
+        """, {"target": target}, as_dict=True)
+
+        if not records:
+            continue
+
+        manager_users = _get_manager_users()
+        for r in records:
+            subject = _("PM Due in {0} day(s): {1} - {2}").format(
+                days_ahead, r.asset_name or r.asset, r.maintenance_task)
+            content = _("Preventive maintenance task <b>{0}</b> for asset "
+                        "<b>{1}</b> is due on <b>{2}</b> ({3}).").format(
+                r.maintenance_task, r.asset_name or r.asset,
+                r.next_due_date, r.maintenance_type)
+            _create_notification(subject, content,
+                                 "Asset Preventive Maintenance Schedule", r.name, manager_users)
+
+    # Auto-mark overdue
+    frappe.db.sql("""
+        UPDATE `tabAsset Preventive Maintenance Schedule`
+        SET status = 'Overdue'
+        WHERE next_due_date < %(today)s
+          AND status = 'Active'
+    """, {"today": today()})
+
+
+# ---------------------------------------------------------------------------
+# Daily: overdue bookings
+# ---------------------------------------------------------------------------
+
+def check_overdue_bookings():
+    """Daily: mark approved bookings as Completed if past to_datetime."""
+    from frappe.utils import now_datetime as _now
+    overdue = frappe.db.sql("""
+        SELECT name, asset, asset_name, booked_by, to_datetime
+        FROM `tabAsset Booking`
+        WHERE docstatus = 1
+          AND status = 'Approved'
+          AND to_datetime < %(now)s
+    """, {"now": str(_now())}, as_dict=True)
+
+    for b in overdue:
+        frappe.db.set_value("Asset Booking", b.name, "status", "Completed")

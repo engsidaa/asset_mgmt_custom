@@ -1,0 +1,102 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Environmental Log",
+  "module": "Asset Mgmt Custom",
+  "is_submittable": 0,
+  "track_changes": 1,
+  "autoname": "format:ENV-{asset}-{log_date}",
+  "fields": [
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1
+    },
+    {
+      "fieldname": "log_date",
+      "fieldtype": "Date",
+      "label": "Log Date",
+      "reqd": 1,
+      "default": "Today"
+    },
+    {
+      "fieldname": "logged_by",
+      "fieldtype": "Link",
+      "label": "Logged By",
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "co2_emissions_kg",
+      "fieldtype": "Float",
+      "label": "CO₂ Emissions (kg)"
+    },
+    {
+      "fieldname": "fuel_consumption_liters",
+      "fieldtype": "Float",
+      "label": "Fuel Consumption (Liters)"
+    },
+    {
+      "fieldname": "waste_generated_kg",
+      "fieldtype": "Float",
+      "label": "Waste Generated (kg)"
+    },
+    {
+      "fieldname": "water_consumption_liters",
+      "fieldtype": "Float",
+      "label": "Water Consumption (Liters)"
+    },
+    {
+      "fieldname": "noise_level_db",
+      "fieldtype": "Float",
+      "label": "Noise Level (dB)"
+    },
+    {
+      "fieldname": "compliance_standard",
+      "fieldtype": "Select",
+      "label": "Compliance Standard",
+      "options": "ISO 14001\nISO 50001\nLocal Regulation\nOther\nNone"
+    },
+    {
+      "fieldname": "is_compliant",
+      "fieldtype": "Check",
+      "label": "Is Compliant",
+      "default": "1"
+    },
+    {
+      "fieldname": "non_compliance_details",
+      "fieldtype": "Small Text",
+      "label": "Non-Compliance Details",
+      "depends_on": "eval:!doc.is_compliant"
+    },
+    {
+      "fieldname": "corrective_action",
+      "fieldtype": "Small Text",
+      "label": "Corrective Action Taken"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Small Text",
+      "label": "Notes"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 0,
+      "cancel": 0,
+      "delete": 1
+    }
+  ]
+}

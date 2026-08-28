@@ -1,0 +1,76 @@
+{
+  "doctype": "DocType",
+  "name": "Asset KPI Target",
+  "module": "Asset Mgmt Custom",
+  "is_submittable": 0,
+  "track_changes": 1,
+  "autoname": "format:KPI-{asset_category}-{fiscal_year}",
+  "fields": [
+    {
+      "fieldname": "asset_category",
+      "fieldtype": "Link",
+      "label": "Asset Category",
+      "options": "Asset Category",
+      "reqd": 1
+    },
+    {
+      "fieldname": "fiscal_year",
+      "fieldtype": "Link",
+      "label": "Fiscal Year",
+      "options": "Fiscal Year",
+      "reqd": 1
+    },
+    {
+      "fieldname": "target_utilization_pct",
+      "fieldtype": "Float",
+      "label": "Target Utilization % (Min)"
+    },
+    {
+      "fieldname": "max_downtime_hours_monthly",
+      "fieldtype": "Float",
+      "label": "Max Downtime Hours/Month"
+    },
+    {
+      "fieldname": "max_maintenance_cost_monthly",
+      "fieldtype": "Currency",
+      "label": "Max Maintenance Cost/Month"
+    },
+    {
+      "fieldname": "min_condition_score",
+      "fieldtype": "Select",
+      "label": "Minimum Condition Level",
+      "options": "Excellent\nGood\nFair"
+    },
+    {
+      "fieldname": "target_mtbf_days",
+      "fieldtype": "Float",
+      "label": "Target MTBF (Days)"
+    },
+    {
+      "fieldname": "target_mttr_hours",
+      "fieldtype": "Float",
+      "label": "Target MTTR (Hours)"
+    },
+    {
+      "fieldname": "max_incidents_monthly",
+      "fieldtype": "Int",
+      "label": "Max Incidents/Month"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Small Text",
+      "label": "Notes"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 0,
+      "cancel": 0,
+      "delete": 1
+    }
+  ]
+}

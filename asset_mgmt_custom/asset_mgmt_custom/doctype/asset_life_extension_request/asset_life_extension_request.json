@@ -1,0 +1,103 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Life Extension Request",
+  "module": "Asset Mgmt Custom",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "autoname": "naming_series:",
+  "naming_series": "LER-.YYYY.-",
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Series",
+      "options": "LER-.YYYY.-"
+    },
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1
+    },
+    {
+      "fieldname": "current_expected_disposal_date",
+      "fieldtype": "Date",
+      "label": "Current Expected Disposal Date",
+      "fetch_from": "asset.disposal_date",
+      "read_only": 1
+    },
+    {
+      "fieldname": "requested_by",
+      "fieldtype": "Link",
+      "label": "Requested By",
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "request_date",
+      "fieldtype": "Date",
+      "label": "Request Date",
+      "reqd": 1,
+      "default": "Today"
+    },
+    {
+      "fieldname": "requested_extension_years",
+      "fieldtype": "Float",
+      "label": "Extension Requested (Years)",
+      "reqd": 1
+    },
+    {
+      "fieldname": "new_expected_disposal_date",
+      "fieldtype": "Date",
+      "label": "New Expected Disposal Date",
+      "reqd": 1
+    },
+    {
+      "fieldname": "justification",
+      "fieldtype": "Text",
+      "label": "Justification",
+      "reqd": 1
+    },
+    {
+      "fieldname": "condition_report",
+      "fieldtype": "Small Text",
+      "label": "Current Condition Report"
+    },
+    {
+      "fieldname": "estimated_extension_cost",
+      "fieldtype": "Currency",
+      "label": "Estimated Extension Cost"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Pending\nApproved\nRejected",
+      "default": "Pending"
+    },
+    {
+      "fieldname": "decision_notes",
+      "fieldtype": "Small Text",
+      "label": "Decision Notes"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 1,
+      "cancel": 1,
+      "delete": 1
+    }
+  ]
+}

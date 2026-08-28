@@ -1,0 +1,96 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Utilization Log",
+  "module": "Asset Mgmt Custom",
+  "is_submittable": 0,
+  "track_changes": 1,
+  "autoname": "format:UTIL-{asset}-{log_date}",
+  "fields": [
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "Asset",
+      "options": "Asset",
+      "reqd": 1
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "Asset Name",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "Branch",
+      "options": "Branch",
+      "fetch_from": "asset.branch",
+      "read_only": 1
+    },
+    {
+      "fieldname": "log_date",
+      "fieldtype": "Date",
+      "label": "Log Date",
+      "reqd": 1,
+      "default": "Today"
+    },
+    {
+      "fieldname": "total_capacity_hours",
+      "fieldtype": "Float",
+      "label": "Total Capacity Hours (in day)",
+      "reqd": 1
+    },
+    {
+      "fieldname": "actual_used_hours",
+      "fieldtype": "Float",
+      "label": "Actual Used Hours",
+      "reqd": 1
+    },
+    {
+      "fieldname": "idle_hours",
+      "fieldtype": "Float",
+      "label": "Idle Hours",
+      "read_only": 1
+    },
+    {
+      "fieldname": "utilization_pct",
+      "fieldtype": "Float",
+      "label": "Utilization %",
+      "read_only": 1
+    },
+    {
+      "fieldname": "downtime_hours",
+      "fieldtype": "Float",
+      "label": "Downtime Hours",
+      "default": "0"
+    },
+    {
+      "fieldname": "downtime_reason",
+      "fieldtype": "Small Text",
+      "label": "Downtime Reason"
+    },
+    {
+      "fieldname": "operator",
+      "fieldtype": "Link",
+      "label": "Operator",
+      "options": "Employee"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Small Text",
+      "label": "Notes"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 0,
+      "cancel": 0,
+      "delete": 1
+    }
+  ]
+}

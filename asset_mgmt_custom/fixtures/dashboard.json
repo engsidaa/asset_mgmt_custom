@@ -15,7 +15,11 @@
       {"card": "Open Incidents"},
       {"card": "Expired Compliance Certs"},
       {"card": "Low Stock Spare Parts"},
-      {"card": "Under Warranty Assets"}
+      {"card": "Under Warranty Assets"},
+      {"card": "Active Bookings"},
+      {"card": "Software Licenses Expiring"},
+      {"card": "Overdue PM Schedules"},
+      {"card": "Critical Assets"}
     ],
     "charts": [
       {"chart": "Asset Value Analytics", "width": "Full"}
