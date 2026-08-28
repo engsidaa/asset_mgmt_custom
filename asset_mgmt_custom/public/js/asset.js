@@ -4,7 +4,7 @@
 //   2. علامة الأصل الاحتياطي (Spare)
 //   3. تحذير كود الستيكر / Tag
 //   4. ملخص تكلفة الصيانة
-//   5. زر "Set Operational" للأصول غير المفعَّلة
+//   5. زر "وضع علامة مُرمَّز" ثم زر "Set Operational" — خطوتان منفصلتان
 
 frappe.ui.form.on("Asset", {
 
@@ -16,6 +16,7 @@ frappe.ui.form.on("Asset", {
 		_render_condition_badge(frm);
 		_show_sticker_alert(frm);
 		_render_maintenance_summary(frm);
+		_add_mark_coded_button(frm);
 		_add_set_operational_button(frm);
 		_add_print_tag_button(frm);
 	},
@@ -86,11 +87,16 @@ function _render_condition_badge(frm) {
 	const condition = frm.doc.custom_asset_condition;
 	const is_spare  = frm.doc.custom_is_spare;
 	const status    = frm.doc.custom_operational_status;
+	const coding    = frm.doc.custom_coding_status;
 
 	const badges = [];
 	if (condition === "New")  badges.push(`<span class="indicator-pill green">${__("New Asset")}</span>`);
 	if (condition === "Used") badges.push(`<span class="indicator-pill orange">${__("Used Asset")}</span>`);
 	if (is_spare)             badges.push(`<span class="indicator-pill blue">${__("Spare / احتياطي")}</span>`);
+
+	if (coding) {
+		badges.push(`<span class="indicator-pill ${coding === "Coded" ? "green" : "red"}">${__(coding)}</span>`);
+	}
 
 	const statusColors = { Operational: "green", Incomplete: "red", "In Transit": "orange" };
 	if (status) {
@@ -135,9 +141,35 @@ function _render_maintenance_summary(frm) {
 	);
 }
 
+function _add_mark_coded_button(frm) {
+	if (frm.doc.docstatus !== 1) return;
+	if (frm.doc.custom_coding_status === "Coded") return;
+
+	frm.add_custom_button(__("Mark Coded (وضع علامة مُرمَّز)"), function () {
+		frappe.confirm(
+			__("Mark asset <b>{0}</b> as Coded? Requires tag code + before/after photos to already be attached.", [frm.doc.asset_name]),
+			function () {
+				frappe.call({
+					method: "asset_mgmt_custom.overrides.asset.mark_coded",
+					args: { asset_name: frm.doc.name },
+					freeze: true,
+					freeze_message: __("Marking asset as Coded…"),
+					callback(r) {
+						if (!r.exc) {
+							frappe.show_alert({ message: __("Asset is now Coded"), indicator: "green" });
+							frm.reload_doc();
+						}
+					},
+				});
+			}
+		);
+	}, __("Actions")).addClass("btn-primary");
+}
+
 function _add_set_operational_button(frm) {
 	if (frm.doc.docstatus !== 1) return;
 	if (frm.doc.custom_operational_status === "Operational") return;
+	if (frm.doc.custom_coding_status !== "Coded") return; // must be coded first
 
 	frm.add_custom_button(__("Set Operational (تعيين كتشغيلي)"), function () {
 		frappe.confirm(

@@ -130,3 +130,10 @@ scheduler_events = {
         "asset_mgmt_custom.tasks.send_warranty_digest_email",
     ],
 }
+
+# ---------------------------------------------------------------------------
+# Migration Hooks — run AFTER sync_fixtures(), unlike patches.txt entries
+# ---------------------------------------------------------------------------
+after_migrate = [
+    "asset_mgmt_custom.setup.after_migrate.backfill_asset_coding_status",
+]

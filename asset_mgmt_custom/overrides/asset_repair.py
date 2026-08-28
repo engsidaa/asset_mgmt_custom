@@ -5,6 +5,9 @@ Validate:
   - عند اكتمال الإصلاح (Completed): يُشترط اسم الفني + ملاحظات الإصلاح + تاريخ الاكتمال
   - CapEx/OpEx: إذا كان إصلاح ضمان، تُصفَّر التكاليف
   - CapEx/OpEx: إذا تجاوزت التكلفة حد الرسملة في Asset Category، يُفعَّل capitalize_repair_cost
+  - CapEx: عند اكتمال إصلاح مُرسمَل (capitalize_repair_cost)، يُشترط إدخال عدد الشهور
+    الإضافية للعمر الإنتاجي (increase_in_asset_life) — بدونها ERPNext يرسمل التكلفة
+    لكن لا يمدد العمر ولا يعيد جدولة الإهلاك
 
 On Submit:
   - يُحدِّث إجمالي تكلفة الصيانة (custom_total_maintenance_cost) على الأصل
@@ -29,6 +32,8 @@ def validate(doc, method=None):
         _validate_completion_requirements(doc)
     _auto_classify_capex(doc)
     _calculate_downtime(doc)
+    if doc.repair_status == "Completed":
+        _require_life_extension_when_capitalized(doc)
 
 
 def _calculate_downtime(doc):
@@ -77,6 +82,25 @@ def _auto_classify_capex(doc):
     total = flt(doc.repair_cost) + flt(doc.get("custom_labor_cost"))
     if threshold and total > flt(threshold):
         doc.capitalize_repair_cost = 1
+
+
+def _require_life_extension_when_capitalized(doc):
+    """
+    ERPNext رسملة (capitalize_repair_cost) بدون increase_in_asset_life تُضيف
+    التكلفة لقيمة الأصل لكن لا تمدد العمر الإنتاجي ولا تعيد جدولة الإهلاك —
+    وده غالباً غلط محاسبي غير مقصود. نجبر إدخال القيمة قبل اكتمال أي إصلاح مُرسمَل.
+    """
+    if not doc.get("capitalize_repair_cost"):
+        return
+    if not doc.get("increase_in_asset_life"):
+        frappe.throw(
+            _(
+                "Please enter 'Increase In Asset Life (Months)' before completing a "
+                "capitalized (CapEx) repair — otherwise the cost is capitalized but the "
+                "asset's useful life and depreciation schedule are never extended."
+            ),
+            title=_("Missing Life Extension"),
+        )
 
 
 # ---------------------------------------------------------------------------

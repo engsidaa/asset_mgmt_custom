@@ -9,12 +9,15 @@ Asset override
    - "Used" → تُطبَّق custom_used_depreciation_rate على جميع finance books
    - "New"  → تُستخدم نسبة الإهلاك المعيارية من Asset Category
 
-3. الحالة التشغيلية:
-   - الأصل الجديد يبدأ بـ Incomplete تلقائياً
-   - "Set Operational" API: تحقق من tag + صورة ثم يُفعِّل الأصل
+3. حالتان منفصلتان (بدل حالة واحدة مدموجة):
+   - custom_coding_status (Uncoded/Coded): خطوة الترميز — لصق/نقش الكود
+     وتوثيقه بصورتين (قبل وبعد). تُضبط عبر mark_coded().
+   - custom_operational_status (Incomplete/Operational/In Transit): التفعيل
+     التشغيلي الفعلي وبدء الإهلاك. يشترط أن يكون الأصل مُرمَّزاً (Coded) أولاً.
+     تُضبط عبر set_operational().
 
-4. set_operational whitelist:
-   - Branch manager clicks "Set Operational" after tagging
+4. mark_coded() ثم set_operational(): إجراءان منفصلان بالترتيب — مسئول
+   الفرع يلصق الكود ويرفع الصورتين أولاً، ثم يُفعِّل الأصل تشغيلياً لاحقاً.
 """
 
 import frappe
@@ -26,6 +29,7 @@ def validate(doc, method=None):
     _enforce_spare_asset_rules(doc)
     _apply_used_depreciation_rate(doc)
     _auto_set_incomplete_status(doc)
+    _auto_set_uncoded_status(doc)
 
 
 def after_insert(doc, method=None):
@@ -50,6 +54,12 @@ def _auto_set_incomplete_status(doc):
     """نضمن أن الأصل الجديد يبدأ بحالة Incomplete إن لم تُضبط."""
     if not doc.custom_operational_status:
         doc.custom_operational_status = "Incomplete"
+
+
+def _auto_set_uncoded_status(doc):
+    """نضمن أن الأصل الجديد يبدأ بحالة ترميز Uncoded إن لم تُضبط."""
+    if not doc.get("custom_coding_status"):
+        doc.custom_coding_status = "Uncoded"
 
 
 # ---------------------------------------------------------------------------
@@ -106,24 +116,28 @@ def _apply_used_depreciation_rate(doc):
 
 
 # ---------------------------------------------------------------------------
-# Set Operational whitelist API
+# Mark Coded whitelist API (step 1: tagging/coding)
 # ---------------------------------------------------------------------------
 
 @frappe.whitelist()
-def set_operational(asset_name):
+def mark_coded(asset_name):
     """
-    Branch manager clicks "Set Operational" after tagging.
-    Validates: tag type set + tag code present + tagging photo present.
-    Then sets custom_operational_status = Operational and available_for_use_date = today.
+    Branch manager clicks "وضع علامة مُرمَّز" (Mark Coded) after physically
+    tagging the asset. Validates: tag type + tag code + BOTH before/after
+    photos present. Then sets custom_coding_status = Coded.
+
+    This is deliberately separate from set_operational() — coding the asset
+    (sticking the barcode/RFID/iron code and documenting it) and activating
+    it for operational use are two distinct steps with two distinct gates.
     """
     doc = frappe.get_doc("Asset", asset_name)
 
-    if doc.custom_operational_status == "Operational":
-        frappe.throw(_("Asset is already Operational."))
+    if doc.custom_coding_status == "Coded":
+        frappe.throw(_("Asset is already marked as Coded."))
 
     if not doc.custom_tag_type:
         frappe.throw(
-            _("Please set the Tag Type (Barcode / RFID / Iron Code) before activating the asset."),
+            _("Please set the Tag Type (Barcode / RFID / Iron Code) before coding the asset."),
             title=_("Missing Tag Type"),
         )
 
@@ -139,10 +153,56 @@ def set_operational(asset_name):
             title=_("Missing Sticker Code"),
         )
 
+    if not doc.custom_tagging_photo_before:
+        frappe.throw(
+            _("A 'before' photo (taken before sticking/engraving the code) is required."),
+            title=_("Missing Before Photo"),
+        )
+
     if not doc.custom_tagging_photo:
         frappe.throw(
-            _("A tagging photo is required before setting the asset to Operational."),
-            title=_("Missing Tagging Photo"),
+            _("An 'after' photo (taken after sticking/engraving the code) is required."),
+            title=_("Missing After Photo"),
+        )
+
+    frappe.db.set_value(
+        "Asset",
+        asset_name,
+        {
+            "custom_coding_status": "Coded",
+            "custom_tagged_by": frappe.session.user,
+            "custom_tagged_on": today(),
+        },
+        update_modified=True,
+    )
+
+    _log_activity(asset_name, "Asset marked as Coded by {0}".format(frappe.session.user))
+
+    return "Coded"
+
+
+# ---------------------------------------------------------------------------
+# Set Operational whitelist API (step 2: operational activation)
+# ---------------------------------------------------------------------------
+
+@frappe.whitelist()
+def set_operational(asset_name):
+    """
+    Branch manager clicks "Set Operational" after the asset has been coded.
+    Requires custom_coding_status == Coded first (see mark_coded()).
+    Then sets custom_operational_status = Operational and
+    available_for_use_date = today — this is the exact moment ERPNext
+    starts computing depreciation for the asset.
+    """
+    doc = frappe.get_doc("Asset", asset_name)
+
+    if doc.custom_operational_status == "Operational":
+        frappe.throw(_("Asset is already Operational."))
+
+    if doc.custom_coding_status != "Coded":
+        frappe.throw(
+            _("Asset must be marked as Coded (tag + before/after photos) before it can be set Operational."),
+            title=_("Asset Not Coded"),
         )
 
     frappe.db.set_value(
@@ -152,23 +212,24 @@ def set_operational(asset_name):
             "custom_operational_status": "Operational",
             "custom_activation_date": today(),
             "custom_activated_by": frappe.session.user,
-            "custom_tagged_by": frappe.session.user,
-            "custom_tagged_on": today(),
             "available_for_use_date": today(),
         },
         update_modified=True,
     )
 
-    # Log activity
+    _log_activity(asset_name, "Asset set to Operational by {0}".format(frappe.session.user))
+
+    return "Operational"
+
+
+def _log_activity(asset_name, subject):
     try:
         frappe.get_doc({
             "doctype": "Asset Activity",
             "asset": asset_name,
-            "subject": "Asset set to Operational by {0}".format(frappe.session.user),
+            "subject": subject,
             "user": frappe.session.user,
             "date": frappe.utils.now_datetime(),
         }).insert(ignore_permissions=True, ignore_links=True)
     except Exception:
         pass
-
-    return "Operational"
