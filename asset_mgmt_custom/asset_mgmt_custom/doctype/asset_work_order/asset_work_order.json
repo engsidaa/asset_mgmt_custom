@@ -214,9 +214,9 @@
   {
    "fieldname": "maintenance_schedule",
    "fieldtype": "Link",
-   "label": "جدول الصيانة الوقائية",
-   "options": "Asset Preventive Maintenance Schedule",
-   "description": "إذا صدر أمر العمل من جدول صيانة وقائية"
+   "label": "خطة الصيانة الوقائية",
+   "options": "Asset Maintenance",
+   "description": "إذا صدر أمر العمل من خطة صيانة وقائية (Asset Maintenance)"
   },
   {
    "fieldname": "incident_report",
