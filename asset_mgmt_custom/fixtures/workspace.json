@@ -825,6 +825,16 @@
     "type": "Link"
    },
    {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "عهد الأصول لدى الموظفين",
+    "link_count": 0,
+    "link_to": "Employee Asset Custody",
+    "link_type": "Report",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
     "type": "Card Break",
     "label": "التقارير المالية",
     "hidden": 0
