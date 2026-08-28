@@ -28,5 +28,10 @@
       "options": "Branch",
       "reqd": 0
     }
+  ],
+  "roles": [
+    {"role": "Assets Manager"},
+    {"role": "System Manager"},
+    {"role": "Accounts Manager"}
   ]
 }

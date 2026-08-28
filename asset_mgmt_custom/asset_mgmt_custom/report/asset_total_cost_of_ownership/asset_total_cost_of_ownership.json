@@ -30,5 +30,10 @@
       "label": "To Date",
       "fieldtype": "Date"
     }
+  ],
+  "roles": [
+    {"role": "Assets Manager"},
+    {"role": "System Manager"},
+    {"role": "Accounts Manager"}
   ]
 }

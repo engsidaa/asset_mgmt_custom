@@ -10,81 +10,27 @@ def execute(filters=None):
 
 def get_columns():
     return [
-        {
-            "fieldname": "asset",
-            "label": "Asset",
-            "fieldtype": "Link",
-            "options": "Asset",
-            "width": 150,
-        },
-        {
-            "fieldname": "asset_name",
-            "label": "Asset Name",
-            "fieldtype": "Data",
-            "width": 180,
-        },
-        {
-            "fieldname": "asset_category",
-            "label": "Asset Category",
-            "fieldtype": "Link",
-            "options": "Asset Category",
-            "width": 140,
-        },
-        {
-            "fieldname": "purchase_value",
-            "label": "Purchase Value",
-            "fieldtype": "Currency",
-            "width": 130,
-        },
-        {
-            "fieldname": "total_repair_cost",
-            "label": "Repair Costs",
-            "fieldtype": "Currency",
-            "width": 130,
-        },
-        {
-            "fieldname": "total_maintenance_cost",
-            "label": "Maintenance Costs",
-            "fieldtype": "Currency",
-            "width": 150,
-        },
-        {
-            "fieldname": "total_insurance_cost",
-            "label": "Insurance Costs",
-            "fieldtype": "Currency",
-            "width": 140,
-        },
-        {
-            "fieldname": "total_energy_cost",
-            "label": "Energy Costs",
-            "fieldtype": "Currency",
-            "width": 130,
-        },
-        {
-            "fieldname": "total_fuel_cost",
-            "label": "Fuel Costs",
-            "fieldtype": "Currency",
-            "width": 120,
-        },
-        {
-            "fieldname": "tco",
-            "label": "Total Cost of Ownership",
-            "fieldtype": "Currency",
-            "width": 140,
-        },
-        {
-            "fieldname": "age_years",
-            "label": "Age (Yrs)",
-            "fieldtype": "Float",
-            "width": 90,
-        },
-        {
-            "fieldname": "annual_tco",
-            "label": "Annual TCO",
-            "fieldtype": "Currency",
-            "width": 130,
-        },
+        {"fieldname": "asset", "label": "Asset", "fieldtype": "Link", "options": "Asset", "width": 150},
+        {"fieldname": "asset_name", "label": "Asset Name", "fieldtype": "Data", "width": 170},
+        {"fieldname": "asset_category", "label": "Asset Category", "fieldtype": "Link", "options": "Asset Category", "width": 130},
+        {"fieldname": "purchase_value", "label": "Purchase Value", "fieldtype": "Currency", "width": 120},
+        {"fieldname": "total_maintenance_cost", "label": "Maintenance & Repair", "fieldtype": "Currency", "width": 140},
+        {"fieldname": "total_insurance_cost", "label": "Insurance", "fieldtype": "Currency", "width": 110},
+        {"fieldname": "total_contract_cost", "label": "Vendor Contracts", "fieldtype": "Currency", "width": 130},
+        {"fieldname": "total_lease_cost", "label": "Lease (to date)", "fieldtype": "Currency", "width": 120},
+        {"fieldname": "total_software_cost", "label": "Software Licenses", "fieldtype": "Currency", "width": 130},
+        {"fieldname": "total_spare_parts_cost", "label": "Spare Parts", "fieldtype": "Currency", "width": 110},
+        {"fieldname": "total_writeoff_cost", "label": "Write-off Loss", "fieldtype": "Currency", "width": 120},
+        {"fieldname": "total_energy_cost", "label": "Energy", "fieldtype": "Currency", "width": 100},
+        {"fieldname": "total_fuel_cost", "label": "Fuel", "fieldtype": "Currency", "width": 100},
+        {"fieldname": "tco", "label": "Total Cost of Ownership", "fieldtype": "Currency", "width": 150},
+        {"fieldname": "age_years", "label": "Age (Yrs)", "fieldtype": "Float", "width": 85},
+        {"fieldname": "annual_tco", "label": "Annual TCO", "fieldtype": "Currency", "width": 120},
     ]
+
+
+def _sum_by_asset(query, params=None):
+    return {r.asset: (r.cost or 0) for r in frappe.db.sql(query, params or {}, as_dict=True)}
 
 
 def get_data(filters):
@@ -106,6 +52,7 @@ def get_data(filters):
             asset_name,
             asset_category,
             gross_purchase_amount AS purchase_value,
+            IFNULL(custom_total_maintenance_cost, 0) AS total_maintenance_cost,
             ROUND(DATEDIFF(CURDATE(), purchase_date) / 365.25, 1) AS age_years
         FROM `tabAsset`
         WHERE docstatus < 2 AND status != 'Disposed of'
@@ -115,53 +62,116 @@ def get_data(filters):
         as_dict=True,
     )
 
-    repair_costs = {
-        r.asset: r.cost
-        for r in frappe.db.sql(
-            """
-            SELECT asset, SUM(repair_cost) AS cost
-            FROM `tabAsset Repair`
-            WHERE docstatus = 1
-            GROUP BY asset
-            """,
-            as_dict=True,
-        )
-    }
+    # Insurance: sum of renewal premiums recorded against the asset.
+    insurance_costs = _sum_by_asset(
+        """
+        SELECT asset, SUM(new_premium) AS cost
+        FROM `tabAsset Insurance Renewal`
+        WHERE docstatus = 1
+        GROUP BY asset
+        """
+    )
 
-    energy_costs = {
-        r.asset: r.cost
-        for r in frappe.db.sql(
-            """
-            SELECT asset, SUM(total_cost) AS cost
-            FROM `tabAsset Energy Log`
-            GROUP BY asset
-            """,
-            as_dict=True,
-        )
-    }
+    # Vendor contracts: a contract can cover several assets, so its value
+    # is split evenly across every asset listed in its child table.
+    contract_costs = _sum_by_asset(
+        """
+        SELECT ca.asset AS asset, SUM(c.contract_value / cnt.asset_count) AS cost
+        FROM `tabAsset Vendor Contract Asset` ca
+        JOIN `tabAsset Vendor Contract` c ON c.name = ca.parent
+        JOIN (
+            SELECT parent, COUNT(*) AS asset_count
+            FROM `tabAsset Vendor Contract Asset`
+            GROUP BY parent
+        ) cnt ON cnt.parent = ca.parent
+        WHERE c.docstatus = 1
+        GROUP BY ca.asset
+        """
+    )
 
-    fuel_costs = {
-        r.asset: r.cost
-        for r in frappe.db.sql(
-            """
-            SELECT asset, SUM(total_cost) AS cost
-            FROM `tabAsset Fuel Log`
-            GROUP BY asset
-            """,
-            as_dict=True,
-        )
-    }
+    # Lease: monthly rent accrued from start_date to end_date (or today if
+    # the lease is still running).
+    lease_costs = _sum_by_asset(
+        """
+        SELECT
+            asset,
+            SUM(
+                monthly_rent * GREATEST(
+                    TIMESTAMPDIFF(MONTH, start_date, LEAST(IFNULL(end_date, CURDATE()), CURDATE())),
+                    0
+                )
+            ) AS cost
+        FROM `tabAsset Lease`
+        WHERE docstatus = 1 AND start_date IS NOT NULL
+        GROUP BY asset
+        """
+    )
+
+    software_costs = _sum_by_asset(
+        """
+        SELECT asset, SUM(annual_cost) AS cost
+        FROM `tabAsset Software License`
+        WHERE asset IS NOT NULL AND asset != ''
+        GROUP BY asset
+        """
+    )
+
+    # Spare parts actually issued against the asset (not just requested).
+    spare_part_costs = _sum_by_asset(
+        """
+        SELECT r.asset AS asset, SUM(r.quantity_issued * IFNULL(sp.unit_cost, 0)) AS cost
+        FROM `tabAsset Spare Part Request` r
+        LEFT JOIN `tabAsset Spare Part` sp ON sp.name = r.spare_part
+        WHERE r.status = 'Issued'
+        GROUP BY r.asset
+        """
+    )
+
+    writeoff_costs = _sum_by_asset(
+        """
+        SELECT asset, SUM(estimated_loss_value) AS cost
+        FROM `tabAsset Write-off Request`
+        WHERE docstatus = 1
+        GROUP BY asset
+        """
+    )
+
+    energy_costs = _sum_by_asset(
+        """
+        SELECT asset, SUM(total_cost) AS cost
+        FROM `tabAsset Energy Log`
+        GROUP BY asset
+        """
+    )
+
+    fuel_costs = _sum_by_asset(
+        """
+        SELECT asset, SUM(total_cost) AS cost
+        FROM `tabAsset Fuel Log`
+        GROUP BY asset
+        """
+    )
 
     data = []
     for row in assets:
-        row.total_repair_cost = repair_costs.get(row.asset, 0) or 0
-        row.total_maintenance_cost = 0
-        row.total_insurance_cost = 0
-        row.total_energy_cost = energy_costs.get(row.asset, 0) or 0
-        row.total_fuel_cost = fuel_costs.get(row.asset, 0) or 0
+        row.total_insurance_cost = insurance_costs.get(row.asset, 0)
+        row.total_contract_cost = contract_costs.get(row.asset, 0)
+        row.total_lease_cost = lease_costs.get(row.asset, 0)
+        row.total_software_cost = software_costs.get(row.asset, 0)
+        row.total_spare_parts_cost = spare_part_costs.get(row.asset, 0)
+        row.total_writeoff_cost = writeoff_costs.get(row.asset, 0)
+        row.total_energy_cost = energy_costs.get(row.asset, 0)
+        row.total_fuel_cost = fuel_costs.get(row.asset, 0)
+
         row.tco = (
             (row.purchase_value or 0)
-            + row.total_repair_cost
+            + row.total_maintenance_cost
+            + row.total_insurance_cost
+            + row.total_contract_cost
+            + row.total_lease_cost
+            + row.total_software_cost
+            + row.total_spare_parts_cost
+            + row.total_writeoff_cost
             + row.total_energy_cost
             + row.total_fuel_cost
         )

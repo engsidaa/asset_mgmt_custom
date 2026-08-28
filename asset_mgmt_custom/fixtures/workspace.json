@@ -1066,6 +1066,16 @@
     "onboard": 0
    },
    {
+    "hidden": 0,
+    "is_query_report": 1,
+    "label": "مقارنة الإهلاك متعدد الدفاتر",
+    "link_count": 0,
+    "link_to": "Asset Multi-Book Depreciation Comparison",
+    "link_type": "Report",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
     "type": "Card Break",
     "label": "تقارير الصيانة",
     "hidden": 0
