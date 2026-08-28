@@ -1,3 +1,4 @@
 # patches go here
 asset_mgmt_custom.patches.v1_remove_pm_schedule_doctype
 asset_mgmt_custom.patches.v2_fix_workspace_pm_links
+asset_mgmt_custom.patches.v3_cleanup_stale_pm_references
