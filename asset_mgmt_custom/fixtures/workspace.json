@@ -8,7 +8,7 @@
     "public": 1,
     "is_hidden": 0,
     "icon": "assets",
-    "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>مؤشرات الأداء الرئيسية</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Active Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue Checkouts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Incidents\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Expired Compliance Certs\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Low Stock Spare Parts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Bookings\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Software Licenses Expiring\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue PM Schedules\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Critical Assets\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>اختصارات سريعة</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب أصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حركة الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تسليم الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إصلاح الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"صيانة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة الوقائية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حجز الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"استعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"فحص السلامة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقييم الحالة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"التدقيق المادي\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"شهادة الامتثال\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"عقد الصيانة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ميزانية رأسمالية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب قطعة غيار\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ترخيص برمجيات\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب التخلص\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"رسملة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تنبيهات الضمان\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة القادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقرير الأصول المتقادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"سجل الأصول\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>الأصول والمعاملات</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الأصول الرئيسية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"طلبات الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"نقل وتسليم الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الصيانة والإصلاح\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحجوزات والاستعارات\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"السلامة والحوادث\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"العقود والتأمين\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"المالية والميزانية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحالة والأداء\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"البيئة والطاقة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"إخراج الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الوثائق والبيانات\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>التقارير</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير التشغيل\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المالية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير الصيانة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المتقدمة\", \"col\": 4}}]",
+    "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>مؤشرات الأداء الرئيسية</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Active Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue Checkouts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Incidents\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Expired Compliance Certs\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Low Stock Spare Parts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Bookings\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Software Licenses Expiring\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue PM Schedules\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Critical Assets\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>اختصارات سريعة</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب أصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حركة الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تسليم الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إصلاح الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"صيانة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة الوقائية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حجز الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"استعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"فحص السلامة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقييم الحالة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"التدقيق المادي\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"شهادة الامتثال\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"عقد الصيانة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ميزانية رأسمالية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب قطعة غيار\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ترخيص برمجيات\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب التخلص\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"رسملة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تنبيهات الضمان\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة القادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقرير الأصول المتقادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"سجل الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"أمر العمل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تصريح العمل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقييم المخاطر\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تحليل أسباب العطل\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>الأصول والمعاملات</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الأصول الرئيسية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"طلبات الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"نقل وتسليم الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الصيانة والإصلاح\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحجوزات والاستعارات\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"السلامة والحوادث\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"العقود والتأمين\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"المالية والميزانية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحالة والأداء\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"البيئة والطاقة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"إخراج الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الوثائق والبيانات\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"أوامر العمل والتصاريح\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التحليل والتخطيط\", \"col\": 4}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>التقارير</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير التشغيل\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المالية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير الصيانة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المتقدمة\", \"col\": 4}}]",
     "number_cards": [
       {
         "number_card_name": "Total Active Assets"
@@ -172,6 +172,26 @@
         "label": "سجل الأصول",
         "link_to": "Asset Register",
         "type": "Report"
+      },
+      {
+        "label": "أمر العمل",
+        "link_to": "Asset Work Order",
+        "type": "DocType"
+      },
+      {
+        "label": "تصريح العمل",
+        "link_to": "Asset Work Permit",
+        "type": "DocType"
+      },
+      {
+        "label": "تقييم المخاطر",
+        "link_to": "Asset Risk Assessment",
+        "type": "DocType"
+      },
+      {
+        "label": "تحليل أسباب العطل",
+        "link_to": "Asset Failure Analysis",
+        "type": "DocType"
       }
     ],
     "links": [
@@ -774,6 +794,79 @@
         "is_query_report": 0,
         "hidden": 0,
         "onboard": 0
+      },
+      {
+        "type": "Card Break",
+        "label": "أوامر العمل والتصاريح",
+        "hidden": 0
+      },
+      {
+        "type": "Link",
+        "label": "أمر العمل",
+        "link_to": "Asset Work Order",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Link",
+        "label": "تصريح العمل",
+        "link_to": "Asset Work Permit",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Link",
+        "label": "قراءة العداد",
+        "link_to": "Asset Meter Reading",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Card Break",
+        "label": "التحليل والتخطيط",
+        "hidden": 0
+      },
+      {
+        "type": "Link",
+        "label": "تقييم المخاطر",
+        "link_to": "Asset Risk Assessment",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Link",
+        "label": "تحليل أسباب العطل",
+        "link_to": "Asset Failure Analysis",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Link",
+        "label": "خطة الاستبدال",
+        "link_to": "Asset Replacement Plan",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
+      },
+      {
+        "type": "Link",
+        "label": "تقييم أداء المورد",
+        "link_to": "Asset Vendor Performance Rating",
+        "link_type": "DocType",
+        "is_query_report": 0,
+        "hidden": 0,
+        "onboard": 1
       },
       {
         "type": "Card Break",

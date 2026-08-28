@@ -1,0 +1,165 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Replacement Plan",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "By \"Naming Series\" field",
+  "autoname": "naming_series:",
+  "is_submittable": 0,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "سلسلة الترقيم",
+      "options": "ARPL-.YYYY.-.####",
+      "default": "ARPL-.YYYY.-.####"
+    },
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "الأصل",
+      "options": "Asset",
+      "reqd": 1,
+      "bold": 1,
+      "in_list_view": 1,
+      "search_index": 1,
+      "description": "الأصل المراد التخطيط لاستبداله"
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "اسم الأصل",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "plan_date",
+      "fieldtype": "Date",
+      "label": "تاريخ الخطة",
+      "reqd": 1,
+      "default": "Today",
+      "description": "تاريخ إعداد خطة الاستبدال"
+    },
+    {
+      "fieldname": "planned_by",
+      "fieldtype": "Link",
+      "label": "أعده",
+      "options": "User",
+      "description": "الموظف المسؤول عن إعداد خطة الاستبدال"
+    },
+    {
+      "fieldname": "priority",
+      "fieldtype": "Select",
+      "label": "الأولوية",
+      "reqd": 1,
+      "options": "حرج\nعالٍ\nمتوسط\nمنخفض",
+      "in_list_view": 1,
+      "description": "مستوى إلحاحية الاستبدال"
+    },
+    {
+      "fieldname": "sec_break_reason",
+      "fieldtype": "Section Break",
+      "label": "سبب الاستبدال"
+    },
+    {
+      "fieldname": "replacement_reason",
+      "fieldtype": "Select",
+      "label": "سبب الاستبدال",
+      "reqd": 1,
+      "options": "انتهاء العمر الافتراضي\nتكاليف صيانة مرتفعة\nتقادم تكنولوجي\nأضرار جسيمة\nترقية وتحسين\nتوسع في الطاقة الإنتاجية\nأخرى",
+      "description": "التبرير الرئيسي لقرار الاستبدال"
+    },
+    {
+      "fieldname": "current_age_years",
+      "fieldtype": "Float",
+      "label": "العمر الحالي (سنة)",
+      "description": "عمر الأصل الحالي منذ الشراء"
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "remaining_life_years",
+      "fieldtype": "Float",
+      "label": "العمر المتبقي المقدر (سنة)",
+      "description": "التقدير الفني للعمر المتبقي قبل التوقف الكامل"
+    },
+    {
+      "fieldname": "planned_replacement_date",
+      "fieldtype": "Date",
+      "label": "تاريخ الاستبدال المخطط",
+      "reqd": 1,
+      "in_list_view": 1,
+      "description": "الموعد المستهدف لاستبدال الأصل"
+    },
+    {
+      "fieldname": "sec_break_finance",
+      "fieldtype": "Section Break",
+      "label": "التمويل والميزانية"
+    },
+    {
+      "fieldname": "replacement_asset_type",
+      "fieldtype": "Data",
+      "label": "نوع الأصل البديل",
+      "description": "مواصفات أو نوع الأصل الذي سيحل محله"
+    },
+    {
+      "fieldname": "estimated_replacement_cost",
+      "fieldtype": "Currency",
+      "label": "التكلفة التقديرية للاستبدال",
+      "description": "القيمة الإجمالية المتوقعة للأصل البديل شاملاً التركيب"
+    },
+    {
+      "fieldname": "budget_source",
+      "fieldtype": "Select",
+      "label": "مصدر التمويل",
+      "options": "ميزانية رأسمالية\nاحتياطي الأصول\nقرض\nتأجير تمويلي\nغير محدد",
+      "description": "الجهة أو المصدر الذي سيموّل عملية الاستبدال"
+    },
+    {
+      "fieldname": "capex_budget",
+      "fieldtype": "Link",
+      "label": "ميزانية الإنفاق الرأسمالي",
+      "options": "Asset CapEx Budget",
+      "description": "ربط الخطة بميزانية إنفاق رأسمالي محددة"
+    },
+    {
+      "fieldname": "sec_break_approval",
+      "fieldtype": "Section Break",
+      "label": "الاعتماد"
+    },
+    {
+      "fieldname": "approval_status",
+      "fieldtype": "Select",
+      "label": "حالة الموافقة",
+      "options": "مسودة\nمعتمد\nمرفوض\nمعلق",
+      "default": "مسودة",
+      "in_list_view": 1,
+      "description": "حالة اعتماد خطة الاستبدال من الجهة المختصة"
+    },
+    {
+      "fieldname": "approved_by",
+      "fieldtype": "Link",
+      "label": "اعتمده",
+      "options": "User",
+      "description": "المسؤول الذي وافق على خطة الاستبدال"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Long Text",
+      "label": "ملاحظات",
+      "description": "معلومات إضافية أو تبريرات تفصيلية لقرار الاستبدال"
+    }
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset User", "read": 1, "write": 1, "create": 1, "submit": 1}
+  ]
+}

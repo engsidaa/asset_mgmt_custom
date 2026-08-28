@@ -122,6 +122,8 @@ scheduler_events = {
         "asset_mgmt_custom.tasks.check_software_license_expiry",
         "asset_mgmt_custom.tasks.check_pm_schedule_due",
         "asset_mgmt_custom.tasks.check_overdue_bookings",
+        "asset_mgmt_custom.tasks.check_expired_work_permits",
+        "asset_mgmt_custom.tasks.check_overdue_work_orders",
     ],
     "weekly": [
         "asset_mgmt_custom.tasks.send_warranty_digest_email",

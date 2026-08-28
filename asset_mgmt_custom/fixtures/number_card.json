@@ -180,5 +180,33 @@
     "show_percentage_stats": 0,
     "type": "Document Type",
     "color": "#7f1d1d"
+  },
+  {
+    "doctype": "Number Card",
+    "name": "Open Work Orders",
+    "label": "Open Work Orders (أوامر العمل المفتوحة)",
+    "document_type": "Asset Work Order",
+    "filters_json": "[[\"Asset Work Order\",\"status\",\"in\",\"مفتوح,قيد التنفيذ\",false],[\"Asset Work Order\",\"docstatus\",\"=\",1,false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 0,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#2563eb"
+  },
+  {
+    "doctype": "Number Card",
+    "name": "Expired Work Permits",
+    "label": "Expired Work Permits (تصاريح منتهية)",
+    "document_type": "Asset Work Permit",
+    "filters_json": "[[\"Asset Work Permit\",\"status\",\"in\",\"منتهي,صالح\",false],[\"Asset Work Permit\",\"docstatus\",\"=\",1,false]]",
+    "function": "Count",
+    "is_public": 1,
+    "is_standard": 0,
+    "module": "Asset Mgmt Custom",
+    "show_percentage_stats": 0,
+    "type": "Document Type",
+    "color": "#dc2626"
   }
 ]

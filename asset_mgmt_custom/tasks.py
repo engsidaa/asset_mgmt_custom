@@ -778,3 +778,47 @@ def check_overdue_bookings():
 
     for b in overdue:
         frappe.db.set_value("Asset Booking", b.name, "status", "Completed")
+
+
+# ---------------------------------------------------------------------------
+# Daily: expire work permits past valid_to
+# ---------------------------------------------------------------------------
+
+def check_expired_work_permits():
+    """Daily: mark submitted work permits as 'منتهي' when valid_to has passed."""
+    from frappe.utils import now_datetime as _now
+    frappe.db.sql("""
+        UPDATE `tabAsset Work Permit`
+        SET status = 'منتهي'
+        WHERE docstatus = 1
+          AND status = 'صالح'
+          AND valid_to < %(now)s
+    """, {"now": str(_now())})
+
+
+# ---------------------------------------------------------------------------
+# Daily: notify open work orders older than 3 days with no completion date
+# ---------------------------------------------------------------------------
+
+def check_overdue_work_orders():
+    """Daily: alert managers about open work orders with no progress after 3 days."""
+    cutoff = add_days(today(), -3)
+    overdue = frappe.db.sql("""
+        SELECT name, title, asset, asset_name, assigned_technician, priority, request_date
+        FROM `tabAsset Work Order`
+        WHERE docstatus = 1
+          AND status IN ('مفتوح', 'قيد التنفيذ')
+          AND request_date <= %(cutoff)s
+          AND completion_date IS NULL
+    """, {"cutoff": cutoff}, as_dict=True)
+
+    if not overdue:
+        return
+
+    manager_users = _get_manager_users()
+    for wo in overdue:
+        subject = _("Overdue Work Order: {0}").format(wo.title)
+        content = _("Work order <b>{0}</b> on asset <b>{1}</b> (priority: {2}) "
+                    "has been open since <b>{3}</b> with no completion.").format(
+            wo.title, wo.asset_name or wo.asset, wo.priority, wo.request_date)
+        _create_notification(subject, content, "Asset Work Order", wo.name, manager_users)

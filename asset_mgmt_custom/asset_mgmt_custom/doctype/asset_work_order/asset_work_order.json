@@ -1,0 +1,234 @@
+{
+  "doctype": "DocType",
+  "name": "Asset Work Order",
+  "module": "Asset Mgmt Custom",
+  "naming_rule": "By \"Naming Series\" field",
+  "autoname": "naming_series:",
+  "is_submittable": 1,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "سلسلة الترقيم",
+      "options": "AWO-.YYYY.-.####",
+      "default": "AWO-.YYYY.-.####"
+    },
+    {
+      "fieldname": "title",
+      "fieldtype": "Data",
+      "label": "عنوان أمر العمل",
+      "reqd": 1,
+      "in_list_view": 1,
+      "bold": 1,
+      "description": "وصف موجز لأمر العمل أو المشكلة"
+    },
+    {
+      "fieldname": "asset",
+      "fieldtype": "Link",
+      "label": "الأصل",
+      "options": "Asset",
+      "reqd": 1,
+      "in_list_view": 1,
+      "search_index": 1,
+      "description": "الأصل الذي يُنفَّذ عليه هذا الأمر"
+    },
+    {
+      "fieldname": "asset_name",
+      "fieldtype": "Data",
+      "label": "اسم الأصل",
+      "fetch_from": "asset.asset_name",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "الفرع",
+      "options": "Branch",
+      "description": "الفرع الذي يتبعه الأصل"
+    },
+    {
+      "fieldname": "col_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "work_type",
+      "fieldtype": "Select",
+      "label": "نوع العمل",
+      "reqd": 1,
+      "options": "صيانة وقائية\nإصلاح\nفحص\nطارئ\nتحسين",
+      "description": "نوع العمل المطلوب تنفيذه"
+    },
+    {
+      "fieldname": "priority",
+      "fieldtype": "Select",
+      "label": "الأولوية",
+      "reqd": 1,
+      "options": "عادي\nمتوسط\nعاجل\nحرج",
+      "default": "عادي",
+      "description": "مستوى الأولوية لتحديد ترتيب التنفيذ"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "الحالة",
+      "options": "مفتوح\nقيد التنفيذ\nمكتمل\nمعلق\nملغي",
+      "default": "مفتوح",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "sec_break_request",
+      "fieldtype": "Section Break",
+      "label": "بيانات الطلب"
+    },
+    {
+      "fieldname": "requested_by",
+      "fieldtype": "Link",
+      "label": "طالب العمل",
+      "options": "User",
+      "description": "الموظف الذي طلب تنفيذ أمر العمل"
+    },
+    {
+      "fieldname": "request_date",
+      "fieldtype": "Date",
+      "label": "تاريخ الطلب",
+      "reqd": 1,
+      "default": "Today"
+    },
+    {
+      "fieldname": "start_date",
+      "fieldtype": "Date",
+      "label": "تاريخ البدء الفعلي",
+      "description": "التاريخ الذي بدأ فيه تنفيذ العمل فعلياً"
+    },
+    {
+      "fieldname": "completion_date",
+      "fieldtype": "Date",
+      "label": "تاريخ الإتمام",
+      "description": "التاريخ الذي اكتمل فيه تنفيذ أمر العمل"
+    },
+    {
+      "fieldname": "sec_break_assign",
+      "fieldtype": "Section Break",
+      "label": "التعيين والتنفيذ"
+    },
+    {
+      "fieldname": "assigned_technician",
+      "fieldtype": "Link",
+      "label": "الفني المكلف",
+      "options": "User",
+      "description": "الفني أو المهندس المسؤول عن التنفيذ"
+    },
+    {
+      "fieldname": "supervisor",
+      "fieldtype": "Link",
+      "label": "المشرف",
+      "options": "User",
+      "description": "المشرف المسؤول عن الإشراف على تنفيذ أمر العمل"
+    },
+    {
+      "fieldname": "col_break_2",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "estimated_hours",
+      "fieldtype": "Float",
+      "label": "الوقت المقدر (ساعة)",
+      "description": "الوقت المتوقع لإنجاز العمل بالساعات"
+    },
+    {
+      "fieldname": "actual_hours",
+      "fieldtype": "Float",
+      "label": "الوقت الفعلي (ساعة)",
+      "description": "الوقت الذي استغرقه التنفيذ فعلياً"
+    },
+    {
+      "fieldname": "sec_break_details",
+      "fieldtype": "Section Break",
+      "label": "تفاصيل العمل"
+    },
+    {
+      "fieldname": "problem_description",
+      "fieldtype": "Long Text",
+      "label": "وصف المشكلة",
+      "description": "شرح تفصيلي للمشكلة أو سبب إنشاء أمر العمل"
+    },
+    {
+      "fieldname": "work_instructions",
+      "fieldtype": "Long Text",
+      "label": "تعليمات العمل",
+      "description": "خطوات التنفيذ والإرشادات الفنية"
+    },
+    {
+      "fieldname": "completion_notes",
+      "fieldtype": "Long Text",
+      "label": "ملاحظات الإتمام",
+      "description": "ما تم إنجازه وأي ملاحظات عند إغلاق الأمر"
+    },
+    {
+      "fieldname": "sec_break_cost",
+      "fieldtype": "Section Break",
+      "label": "التكلفة"
+    },
+    {
+      "fieldname": "estimated_cost",
+      "fieldtype": "Currency",
+      "label": "التكلفة المقدرة",
+      "description": "التكلفة الإجمالية المتوقعة لتنفيذ أمر العمل"
+    },
+    {
+      "fieldname": "actual_cost",
+      "fieldtype": "Currency",
+      "label": "التكلفة الفعلية",
+      "description": "إجمالي ما أُنفق فعلياً بما في ذلك المواد والعمالة"
+    },
+    {
+      "fieldname": "col_break_3",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "spare_parts_cost",
+      "fieldtype": "Currency",
+      "label": "تكلفة قطع الغيار",
+      "description": "قيمة قطع الغيار المستخدمة في هذا الأمر"
+    },
+    {
+      "fieldname": "labor_cost",
+      "fieldtype": "Currency",
+      "label": "تكلفة العمالة",
+      "description": "أجور الفنيين والعمالة المستخدمة"
+    },
+    {
+      "fieldname": "sec_break_refs",
+      "fieldtype": "Section Break",
+      "label": "المرجعيات"
+    },
+    {
+      "fieldname": "maintenance_schedule",
+      "fieldtype": "Link",
+      "label": "جدول الصيانة الوقائية",
+      "options": "Asset Preventive Maintenance Schedule",
+      "description": "إذا صدر أمر العمل من جدول صيانة وقائية"
+    },
+    {
+      "fieldname": "incident_report",
+      "fieldtype": "Link",
+      "label": "تقرير الحادث",
+      "options": "Asset Incident Report",
+      "description": "الحادث الذي أسفر عن إنشاء هذا الأمر إن وجد"
+    },
+    {
+      "fieldname": "work_permit",
+      "fieldtype": "Link",
+      "label": "تصريح العمل",
+      "options": "Asset Work Permit",
+      "description": "تصريح السلامة المرتبط بهذا الأمر"
+    }
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
+    {"role": "Asset User", "read": 1, "write": 1, "create": 1, "submit": 1}
+  ]
+}
