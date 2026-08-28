@@ -3,7 +3,7 @@ from frappe.model.document import Document
 from frappe import _
 
 
-class AssetCapexBudget(Document):
+class AssetCapExBudget(Document):
     def validate(self):
         allocated = (
             (self.new_acquisition_budget or 0)

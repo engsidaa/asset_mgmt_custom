@@ -1,5 +1,5 @@
 from frappe.model.document import Document
 
 
-class AssetCapexBudgetItem(Document):
+class AssetCapExBudgetItem(Document):
     pass
