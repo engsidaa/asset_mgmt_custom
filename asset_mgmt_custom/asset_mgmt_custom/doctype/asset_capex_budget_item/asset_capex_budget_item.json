@@ -1,64 +1,112 @@
 {
-  "doctype": "DocType",
-  "name": "Asset CapEx Budget Item",
-  "module": "Asset Mgmt Custom",
-  "istable": 1,
-  "editable_grid": 1,
-  "track_changes": 0,
-  "fields": [
-    {
-      "fieldname": "asset_category",
-      "fieldtype": "Link",
-      "label": "فئة الأصل",
-      "options": "Asset Category",
-      "reqd": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "description",
-      "fieldtype": "Data",
-      "label": "اسم/وصف الأصل",
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "capex_type",
-      "fieldtype": "Select",
-      "label": "CapEx Type",
-      "options": "\nNew Acquisition\nReplacement\nUpgrade",
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "quantity",
-      "fieldtype": "Int",
-      "label": "الكمية",
-      "default": "1",
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "unit_cost",
-      "fieldtype": "Currency",
-      "label": "تكلفة الوحدة",
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "total_cost",
-      "fieldtype": "Currency",
-      "label": "التكلفة الإجمالية",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "priority",
-      "fieldtype": "Select",
-      "label": "Priority",
-      "options": "\nHigh\nMedium\nLow"
-    },
-    {
-      "fieldname": "planned_quarter",
-      "fieldtype": "Select",
-      "label": "Planned Quarter",
-      "options": "\nQ1\nQ2\nQ3\nQ4"
-    }
-  ],
-  "permissions": []
+ "doctype": "DocType",
+ "name": "Asset CapEx Budget Item",
+ "module": "Asset Mgmt Custom",
+ "istable": 1,
+ "editable_grid": 1,
+ "track_changes": 0,
+ "fields": [
+  {
+   "fieldname": "asset_category",
+   "fieldtype": "Link",
+   "label": "فئة الأصل",
+   "options": "Asset Category",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "label": "اسم/وصف الأصل",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "capex_type",
+   "fieldtype": "Select",
+   "label": "CapEx Type",
+   "options": "\nNew Acquisition\nReplacement\nUpgrade",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "label": "الكمية",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "unit_cost",
+   "fieldtype": "Currency",
+   "label": "تكلفة الوحدة",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Currency",
+   "label": "التكلفة الإجمالية",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "Priority",
+   "options": "\nHigh\nMedium\nLow"
+  },
+  {
+   "fieldname": "planned_quarter",
+   "fieldtype": "Select",
+   "label": "Planned Quarter",
+   "options": "\nQ1\nQ2\nQ3\nQ4"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ]
 }

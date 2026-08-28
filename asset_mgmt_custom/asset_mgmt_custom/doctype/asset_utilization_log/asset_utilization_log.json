@@ -1,102 +1,155 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Utilization Log",
-  "module": "Asset Mgmt Custom",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "autoname": "format:UTIL-{asset}-{log_date}",
-  "fields": [
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1
-    },
-    {
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "label": "الفرع",
-      "options": "Branch",
-      "fetch_from": "asset.branch",
-      "read_only": 1
-    },
-    {
-      "fieldname": "log_date",
-      "fieldtype": "Date",
-      "label": "تاريخ السجل",
-      "reqd": 1,
-      "default": "Today"
-    },
-    {
-      "fieldname": "total_capacity_hours",
-      "fieldtype": "Float",
-      "label": "إجمالي ساعات الطاقة",
-      "description": "إجمالي الساعات المتاحة للتشغيل في اليوم",
-      "reqd": 1
-    },
-    {
-      "fieldname": "actual_used_hours",
-      "fieldtype": "Float",
-      "label": "ساعات الاستخدام الفعلية",
-      "description": "عدد الساعات التي عمل فيها الأصل فعلاً",
-      "reqd": 1
-    },
-    {
-      "fieldname": "idle_hours",
-      "fieldtype": "Float",
-      "label": "ساعات التوقف",
-      "description": "يُحسب تلقائياً: الطاقة ناقص الاستخدام",
-      "read_only": 1
-    },
-    {
-      "fieldname": "utilization_pct",
-      "fieldtype": "Float",
-      "label": "نسبة الاستخدام %",
-      "description": "يُحسب تلقائياً: الاستخدام ÷ الطاقة × 100",
-      "read_only": 1
-    },
-    {
-      "fieldname": "downtime_hours",
-      "fieldtype": "Float",
-      "label": "ساعات العطل",
-      "description": "ساعات التوقف بسبب عطل أو صيانة",
-      "default": "0"
-    },
-    {
-      "fieldname": "downtime_reason",
-      "fieldtype": "Small Text",
-      "label": "سبب العطل"
-    },
-    {
-      "fieldname": "operator",
-      "fieldtype": "Link",
-      "label": "المشغّل",
-      "description": "الموظف الذي يشغّل الأصل",
-      "options": "Employee"
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Small Text",
-      "label": "ملاحظات"
-    }
-  ],
-  "permissions": [
-    {
-      "role": "System Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "submit": 0,
-      "cancel": 0,
-      "delete": 1
-    }
-  ]
+ "doctype": "DocType",
+ "name": "Asset Utilization Log",
+ "module": "Asset Mgmt Custom",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "autoname": "format:UTIL-{asset}-{log_date}",
+ "fields": [
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "الفرع",
+   "options": "Branch",
+   "fetch_from": "asset.branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "log_date",
+   "fieldtype": "Date",
+   "label": "تاريخ السجل",
+   "reqd": 1,
+   "default": "Today"
+  },
+  {
+   "fieldname": "total_capacity_hours",
+   "fieldtype": "Float",
+   "label": "إجمالي ساعات الطاقة",
+   "description": "إجمالي الساعات المتاحة للتشغيل في اليوم",
+   "reqd": 1
+  },
+  {
+   "fieldname": "actual_used_hours",
+   "fieldtype": "Float",
+   "label": "ساعات الاستخدام الفعلية",
+   "description": "عدد الساعات التي عمل فيها الأصل فعلاً",
+   "reqd": 1
+  },
+  {
+   "fieldname": "idle_hours",
+   "fieldtype": "Float",
+   "label": "ساعات التوقف",
+   "description": "يُحسب تلقائياً: الطاقة ناقص الاستخدام",
+   "read_only": 1
+  },
+  {
+   "fieldname": "utilization_pct",
+   "fieldtype": "Float",
+   "label": "نسبة الاستخدام %",
+   "description": "يُحسب تلقائياً: الاستخدام ÷ الطاقة × 100",
+   "read_only": 1
+  },
+  {
+   "fieldname": "downtime_hours",
+   "fieldtype": "Float",
+   "label": "ساعات العطل",
+   "description": "ساعات التوقف بسبب عطل أو صيانة",
+   "default": "0"
+  },
+  {
+   "fieldname": "downtime_reason",
+   "fieldtype": "Small Text",
+   "label": "سبب العطل"
+  },
+  {
+   "fieldname": "operator",
+   "fieldtype": "Link",
+   "label": "المشغّل",
+   "description": "الموظف الذي يشغّل الأصل",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "print": 1
+  }
+ ]
 }

@@ -1,27 +1,176 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Booking",
-  "module": "Asset Mgmt Custom",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "naming_rule": "By \"Naming Series\" field",
-  "fields": [
-    {"fieldname": "naming_series", "fieldtype": "Select", "label": "Series", "options": "BOOK-.YYYY.-"},
-    {"fieldname": "asset", "fieldtype": "Link", "options": "Asset", "label": "الأصل", "description": "الأصل المراد حجزه", "reqd": 1},
-    {"fieldname": "asset_name", "fieldtype": "Data", "label": "اسم الأصل", "fetch_from": "asset.asset_name", "read_only": 1},
-    {"fieldname": "asset_category", "fieldtype": "Link", "options": "Asset Category", "label": "فئة الأصل", "fetch_from": "asset.asset_category", "read_only": 1},
-    {"fieldname": "booked_by", "fieldtype": "Link", "options": "Employee", "label": "الموظف الحاجز", "description": "الموظف الذي يقوم بالحجز", "reqd": 1},
-    {"fieldname": "department", "fieldtype": "Link", "options": "Department", "label": "القسم", "fetch_from": "booked_by.department", "read_only": 1},
-    {"fieldname": "booking_date", "fieldtype": "Date", "label": "تاريخ الحجز", "reqd": 1},
-    {"fieldname": "from_datetime", "fieldtype": "Datetime", "label": "من (التاريخ والوقت)", "description": "بداية فترة الحجز", "reqd": 1},
-    {"fieldname": "to_datetime", "fieldtype": "Datetime", "label": "إلى (التاريخ والوقت)", "description": "نهاية فترة الحجز", "reqd": 1},
-    {"fieldname": "purpose", "fieldtype": "Small Text", "label": "الغرض من الحجز", "description": "سبب الحجز أو المناسبة"},
-    {"fieldname": "status", "fieldtype": "Select", "label": "الحالة", "options": "Pending\nApproved\nRejected\nCompleted\nCancelled", "default": "Pending"},
-    {"fieldname": "approved_by", "fieldtype": "Link", "options": "User", "label": "معتمد من", "read_only": 1},
-    {"fieldname": "approval_date", "fieldtype": "Date", "label": "تاريخ الاعتماد", "read_only": 1},
-    {"fieldname": "notes", "fieldtype": "Small Text", "label": "ملاحظات"}
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "delete": 0}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Booking",
+ "module": "Asset Mgmt Custom",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "naming_rule": "By \"Naming Series\" field",
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "BOOK-.YYYY.-"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "options": "Asset",
+   "label": "الأصل",
+   "description": "الأصل المراد حجزه",
+   "reqd": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "asset_category",
+   "fieldtype": "Link",
+   "options": "Asset Category",
+   "label": "فئة الأصل",
+   "fetch_from": "asset.asset_category",
+   "read_only": 1
+  },
+  {
+   "fieldname": "booked_by",
+   "fieldtype": "Link",
+   "options": "Employee",
+   "label": "الموظف الحاجز",
+   "description": "الموظف الذي يقوم بالحجز",
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "options": "Department",
+   "label": "القسم",
+   "fetch_from": "booked_by.department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "booking_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الحجز",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_datetime",
+   "fieldtype": "Datetime",
+   "label": "من (التاريخ والوقت)",
+   "description": "بداية فترة الحجز",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_datetime",
+   "fieldtype": "Datetime",
+   "label": "إلى (التاريخ والوقت)",
+   "description": "نهاية فترة الحجز",
+   "reqd": 1
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Small Text",
+   "label": "الغرض من الحجز",
+   "description": "سبب الحجز أو المناسبة"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "Pending\nApproved\nRejected\nCompleted\nCancelled",
+   "default": "Pending"
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "معتمد من",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approval_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الاعتماد",
+   "read_only": 1
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Employee",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ]
 }

@@ -1,124 +1,198 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Write-off Request",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "naming_series:",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "السلسلة",
-      "options": "WO-.YYYY.-",
-      "default": "WO-.YYYY.-"
-    },
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "الحالة",
-      "options": "Draft\nPending Approval\nApproved\nRejected",
-      "default": "Draft",
-      "read_only": 1,
-      "in_list_view": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "write_off_date",
-      "fieldtype": "Date",
-      "label": "تاريخ الشطب",
-      "reqd": 1
-    },
-    {
-      "fieldname": "sec_break_reason",
-      "fieldtype": "Section Break",
-      "label": "تفاصيل الشطب"
-    },
-    {
-      "fieldname": "reason",
-      "fieldtype": "Select",
-      "label": "سبب الشطب",
-      "description": "المبرر الرئيسي لشطب هذا الأصل من السجلات",
-      "options": "\nLost\nDestroyed\nStolen\nBeyond Economical Repair\nObsolete\nOther",
-      "reqd": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "police_report_no",
-      "fieldtype": "Data",
-      "label": "رقم بلاغ الشرطة",
-      "depends_on": "eval:in_list(['Lost','Stolen'], doc.reason)"
-    },
-    {
-      "fieldname": "col_break_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "estimated_loss_value",
-      "fieldtype": "Currency",
-      "label": "القيمة الدفترية",
-      "description": "القيمة الحالية للأصل في السجلات المحاسبية"
-    },
-    {
-      "fieldname": "description",
-      "fieldtype": "Text Editor",
-      "label": "الوصف التفصيلي",
-      "reqd": 1
-    },
-    {
-      "fieldname": "sec_break_approval",
-      "fieldtype": "Section Break",
-      "label": "الاعتماد"
-    },
-    {
-      "fieldname": "approved_by",
-      "fieldtype": "Data",
-      "label": "معتمد من",
-      "read_only": 1
-    },
-    {
-      "fieldname": "approval_date",
-      "fieldtype": "Date",
-      "label": "تاريخ الاعتماد",
-      "read_only": 1
-    },
-    {
-      "fieldname": "col_break_3",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "rejection_reason",
-      "fieldtype": "Text",
-      "label": "سبب الرفض",
-      "read_only": 1
-    }
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Write-off Request",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "naming_series:",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "السلسلة",
+   "options": "WO-.YYYY.-",
+   "default": "WO-.YYYY.-"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "Draft\nPending Approval\nApproved\nRejected",
+   "default": "Draft",
+   "read_only": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "write_off_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الشطب",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sec_break_reason",
+   "fieldtype": "Section Break",
+   "label": "تفاصيل الشطب"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Select",
+   "label": "سبب الشطب",
+   "description": "المبرر الرئيسي لشطب هذا الأصل من السجلات",
+   "options": "\nLost\nDestroyed\nStolen\nBeyond Economical Repair\nObsolete\nOther",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "police_report_no",
+   "fieldtype": "Data",
+   "label": "رقم بلاغ الشرطة",
+   "depends_on": "eval:in_list(['Lost','Stolen'], doc.reason)"
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "estimated_loss_value",
+   "fieldtype": "Currency",
+   "label": "القيمة الدفترية",
+   "description": "القيمة الحالية للأصل في السجلات المحاسبية"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "الوصف التفصيلي",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sec_break_approval",
+   "fieldtype": "Section Break",
+   "label": "الاعتماد"
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Data",
+   "label": "معتمد من",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approval_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الاعتماد",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rejection_reason",
+   "fieldtype": "Text",
+   "label": "سبب الرفض",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "مركز التكلفة",
+   "options": "Cost Center",
+   "description": "مركز التكلفة للقيد المحاسبي الذي سيُنشأ تلقائياً عند الموافقة."
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "قيد اليومية",
+   "options": "Journal Entry",
+   "read_only": 1,
+   "description": "القيد المحاسبي الذي تم إنشاؤه تلقائياً عند الموافقة على شطب الأصل."
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "report": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1
+  }
+ ]
 }

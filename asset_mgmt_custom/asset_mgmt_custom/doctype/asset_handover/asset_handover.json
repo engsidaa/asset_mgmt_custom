@@ -1,134 +1,194 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Handover",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "Expression",
-  "autoname": "format:AHO-.YYYY.-.#####",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "options": "Branch",
-      "label": "Branch",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1
-    },
-    {
-      "fieldname": "handover_date",
-      "fieldtype": "Date",
-      "label": "تاريخ التسليم",
-      "reqd": 1,
-      "default": "Today",
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "الحالة",
-      "options": "Draft\nPending Signatures\nCompleted",
-      "default": "Draft",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "managers_section",
-      "fieldtype": "Section Break",
-      "label": "Outgoing & Incoming Manager"
-    },
-    {
-      "fieldname": "outgoing_manager",
-      "fieldtype": "Data",
-      "label": "الموظف المسلِّم",
-      "description": "الموظف الذي يسلّم الأصول",
-      "reqd": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "outgoing_manager_title",
-      "fieldtype": "Data",
-      "label": "Title / Role (Outgoing)"
-    },
-    {
-      "fieldname": "col2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "incoming_manager",
-      "fieldtype": "Data",
-      "label": "الموظف المستلِم",
-      "description": "الموظف الذي يستلم الأصول",
-      "reqd": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "incoming_manager_title",
-      "fieldtype": "Data",
-      "label": "Title / Role (Incoming)"
-    },
-    {
-      "fieldname": "assets_section",
-      "fieldtype": "Section Break",
-      "label": "Assets"
-    },
-    {
-      "fieldname": "items",
-      "fieldtype": "Table",
-      "label": "الأصول المُسلَّمة",
-      "description": "قائمة الأصول التي تم تسليمها",
-      "options": "Asset Handover Item",
-      "reqd": 1
-    },
-    {
-      "fieldname": "summary_section",
-      "fieldtype": "Section Break",
-      "label": "Summary"
-    },
-    {
-      "fieldname": "total_assets",
-      "fieldtype": "Int",
-      "label": "Total Assets",
-      "read_only": 1
-    },
-    {
-      "fieldname": "col3",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "good_count",
-      "fieldtype": "Int",
-      "label": "Good Condition",
-      "read_only": 1
-    },
-    {
-      "fieldname": "col4",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "damaged_count",
-      "fieldtype": "Int",
-      "label": "Damaged / Issues",
-      "read_only": 1
-    },
-    {
-      "fieldname": "notes_section",
-      "fieldtype": "Section Break",
-      "label": "Notes & Remarks"
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Text Editor",
-      "label": "ملاحظات"
-    }
-  ],
-  "permissions": [
-    {"role": "Assets Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1, "print": 1},
-    {"role": "Asset User", "read": 1, "print": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Handover",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "Expression",
+ "autoname": "format:AHO-.YYYY.-.#####",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "options": "Branch",
+   "label": "Branch",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "handover_date",
+   "fieldtype": "Date",
+   "label": "تاريخ التسليم",
+   "reqd": 1,
+   "default": "Today",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "Draft\nPending Signatures\nCompleted",
+   "default": "Draft",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "managers_section",
+   "fieldtype": "Section Break",
+   "label": "Outgoing & Incoming Manager"
+  },
+  {
+   "fieldname": "outgoing_manager",
+   "fieldtype": "Data",
+   "label": "الموظف المسلِّم",
+   "description": "الموظف الذي يسلّم الأصول",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "outgoing_manager_title",
+   "fieldtype": "Data",
+   "label": "Title / Role (Outgoing)"
+  },
+  {
+   "fieldname": "col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "incoming_manager",
+   "fieldtype": "Data",
+   "label": "الموظف المستلِم",
+   "description": "الموظف الذي يستلم الأصول",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "incoming_manager_title",
+   "fieldtype": "Data",
+   "label": "Title / Role (Incoming)"
+  },
+  {
+   "fieldname": "assets_section",
+   "fieldtype": "Section Break",
+   "label": "Assets"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "الأصول المُسلَّمة",
+   "description": "قائمة الأصول التي تم تسليمها",
+   "options": "Asset Handover Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "summary_section",
+   "fieldtype": "Section Break",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "total_assets",
+   "fieldtype": "Int",
+   "label": "Total Assets",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "good_count",
+   "fieldtype": "Int",
+   "label": "Good Condition",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "damaged_count",
+   "fieldtype": "Int",
+   "label": "Damaged / Issues",
+   "read_only": 1
+  },
+  {
+   "fieldname": "notes_section",
+   "fieldtype": "Section Break",
+   "label": "Notes & Remarks"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text Editor",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "print": 1
+  }
+ ]
 }

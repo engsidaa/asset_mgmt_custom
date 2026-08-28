@@ -1,123 +1,188 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Checkout",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "naming_series:",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "سلسلة الترقيم",
-      "options": "CHKOUT-.YYYY.-",
-      "default": "CHKOUT-.YYYY.-"
-    },
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "الحالة",
-      "options": "Checked Out\nReturned\nOverdue",
-      "default": "Checked Out",
-      "read_only": 1,
-      "in_list_view": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "label": "الفرع",
-      "options": "Branch",
-      "fetch_from": "asset.custom_branch"
-    },
-    {
-      "fieldname": "sec_break_checkout",
-      "fieldtype": "Section Break",
-      "label": "تفاصيل الاستعارة"
-    },
-    {
-      "fieldname": "checked_out_by",
-      "fieldtype": "Link",
-      "label": "مُستعار من قِبل",
-      "options": "Employee",
-      "reqd": 1,
-      "in_list_view": 1,
-      "description": "الشخص أو الجهة التي استعارت الأصل"
-    },
-    {
-      "fieldname": "checkout_datetime",
-      "fieldtype": "Datetime",
-      "label": "تاريخ الاستعارة ووقتها",
-      "reqd": 1
-    },
-    {
-      "fieldname": "col_break_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "expected_return",
-      "fieldtype": "Datetime",
-      "label": "تاريخ الإعادة المتوقع",
-      "reqd": 1
-    },
-    {
-      "fieldname": "purpose",
-      "fieldtype": "Text",
-      "label": "غرض الاستعارة"
-    },
-    {
-      "fieldname": "sec_break_return",
-      "fieldtype": "Section Break",
-      "label": "تفاصيل الإعادة"
-    },
-    {
-      "fieldname": "actual_return_datetime",
-      "fieldtype": "Datetime",
-      "label": "تاريخ الإعادة الفعلي",
-      "read_only": 1
-    },
-    {
-      "fieldname": "condition_on_return",
-      "fieldtype": "Select",
-      "label": "الحالة عند الإعادة",
-      "options": "\nGood\nDamaged\nLost"
-    },
-    {
-      "fieldname": "col_break_3",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "return_notes",
-      "fieldtype": "Text",
-      "label": "ملاحظات الإعادة"
-    }
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset User", "read": 1, "write": 1, "create": 1, "submit": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Checkout",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "naming_series:",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "سلسلة الترقيم",
+   "options": "CHKOUT-.YYYY.-",
+   "default": "CHKOUT-.YYYY.-"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "Checked Out\nReturned\nOverdue",
+   "default": "Checked Out",
+   "read_only": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "الفرع",
+   "options": "Branch",
+   "fetch_from": "asset.custom_branch"
+  },
+  {
+   "fieldname": "sec_break_checkout",
+   "fieldtype": "Section Break",
+   "label": "تفاصيل الاستعارة"
+  },
+  {
+   "fieldname": "checked_out_by",
+   "fieldtype": "Link",
+   "label": "مُستعار من قِبل",
+   "options": "Employee",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "الشخص أو الجهة التي استعارت الأصل"
+  },
+  {
+   "fieldname": "checkout_datetime",
+   "fieldtype": "Datetime",
+   "label": "تاريخ الاستعارة ووقتها",
+   "reqd": 1
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "expected_return",
+   "fieldtype": "Datetime",
+   "label": "تاريخ الإعادة المتوقع",
+   "reqd": 1
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Text",
+   "label": "غرض الاستعارة"
+  },
+  {
+   "fieldname": "sec_break_return",
+   "fieldtype": "Section Break",
+   "label": "تفاصيل الإعادة"
+  },
+  {
+   "fieldname": "actual_return_datetime",
+   "fieldtype": "Datetime",
+   "label": "تاريخ الإعادة الفعلي",
+   "read_only": 1
+  },
+  {
+   "fieldname": "condition_on_return",
+   "fieldtype": "Select",
+   "label": "الحالة عند الإعادة",
+   "options": "\nGood\nDamaged\nLost"
+  },
+  {
+   "fieldname": "col_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "return_notes",
+   "fieldtype": "Text",
+   "label": "ملاحظات الإعادة"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Employee",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ]
 }

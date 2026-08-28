@@ -1,1154 +1,1170 @@
 [
-  {
-    "doctype": "Workspace",
-    "name": "Asset Management",
-    "label": "إدارة الأصول",
-    "title": "إدارة الأصول",
-    "module": "Asset Mgmt Custom",
-    "public": 1,
-    "is_hidden": 0,
-    "icon": "assets",
-    "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>مؤشرات الأداء الرئيسية</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Active Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue Checkouts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Incidents\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Expired Compliance Certs\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Low Stock Spare Parts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Bookings\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Software Licenses Expiring\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue PM Schedules\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Critical Assets\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>اختصارات سريعة</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب أصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حركة الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تسليم الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إصلاح الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"صيانة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة الوقائية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حجز الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"استعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"فحص السلامة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقييم الحالة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"التدقيق المادي\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"شهادة الامتثال\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"عقد الصيانة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ميزانية رأسمالية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب قطعة غيار\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ترخيص برمجيات\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب التخلص\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"رسملة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تنبيهات الضمان\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة القادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقرير الأصول المتقادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"سجل الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"أمر العمل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تصريح العمل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقييم المخاطر\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تحليل أسباب العطل\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>الأصول والمعاملات</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الأصول الرئيسية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"طلبات الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"نقل وتسليم الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الصيانة والإصلاح\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحجوزات والاستعارات\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"السلامة والحوادث\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"العقود والتأمين\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"المالية والميزانية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحالة والأداء\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"البيئة والطاقة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"إخراج الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الوثائق والبيانات\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"أوامر العمل والتصاريح\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التحليل والتخطيط\", \"col\": 4}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>التقارير</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير التشغيل\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المالية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير الصيانة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المتقدمة\", \"col\": 4}}]",
-    "number_cards": [
-      {
-        "number_card_name": "Total Active Assets"
-      },
-      {
-        "number_card_name": "Pending Asset Requests"
-      },
-      {
-        "number_card_name": "Assets In Transit"
-      },
-      {
-        "number_card_name": "Assets Under Repair"
-      },
-      {
-        "number_card_name": "Overdue Checkouts"
-      },
-      {
-        "number_card_name": "Open Incidents"
-      },
-      {
-        "number_card_name": "Expired Compliance Certs"
-      },
-      {
-        "number_card_name": "Low Stock Spare Parts"
-      },
-      {
-        "number_card_name": "Under Warranty Assets"
-      },
-      {
-        "number_card_name": "Active Bookings"
-      },
-      {
-        "number_card_name": "Software Licenses Expiring"
-      },
-      {
-        "number_card_name": "Overdue PM Schedules"
-      },
-      {
-        "number_card_name": "Critical Assets"
-      }
-    ],
-    "shortcuts": [
-      {
-        "label": "الأصول",
-        "link_to": "Asset",
-        "type": "DocType"
-      },
-      {
-        "label": "طلب أصل",
-        "link_to": "Asset Requisition",
-        "type": "DocType"
-      },
-      {
-        "label": "حركة الأصول",
-        "link_to": "Asset Movement",
-        "type": "DocType"
-      },
-      {
-        "label": "تسليم الأصول",
-        "link_to": "Asset Handover",
-        "type": "DocType"
-      },
-      {
-        "label": "إصلاح الأصل",
-        "link_to": "Asset Repair",
-        "type": "DocType"
-      },
-      {
-        "label": "صيانة الأصل",
-        "link_to": "Asset Maintenance",
-        "type": "DocType"
-      },
-      {
-        "label": "الصيانة الوقائية",
-        "link_to": "Asset Preventive Maintenance Schedule",
-        "type": "DocType"
-      },
-      {
-        "label": "حجز الأصل",
-        "link_to": "Asset Booking",
-        "type": "DocType"
-      },
-      {
-        "label": "استعارة الأصل",
-        "link_to": "Asset Checkout",
-        "type": "DocType"
-      },
-      {
-        "label": "فحص السلامة",
-        "link_to": "Asset Safety Inspection",
-        "type": "DocType"
-      },
-      {
-        "label": "تقييم الحالة",
-        "link_to": "Asset Condition Assessment",
-        "type": "DocType"
-      },
-      {
-        "label": "التدقيق المادي",
-        "link_to": "Asset Physical Audit",
-        "type": "DocType"
-      },
-      {
-        "label": "شهادة الامتثال",
-        "link_to": "Asset Compliance Certificate",
-        "type": "DocType"
-      },
-      {
-        "label": "عقد الصيانة",
-        "link_to": "Asset Maintenance Contract",
-        "type": "DocType"
-      },
-      {
-        "label": "ميزانية رأسمالية",
-        "link_to": "Asset CapEx Budget",
-        "type": "DocType"
-      },
-      {
-        "label": "طلب قطعة غيار",
-        "link_to": "Asset Spare Part Request",
-        "type": "DocType"
-      },
-      {
-        "label": "إعارة الأصل",
-        "link_to": "Asset Loan",
-        "type": "DocType"
-      },
-      {
-        "label": "ترخيص برمجيات",
-        "link_to": "Asset Software License",
-        "type": "DocType"
-      },
-      {
-        "label": "طلب التخلص",
-        "link_to": "Asset Disposal Request",
-        "type": "DocType"
-      },
-      {
-        "label": "رسملة الأصل",
-        "link_to": "Asset Capitalization",
-        "type": "DocType"
-      },
-      {
-        "label": "تنبيهات الضمان",
-        "link_to": "Warranty Expiry Alerts",
-        "type": "Report",
-        "report_ref_doctype": "Asset"
-      },
-      {
-        "label": "الصيانة القادمة",
-        "link_to": "Upcoming Maintenance",
-        "type": "Report",
-        "report_ref_doctype": "Asset Maintenance"
-      },
-      {
-        "label": "تقرير الأصول المتقادمة",
-        "link_to": "Asset Aging Report",
-        "type": "Report"
-      },
-      {
-        "label": "سجل الأصول",
-        "link_to": "Asset Register",
-        "type": "Report"
-      },
-      {
-        "label": "أمر العمل",
-        "link_to": "Asset Work Order",
-        "type": "DocType"
-      },
-      {
-        "label": "تصريح العمل",
-        "link_to": "Asset Work Permit",
-        "type": "DocType"
-      },
-      {
-        "label": "تقييم المخاطر",
-        "link_to": "Asset Risk Assessment",
-        "type": "DocType"
-      },
-      {
-        "label": "تحليل أسباب العطل",
-        "link_to": "Asset Failure Analysis",
-        "type": "DocType"
-      }
-    ],
-    "links": [
-      {
-        "type": "Card Break",
-        "label": "الأصول الرئيسية",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "الأصل",
-        "link_to": "Asset",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "فئة الأصول",
-        "link_to": "Asset Category",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "الموقع",
-        "link_to": "Location",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "فريق صيانة الأصول",
-        "link_to": "Asset Maintenance Team",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "دفتر مالي",
-        "link_to": "Finance Book",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "قطعة الغيار",
-        "link_to": "Asset Spare Part",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "طلبات الأصول",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "طلب أصل",
-        "link_to": "Asset Requisition",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "طلب الاحتفاظ بالأصل",
-        "link_to": "Asset Retention Request",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "طلب قطعة غيار",
-        "link_to": "Asset Spare Part Request",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "طلب إرجاع أصل",
-        "link_to": "Asset Return Request",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "طلب تمديد العمر",
-        "link_to": "Asset Life Extension Request",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "طلب شطب الأصل",
-        "link_to": "Asset Write-off Request",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "حالة طلبات الأصول",
-        "link_to": "Asset Requisition Status",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "نقل وتسليم الأصول",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "حركة الأصول",
-        "link_to": "Asset Movement",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تسليم الأصول",
-        "link_to": "Asset Handover",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "طلب النقل",
-        "link_to": "Asset Transfer Request",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "سجل مواقع الأصل",
-        "link_to": "Asset Relocation History",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "تخصيص الأصل للموظف",
-        "link_to": "Asset Employee Allocation",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "الأصول في العبور",
-        "link_to": "In Transit Assets",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "تسليم أصول الفروع",
-        "link_to": "Branch Asset Handover",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "خريطة مواقع الأصول",
-        "link_to": "Asset Location Map",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "الصيانة والإصلاح",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "إصلاح الأصل",
-        "link_to": "Asset Repair",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "صيانة الأصل",
-        "link_to": "Asset Maintenance",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "عقد الصيانة",
-        "link_to": "Asset Maintenance Contract",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "ميزانية الصيانة",
-        "link_to": "Asset Maintenance Budget",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "سجل الصيانة",
-        "link_to": "Asset Maintenance Log Custom",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "جدول الصيانة الوقائية",
-        "link_to": "Asset Preventive Maintenance Schedule",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "سجل المعايرة",
-        "link_to": "Asset Calibration Record",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "جدول التنظيف",
-        "link_to": "Asset Cleaning Schedule",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "مطالبة بالضمان",
-        "link_to": "Asset Warranty Claim",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "الحجوزات والاستعارات",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "حجز الأصل",
-        "link_to": "Asset Booking",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "استعارة الأصل",
-        "link_to": "Asset Checkout",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "إعارة الأصل",
-        "link_to": "Asset Loan",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Card Break",
-        "label": "السلامة والحوادث",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "فحص السلامة",
-        "link_to": "Asset Safety Inspection",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تقرير الحادث",
-        "link_to": "Asset Incident Report",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تقييم أداء الأصل",
-        "link_to": "Asset Performance Rating",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "شكوى على الأصل",
-        "link_to": "Asset Complaint",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "العقود والتأمين",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "عقد المورد",
-        "link_to": "Asset Vendor Contract",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "عقد التأجير",
-        "link_to": "Asset Lease",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تجديد التأمين",
-        "link_to": "Asset Insurance Renewal",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "شهادة الامتثال",
-        "link_to": "Asset Compliance Certificate",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "الرخص والتصاريح",
-        "link_to": "Asset License Permit",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "المالية والميزانية",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "رسملة الأصل",
-        "link_to": "Asset Capitalization",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تعديل قيمة الأصل",
-        "link_to": "Asset Value Adjustment",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "ميزانية الإنفاق الرأسمالي",
-        "link_to": "Asset CapEx Budget",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "توزيع الأصول على الورديات",
-        "link_to": "Asset Shift Allocation",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "الحالة والأداء",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "تقييم الحالة",
-        "link_to": "Asset Condition Assessment",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "مصفوفة الحرجية",
-        "link_to": "Asset Criticality Matrix",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "مستهدفات المؤشرات",
-        "link_to": "Asset KPI Target",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "التدقيق المادي",
-        "link_to": "Asset Physical Audit",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Card Break",
-        "label": "البيئة والطاقة",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "سجل الاستخدام",
-        "link_to": "Asset Utilization Log",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "سجل الطاقة",
-        "link_to": "Asset Energy Log",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "سجل الوقود",
-        "link_to": "Asset Fuel Log",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "سجل البيئة",
-        "link_to": "Asset Environmental Log",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "إخراج الأصول",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "طلب التخلص",
-        "link_to": "Asset Disposal Request",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تنفيذ التخلص",
-        "link_to": "Asset Disposal Execution",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "شهادة التخلص",
-        "link_to": "Asset Disposal Certificate",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Card Break",
-        "label": "الوثائق والبيانات",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "ترخيص البرمجيات",
-        "link_to": "Asset Software License",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "خزنة المستندات",
-        "link_to": "Asset Document Vault",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "سجل التدريب",
-        "link_to": "Asset Training Record",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "أوامر العمل والتصاريح",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "أمر العمل",
-        "link_to": "Asset Work Order",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تصريح العمل",
-        "link_to": "Asset Work Permit",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "قراءة العداد",
-        "link_to": "Asset Meter Reading",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Card Break",
-        "label": "التحليل والتخطيط",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "تقييم المخاطر",
-        "link_to": "Asset Risk Assessment",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تحليل أسباب العطل",
-        "link_to": "Asset Failure Analysis",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "خطة الاستبدال",
-        "link_to": "Asset Replacement Plan",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تقييم أداء المورد",
-        "link_to": "Asset Vendor Performance Rating",
-        "link_type": "DocType",
-        "is_query_report": 0,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Card Break",
-        "label": "تقارير التشغيل",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "تنبيهات انتهاء الضمان",
-        "link_to": "Warranty Expiry Alerts",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "الصيانة القادمة",
-        "link_to": "Upcoming Maintenance",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "الأصول غير المكتملة",
-        "link_to": "Incomplete Assets",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "تحليل أعمار الأصول",
-        "link_to": "Asset Age Analysis",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "تخطيط استبدال الأصول",
-        "link_to": "Asset Replacement Planning",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "ملخص التأمين",
-        "link_to": "Asset Insurance Summary",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "حالة الاستعارات",
-        "link_to": "Asset Checkout Status",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "ملخص الحوادث",
-        "link_to": "Asset Incident Summary",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "تكلفة الطاقة بالفرع",
-        "link_to": "Asset Energy Cost by Branch",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "امتثال التنظيف",
-        "link_to": "Asset Cleaning Compliance",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "حالة قطع الغيار",
-        "link_to": "Asset Spare Parts Status",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "تقرير درجة السلامة",
-        "link_to": "Asset Safety Score Report",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "التقارير المالية",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "سجل الأصول",
-        "link_to": "Asset Register",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "رسملة الإنفاق الرأسمالي",
-        "link_to": "CapEx Capitalization",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تكلفة دورة حياة الأصل",
-        "link_to": "Asset Lifecycle Cost",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "ملخص أصول الأقسام",
-        "link_to": "Department Asset Summary",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "توقعات الإهلاك",
-        "link_to": "Depreciation Forecast",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "الميزانية الرأسمالية مقابل الفعلي",
-        "link_to": "CapEx Budget vs Actual",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "الميزانية مقابل الفعلي",
-        "link_to": "Asset Budget vs Actual",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "تقارير الصيانة",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "تفاصيل تكلفة الصيانة",
-        "link_to": "Maintenance Cost Detail",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "نسبة تكلفة الصيانة",
-        "link_to": "Maintenance Cost Ratio",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "تحليل التوقف عن العمل",
-        "link_to": "Asset Downtime Analysis",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "ميزانية الصيانة مقابل الفعلي",
-        "link_to": "Maintenance Budget vs Actual",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Card Break",
-        "label": "التقارير المتقدمة",
-        "hidden": 0
-      },
-      {
-        "type": "Link",
-        "label": "تقرير الأصول المتقادمة",
-        "link_to": "Asset Aging Report",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تقرير الاستخدام",
-        "link_to": "Asset Utilization Report",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "إجمالي تكلفة الملكية",
-        "link_to": "Asset Total Cost of Ownership",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تقرير دورة حياة الأصل",
-        "link_to": "Asset Lifecycle Report",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 1
-      },
-      {
-        "type": "Link",
-        "label": "تقويم الحجوزات",
-        "link_to": "Asset Booking Calendar",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      },
-      {
-        "type": "Link",
-        "label": "تقرير استبدال الأصول",
-        "link_to": "Asset Replacement Planning",
-        "link_type": "Report",
-        "is_query_report": 1,
-        "hidden": 0,
-        "onboard": 0
-      }
-    ]
-  }
+ {
+  "doctype": "Workspace",
+  "name": "Asset Management",
+  "label": "إدارة الأصول",
+  "title": "إدارة الأصول",
+  "module": "Asset Mgmt Custom",
+  "public": 1,
+  "is_hidden": 0,
+  "icon": "assets",
+  "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>مؤشرات الأداء الرئيسية</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Total Active Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Pending Asset Requests\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets In Transit\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue Checkouts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Incidents\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Expired Compliance Certs\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Low Stock Spare Parts\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Under Warranty Assets\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Bookings\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Software Licenses Expiring\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue PM Schedules\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Critical Assets\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>اختصارات سريعة</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب أصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حركة الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تسليم الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إصلاح الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"صيانة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة الوقائية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"حجز الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"استعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"فحص السلامة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقييم الحالة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"التدقيق المادي\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"شهادة الامتثال\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"عقد الصيانة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ميزانية رأسمالية\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب قطعة غيار\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"إعارة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"ترخيص برمجيات\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"طلب التخلص\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"رسملة الأصل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تنبيهات الضمان\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"الصيانة القادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقرير الأصول المتقادمة\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"سجل الأصول\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"أمر العمل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تصريح العمل\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تقييم المخاطر\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"تحليل أسباب العطل\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>الأصول والمعاملات</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الأصول الرئيسية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"طلبات الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"نقل وتسليم الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الصيانة والإصلاح\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحجوزات والاستعارات\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"السلامة والحوادث\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"العقود والتأمين\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"المالية والميزانية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الحالة والأداء\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"البيئة والطاقة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"إخراج الأصول\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"الوثائق والبيانات\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"أوامر العمل والتصاريح\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التحليل والتخطيط\", \"col\": 4}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>التقارير</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير التشغيل\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المالية\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"تقارير الصيانة\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"التقارير المتقدمة\", \"col\": 4}}]",
+  "number_cards": [
+   {
+    "number_card_name": "Total Active Assets"
+   },
+   {
+    "number_card_name": "Pending Asset Requests"
+   },
+   {
+    "number_card_name": "Assets In Transit"
+   },
+   {
+    "number_card_name": "Assets Under Repair"
+   },
+   {
+    "number_card_name": "Overdue Checkouts"
+   },
+   {
+    "number_card_name": "Open Incidents"
+   },
+   {
+    "number_card_name": "Expired Compliance Certs"
+   },
+   {
+    "number_card_name": "Low Stock Spare Parts"
+   },
+   {
+    "number_card_name": "Under Warranty Assets"
+   },
+   {
+    "number_card_name": "Active Bookings"
+   },
+   {
+    "number_card_name": "Software Licenses Expiring"
+   },
+   {
+    "number_card_name": "Overdue PM Schedules"
+   },
+   {
+    "number_card_name": "Critical Assets"
+   }
+  ],
+  "shortcuts": [
+   {
+    "label": "الأصول",
+    "link_to": "Asset",
+    "type": "DocType"
+   },
+   {
+    "label": "طلب أصل",
+    "link_to": "Asset Requisition",
+    "type": "DocType"
+   },
+   {
+    "label": "حركة الأصول",
+    "link_to": "Asset Movement",
+    "type": "DocType"
+   },
+   {
+    "label": "تسليم الأصول",
+    "link_to": "Asset Handover",
+    "type": "DocType"
+   },
+   {
+    "label": "إصلاح الأصل",
+    "link_to": "Asset Repair",
+    "type": "DocType"
+   },
+   {
+    "label": "صيانة الأصل",
+    "link_to": "Asset Maintenance",
+    "type": "DocType"
+   },
+   {
+    "label": "حجز الأصل",
+    "link_to": "Asset Booking",
+    "type": "DocType"
+   },
+   {
+    "label": "استعارة الأصل",
+    "link_to": "Asset Checkout",
+    "type": "DocType"
+   },
+   {
+    "label": "فحص السلامة",
+    "link_to": "Asset Safety Inspection",
+    "type": "DocType"
+   },
+   {
+    "label": "تقييم الحالة",
+    "link_to": "Asset Condition Assessment",
+    "type": "DocType"
+   },
+   {
+    "label": "التدقيق المادي",
+    "link_to": "Asset Physical Audit",
+    "type": "DocType"
+   },
+   {
+    "label": "شهادة الامتثال",
+    "link_to": "Asset Compliance Certificate",
+    "type": "DocType"
+   },
+   {
+    "label": "عقد الصيانة",
+    "link_to": "Asset Maintenance Contract",
+    "type": "DocType"
+   },
+   {
+    "label": "ميزانية رأسمالية",
+    "link_to": "Asset CapEx Budget",
+    "type": "DocType"
+   },
+   {
+    "label": "طلب قطعة غيار",
+    "link_to": "Asset Spare Part Request",
+    "type": "DocType"
+   },
+   {
+    "label": "إعارة الأصل",
+    "link_to": "Asset Loan",
+    "type": "DocType"
+   },
+   {
+    "label": "ترخيص برمجيات",
+    "link_to": "Asset Software License",
+    "type": "DocType"
+   },
+   {
+    "label": "طلب التخلص",
+    "link_to": "Asset Disposal Request",
+    "type": "DocType"
+   },
+   {
+    "label": "رسملة الأصل",
+    "link_to": "Asset Capitalization",
+    "type": "DocType"
+   },
+   {
+    "label": "تنبيهات الضمان",
+    "link_to": "Warranty Expiry Alerts",
+    "type": "Report",
+    "report_ref_doctype": "Asset"
+   },
+   {
+    "label": "الصيانة القادمة",
+    "link_to": "Upcoming Maintenance",
+    "type": "Report",
+    "report_ref_doctype": "Asset Maintenance"
+   },
+   {
+    "label": "تقرير الأصول المتقادمة",
+    "link_to": "Asset Aging Report",
+    "type": "Report"
+   },
+   {
+    "label": "سجل الأصول",
+    "link_to": "Asset Register",
+    "type": "Report"
+   },
+   {
+    "label": "أمر العمل",
+    "link_to": "Asset Work Order",
+    "type": "DocType"
+   },
+   {
+    "label": "تصريح العمل",
+    "link_to": "Asset Work Permit",
+    "type": "DocType"
+   },
+   {
+    "label": "تقييم المخاطر",
+    "link_to": "Asset Risk Assessment",
+    "type": "DocType"
+   },
+   {
+    "label": "تحليل أسباب العطل",
+    "link_to": "Asset Failure Analysis",
+    "type": "DocType"
+   }
+  ],
+  "links": [
+   {
+    "type": "Card Break",
+    "label": "الأصول الرئيسية",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "الأصل",
+    "link_to": "Asset",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "فئة الأصول",
+    "link_to": "Asset Category",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "الموقع",
+    "link_to": "Location",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "فريق صيانة الأصول",
+    "link_to": "Asset Maintenance Team",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "دفتر مالي",
+    "link_to": "Finance Book",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "قطعة الغيار",
+    "link_to": "Asset Spare Part",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "مكونات الأصول",
+    "link_count": 0,
+    "link_to": "Asset Component",
+    "link_type": "DocType",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "type": "Card Break",
+    "label": "طلبات الأصول",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "طلب أصل",
+    "link_to": "Asset Requisition",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "طلب الاحتفاظ بالأصل",
+    "link_to": "Asset Retention Request",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "طلب قطعة غيار",
+    "link_to": "Asset Spare Part Request",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "طلب إرجاع أصل",
+    "link_to": "Asset Return Request",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "طلب تمديد العمر",
+    "link_to": "Asset Life Extension Request",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "طلب شطب الأصل",
+    "link_to": "Asset Write-off Request",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "حالة طلبات الأصول",
+    "link_to": "Asset Requisition Status",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "نقل وتسليم الأصول",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "حركة الأصول",
+    "link_to": "Asset Movement",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تسليم الأصول",
+    "link_to": "Asset Handover",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "طلب النقل",
+    "link_to": "Asset Transfer Request",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "سجل مواقع الأصل",
+    "link_to": "Asset Relocation History",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تخصيص الأصل للموظف",
+    "link_to": "Asset Employee Allocation",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "الأصول في العبور",
+    "link_to": "In Transit Assets",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تسليم أصول الفروع",
+    "link_to": "Branch Asset Handover",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "خريطة مواقع الأصول",
+    "link_to": "Asset Location Map",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "الصيانة والإصلاح",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "إصلاح الأصل",
+    "link_to": "Asset Repair",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "صيانة الأصل",
+    "link_to": "Asset Maintenance",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "عقد الصيانة",
+    "link_to": "Asset Maintenance Contract",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "ميزانية الصيانة",
+    "link_to": "Asset Maintenance Budget",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "سجل الصيانة",
+    "link_to": "Asset Maintenance Log Custom",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "سجل المعايرة",
+    "link_to": "Asset Calibration Record",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "جدول التنظيف",
+    "link_to": "Asset Cleaning Schedule",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "مطالبة بالضمان",
+    "link_to": "Asset Warranty Claim",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "الحجوزات والاستعارات",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "حجز الأصل",
+    "link_to": "Asset Booking",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "استعارة الأصل",
+    "link_to": "Asset Checkout",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "إعارة الأصل",
+    "link_to": "Asset Loan",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Card Break",
+    "label": "السلامة والحوادث",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "فحص السلامة",
+    "link_to": "Asset Safety Inspection",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تقرير الحادث",
+    "link_to": "Asset Incident Report",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تقييم أداء الأصل",
+    "link_to": "Asset Performance Rating",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "شكوى على الأصل",
+    "link_to": "Asset Complaint",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "العقود والتأمين",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "عقد المورد",
+    "link_to": "Asset Vendor Contract",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "عقد التأجير",
+    "link_to": "Asset Lease",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تجديد التأمين",
+    "link_to": "Asset Insurance Renewal",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "شهادة الامتثال",
+    "link_to": "Asset Compliance Certificate",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "الرخص والتصاريح",
+    "link_to": "Asset License Permit",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "المالية والميزانية",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "رسملة الأصل",
+    "link_to": "Asset Capitalization",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تعديل قيمة الأصل",
+    "link_to": "Asset Value Adjustment",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "ميزانية الإنفاق الرأسمالي",
+    "link_to": "Asset CapEx Budget",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "توزيع الأصول على الورديات",
+    "link_to": "Asset Shift Allocation",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "الحالة والأداء",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "تقييم الحالة",
+    "link_to": "Asset Condition Assessment",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "مصفوفة الحرجية",
+    "link_to": "Asset Criticality Matrix",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "مستهدفات المؤشرات",
+    "link_to": "Asset KPI Target",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "التدقيق المادي",
+    "link_to": "Asset Physical Audit",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Card Break",
+    "label": "البيئة والطاقة",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "سجل الاستخدام",
+    "link_to": "Asset Utilization Log",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "سجل الطاقة",
+    "link_to": "Asset Energy Log",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "سجل الوقود",
+    "link_to": "Asset Fuel Log",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "سجل البيئة",
+    "link_to": "Asset Environmental Log",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "إخراج الأصول",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "طلب التخلص",
+    "link_to": "Asset Disposal Request",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تنفيذ التخلص",
+    "link_to": "Asset Disposal Execution",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "شهادة التخلص",
+    "link_to": "Asset Disposal Certificate",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Card Break",
+    "label": "الوثائق والبيانات",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "ترخيص البرمجيات",
+    "link_to": "Asset Software License",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "خزنة المستندات",
+    "link_to": "Asset Document Vault",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "سجل التدريب",
+    "link_to": "Asset Training Record",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "أوامر العمل والتصاريح",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "أمر العمل",
+    "link_to": "Asset Work Order",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تصريح العمل",
+    "link_to": "Asset Work Permit",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "قراءة العداد",
+    "link_to": "Asset Meter Reading",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Card Break",
+    "label": "التحليل والتخطيط",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "تقييم المخاطر",
+    "link_to": "Asset Risk Assessment",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تحليل أسباب العطل",
+    "link_to": "Asset Failure Analysis",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "خطة الاستبدال",
+    "link_to": "Asset Replacement Plan",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تقييم أداء المورد",
+    "link_to": "Asset Vendor Performance Rating",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Card Break",
+    "label": "تقارير التشغيل",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "تنبيهات انتهاء الضمان",
+    "link_to": "Warranty Expiry Alerts",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "الصيانة القادمة",
+    "link_to": "Upcoming Maintenance",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "الأصول غير المكتملة",
+    "link_to": "Incomplete Assets",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تحليل أعمار الأصول",
+    "link_to": "Asset Age Analysis",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تخطيط استبدال الأصول",
+    "link_to": "Asset Replacement Planning",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "ملخص التأمين",
+    "link_to": "Asset Insurance Summary",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "حالة الاستعارات",
+    "link_to": "Asset Checkout Status",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "ملخص الحوادث",
+    "link_to": "Asset Incident Summary",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تكلفة الطاقة بالفرع",
+    "link_to": "Asset Energy Cost by Branch",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "امتثال التنظيف",
+    "link_to": "Asset Cleaning Compliance",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "حالة قطع الغيار",
+    "link_to": "Asset Spare Parts Status",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تقرير درجة السلامة",
+    "link_to": "Asset Safety Score Report",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "تحليل MTBF / MTTR",
+    "link_count": 0,
+    "link_to": "Asset MTBF MTTR Analysis",
+    "link_type": "Report",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "فعالية المعدات OEE",
+    "link_count": 0,
+    "link_to": "Asset OEE Report",
+    "link_type": "Report",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "type": "Card Break",
+    "label": "التقارير المالية",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "سجل الأصول",
+    "link_to": "Asset Register",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "رسملة الإنفاق الرأسمالي",
+    "link_to": "CapEx Capitalization",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تكلفة دورة حياة الأصل",
+    "link_to": "Asset Lifecycle Cost",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "ملخص أصول الأقسام",
+    "link_to": "Department Asset Summary",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "توقعات الإهلاك",
+    "link_to": "Depreciation Forecast",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "الميزانية الرأسمالية مقابل الفعلي",
+    "link_to": "CapEx Budget vs Actual",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "الميزانية مقابل الفعلي",
+    "link_to": "Asset Budget vs Actual",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "تقارير الصيانة",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "تفاصيل تكلفة الصيانة",
+    "link_to": "Maintenance Cost Detail",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "نسبة تكلفة الصيانة",
+    "link_to": "Maintenance Cost Ratio",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تحليل التوقف عن العمل",
+    "link_to": "Asset Downtime Analysis",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "ميزانية الصيانة مقابل الفعلي",
+    "link_to": "Maintenance Budget vs Actual",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "التقارير المتقدمة",
+    "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "تقرير الأصول المتقادمة",
+    "link_to": "Asset Aging Report",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تقرير الاستخدام",
+    "link_to": "Asset Utilization Report",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "إجمالي تكلفة الملكية",
+    "link_to": "Asset Total Cost of Ownership",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تقرير دورة حياة الأصل",
+    "link_to": "Asset Lifecycle Report",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تقويم الحجوزات",
+    "link_to": "Asset Booking Calendar",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تقرير استبدال الأصول",
+    "link_to": "Asset Replacement Planning",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   }
+  ]
+ }
 ]

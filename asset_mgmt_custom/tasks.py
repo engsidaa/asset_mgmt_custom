@@ -727,38 +727,37 @@ def check_software_license_expiry():
 # ---------------------------------------------------------------------------
 
 def check_pm_schedule_due():
-    """Daily: notify when preventive maintenance is due and auto-mark overdue."""
+    """Daily: notify when ERPNext Asset Maintenance tasks are due (uses built-in Asset Maintenance Task)."""
+    manager_users = _get_manager_users()
     for days_ahead in [7, 3, 1]:
         target = add_days(today(), days_ahead)
         records = frappe.db.sql("""
-            SELECT name, asset, asset_name, maintenance_type,
-                   maintenance_task, next_due_date, assigned_to
-            FROM `tabAsset Preventive Maintenance Schedule`
-            WHERE next_due_date = %(target)s
-              AND status = 'Active'
+            SELECT
+                t.name AS task_name,
+                t.maintenance_task,
+                t.maintenance_type,
+                t.next_due_date,
+                t.assign_to_name AS assigned_to,
+                am.name AS schedule_name,
+                am.asset_name
+            FROM `tabAsset Maintenance Task` t
+            JOIN `tabAsset Maintenance` am ON am.name = t.parent
+            WHERE t.next_due_date = %(target)s
+              AND t.maintenance_status IN ('Pending', 'Overdue')
+              AND am.docstatus = 1
         """, {"target": target}, as_dict=True)
 
         if not records:
             continue
 
-        manager_users = _get_manager_users()
         for r in records:
-            subject = _("PM Due in {0} day(s): {1} - {2}").format(
-                days_ahead, r.asset_name or r.asset, r.maintenance_task)
-            content = _("Preventive maintenance task <b>{0}</b> for asset "
-                        "<b>{1}</b> is due on <b>{2}</b> ({3}).").format(
-                r.maintenance_task, r.asset_name or r.asset,
+            subject = _("PM موعده بعد {0} يوم: {1} - {2}").format(
+                days_ahead, r.asset_name or r.schedule_name, r.maintenance_task)
+            content = _("مهمة الصيانة الوقائية <b>{0}</b> للأصل "
+                        "<b>{1}</b> موعدها <b>{2}</b> ({3}).").format(
+                r.maintenance_task, r.asset_name,
                 r.next_due_date, r.maintenance_type)
-            _create_notification(subject, content,
-                                 "Asset Preventive Maintenance Schedule", r.name, manager_users)
-
-    # Auto-mark overdue
-    frappe.db.sql("""
-        UPDATE `tabAsset Preventive Maintenance Schedule`
-        SET status = 'Overdue'
-        WHERE next_due_date < %(today)s
-          AND status = 'Active'
-    """, {"today": today()})
+            _create_notification(subject, content, "Asset Maintenance", r.schedule_name, manager_users)
 
 
 # ---------------------------------------------------------------------------

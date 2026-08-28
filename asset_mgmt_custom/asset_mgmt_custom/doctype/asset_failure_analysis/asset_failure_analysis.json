@@ -1,147 +1,201 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Failure Analysis",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "naming_series:",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "سلسلة الترقيم",
-      "options": "FA-.YYYY.-.####",
-      "default": "FA-.YYYY.-.####"
-    },
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "bold": 1,
-      "in_list_view": 1,
-      "search_index": 1,
-      "description": "الأصل الذي وقع فيه العطل"
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "failure_date",
-      "fieldtype": "Date",
-      "label": "تاريخ العطل",
-      "reqd": 1,
-      "default": "Today",
-      "in_list_view": 1,
-      "description": "التاريخ الذي حدث فيه العطل"
-    },
-    {
-      "fieldname": "analyzed_by",
-      "fieldtype": "Link",
-      "label": "المحلِّل",
-      "options": "User",
-      "description": "الفني أو المهندس الذي أجرى التحليل"
-    },
-    {
-      "fieldname": "recurrence_risk",
-      "fieldtype": "Select",
-      "label": "خطر التكرار",
-      "options": "منخفض\nمتوسط\nمرتفع",
-      "in_list_view": 1,
-      "description": "احتمال تكرار نفس العطل في المستقبل"
-    },
-    {
-      "fieldname": "sec_break_failure",
-      "fieldtype": "Section Break",
-      "label": "تفاصيل العطل"
-    },
-    {
-      "fieldname": "failure_mode",
-      "fieldtype": "Select",
-      "label": "نمط العطل",
-      "reqd": 1,
-      "options": "تآكل وتلف\nتشحيم غير كافٍ\nفشل كهربائي\nحمل زائد\nإهمال\nخطأ تشغيلي\nعيب تصنيع\nتلف بسبب حادث\nأخرى",
-      "description": "التصنيف العام لنوع العطل"
-    },
-    {
-      "fieldname": "failure_effect",
-      "fieldtype": "Data",
-      "label": "تأثير العطل",
-      "description": "الأثر الفوري للعطل على التشغيل أو الإنتاج"
-    },
-    {
-      "fieldname": "col_break_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "downtime_hours",
-      "fieldtype": "Float",
-      "label": "ساعات التوقف",
-      "description": "مدة توقف الأصل بسبب هذا العطل"
-    },
-    {
-      "fieldname": "repair_cost",
-      "fieldtype": "Currency",
-      "label": "تكلفة الإصلاح",
-      "description": "إجمالي تكلفة إصلاح العطل"
-    },
-    {
-      "fieldname": "sec_break_analysis",
-      "fieldtype": "Section Break",
-      "label": "التحليل والإجراءات"
-    },
-    {
-      "fieldname": "root_cause",
-      "fieldtype": "Long Text",
-      "label": "السبب الجذري",
-      "reqd": 1,
-      "description": "التحليل المفصل لأصل المشكلة وليس مجرد الأعراض الظاهرة"
-    },
-    {
-      "fieldname": "corrective_action",
-      "fieldtype": "Long Text",
-      "label": "الإجراء التصحيحي",
-      "description": "ما تم تنفيذه لإصلاح العطل ومنع تكراره فوراً"
-    },
-    {
-      "fieldname": "preventive_action",
-      "fieldtype": "Long Text",
-      "label": "الإجراء الوقائي",
-      "description": "التغييرات طويلة الأمد لمنع تكرار هذا العطل"
-    },
-    {
-      "fieldname": "lessons_learned",
-      "fieldtype": "Long Text",
-      "label": "الدروس المستفادة",
-      "description": "المعرفة المكتسبة لتحسين الصيانة والتشغيل في المستقبل"
-    },
-    {
-      "fieldname": "sec_break_refs",
-      "fieldtype": "Section Break",
-      "label": "المرجعيات"
-    },
-    {
-      "fieldname": "incident_report",
-      "fieldtype": "Link",
-      "label": "تقرير الحادث المرتبط",
-      "options": "Asset Incident Report",
-      "description": "تقرير الحادث الذي أسفر عن هذا العطل إن وجد"
-    }
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset User", "read": 1, "write": 1, "create": 1, "submit": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Failure Analysis",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "naming_series:",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "سلسلة الترقيم",
+   "options": "FA-.YYYY.-.####",
+   "default": "FA-.YYYY.-.####"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "bold": 1,
+   "in_list_view": 1,
+   "search_index": 1,
+   "description": "الأصل الذي وقع فيه العطل"
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "failure_date",
+   "fieldtype": "Date",
+   "label": "تاريخ العطل",
+   "reqd": 1,
+   "default": "Today",
+   "in_list_view": 1,
+   "description": "التاريخ الذي حدث فيه العطل"
+  },
+  {
+   "fieldname": "analyzed_by",
+   "fieldtype": "Link",
+   "label": "المحلِّل",
+   "options": "User",
+   "description": "الفني أو المهندس الذي أجرى التحليل"
+  },
+  {
+   "fieldname": "recurrence_risk",
+   "fieldtype": "Select",
+   "label": "خطر التكرار",
+   "options": "منخفض\nمتوسط\nمرتفع",
+   "in_list_view": 1,
+   "description": "احتمال تكرار نفس العطل في المستقبل"
+  },
+  {
+   "fieldname": "sec_break_failure",
+   "fieldtype": "Section Break",
+   "label": "تفاصيل العطل"
+  },
+  {
+   "fieldname": "failure_mode",
+   "fieldtype": "Select",
+   "label": "نمط العطل",
+   "reqd": 1,
+   "options": "تآكل وتلف\nتشحيم غير كافٍ\nفشل كهربائي\nحمل زائد\nإهمال\nخطأ تشغيلي\nعيب تصنيع\nتلف بسبب حادث\nأخرى",
+   "description": "التصنيف العام لنوع العطل"
+  },
+  {
+   "fieldname": "failure_effect",
+   "fieldtype": "Data",
+   "label": "تأثير العطل",
+   "description": "الأثر الفوري للعطل على التشغيل أو الإنتاج"
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "downtime_hours",
+   "fieldtype": "Float",
+   "label": "ساعات التوقف",
+   "description": "مدة توقف الأصل بسبب هذا العطل"
+  },
+  {
+   "fieldname": "repair_cost",
+   "fieldtype": "Currency",
+   "label": "تكلفة الإصلاح",
+   "description": "إجمالي تكلفة إصلاح العطل"
+  },
+  {
+   "fieldname": "sec_break_analysis",
+   "fieldtype": "Section Break",
+   "label": "التحليل والإجراءات"
+  },
+  {
+   "fieldname": "root_cause",
+   "fieldtype": "Long Text",
+   "label": "السبب الجذري",
+   "reqd": 1,
+   "description": "التحليل المفصل لأصل المشكلة وليس مجرد الأعراض الظاهرة"
+  },
+  {
+   "fieldname": "corrective_action",
+   "fieldtype": "Long Text",
+   "label": "الإجراء التصحيحي",
+   "description": "ما تم تنفيذه لإصلاح العطل ومنع تكراره فوراً"
+  },
+  {
+   "fieldname": "preventive_action",
+   "fieldtype": "Long Text",
+   "label": "الإجراء الوقائي",
+   "description": "التغييرات طويلة الأمد لمنع تكرار هذا العطل"
+  },
+  {
+   "fieldname": "lessons_learned",
+   "fieldtype": "Long Text",
+   "label": "الدروس المستفادة",
+   "description": "المعرفة المكتسبة لتحسين الصيانة والتشغيل في المستقبل"
+  },
+  {
+   "fieldname": "sec_break_refs",
+   "fieldtype": "Section Break",
+   "label": "المرجعيات"
+  },
+  {
+   "fieldname": "incident_report",
+   "fieldtype": "Link",
+   "label": "تقرير الحادث المرتبط",
+   "options": "Asset Incident Report",
+   "description": "تقرير الحادث الذي أسفر عن هذا العطل إن وجد"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1
+  }
+ ]
 }

@@ -1,154 +1,200 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Compliance Certificate",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "field:certificate_number",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "certificate_number",
-      "fieldtype": "Data",
-      "label": "رقم الشهادة",
-      "reqd": 1,
-      "in_list_view": 1,
-      "bold": 1,
-      "unique": 1
-    },
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1
-    },
-    {
-      "fieldname": "col1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "certificate_type",
-      "fieldtype": "Select",
-      "label": "نوع الشهادة",
-      "description": "نوع شهادة الامتثال أو الترخيص",
-      "options": "\nFire Safety\nElectrical Safety\nPressure Vessel\nLift/Elevator\nFood Safety\nHealth & Safety\nEnvironmental\nOther",
-      "reqd": 1,
-      "in_list_view": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "الحالة",
-      "description": "سارية / منتهية / معلقة",
-      "options": "Active\nExpired\nPending Renewal\nCancelled",
-      "default": "Active",
-      "in_list_view": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "section_dates",
-      "fieldtype": "Section Break",
-      "label": "تفاصيل الشهادة"
-    },
-    {
-      "fieldname": "issuing_authority",
-      "fieldtype": "Data",
-      "label": "جهة الإصدار",
-      "reqd": 1
-    },
-    {
-      "fieldname": "issue_date",
-      "fieldtype": "Date",
-      "label": "تاريخ الإصدار",
-      "reqd": 1
-    },
-    {
-      "fieldname": "col2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "expiry_date",
-      "fieldtype": "Date",
-      "label": "تاريخ الانتهاء",
-      "description": "تاريخ انتهاء صلاحية الشهادة",
-      "reqd": 1,
-      "in_list_view": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "renewal_reminder_days",
-      "fieldtype": "Int",
-      "label": "التذكير قبل الانتهاء (أيام)",
-      "default": "30",
-      "description": "إرسال تنبيه قبل تاريخ الانتهاء بهذا العدد من الأيام"
-    },
-    {
-      "fieldname": "section_branch",
-      "fieldtype": "Section Break",
-      "label": "الفرع والشركة"
-    },
-    {
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "label": "الفرع",
-      "options": "Branch",
-      "in_list_view": 1,
-      "search_index": 1
-    },
-    {
-      "fieldname": "company",
-      "fieldtype": "Link",
-      "label": "الشركة",
-      "options": "Company",
-      "reqd": 1
-    },
-    {
-      "fieldname": "section_docs",
-      "fieldtype": "Section Break",
-      "label": "الوثائق",
-      "collapsible": 1
-    },
-    {
-      "fieldname": "certificate_document",
-      "fieldtype": "Attach",
-      "label": "وثيقة الشهادة (PDF)"
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Text Editor",
-      "label": "ملاحظات"
-    }
-  ],
-  "permissions": [
-    {
-      "role": "Assets Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "delete": 1,
-      "submit": 0
-    },
-    {
-      "role": "System Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "delete": 1
-    }
-  ],
-  "search_fields": "asset, certificate_type, status",
-  "title_field": "certificate_number",
-  "sort_field": "expiry_date",
-  "sort_order": "ASC"
+ "doctype": "DocType",
+ "name": "Asset Compliance Certificate",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "field:certificate_number",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "certificate_number",
+   "fieldtype": "Data",
+   "label": "رقم الشهادة",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "certificate_type",
+   "fieldtype": "Select",
+   "label": "نوع الشهادة",
+   "description": "نوع شهادة الامتثال أو الترخيص",
+   "options": "\nFire Safety\nElectrical Safety\nPressure Vessel\nLift/Elevator\nFood Safety\nHealth & Safety\nEnvironmental\nOther",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "description": "سارية / منتهية / معلقة",
+   "options": "Active\nExpired\nPending Renewal\nCancelled",
+   "default": "Active",
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "section_dates",
+   "fieldtype": "Section Break",
+   "label": "تفاصيل الشهادة"
+  },
+  {
+   "fieldname": "issuing_authority",
+   "fieldtype": "Data",
+   "label": "جهة الإصدار",
+   "reqd": 1
+  },
+  {
+   "fieldname": "issue_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الإصدار",
+   "reqd": 1
+  },
+  {
+   "fieldname": "col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "expiry_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الانتهاء",
+   "description": "تاريخ انتهاء صلاحية الشهادة",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "renewal_reminder_days",
+   "fieldtype": "Int",
+   "label": "التذكير قبل الانتهاء (أيام)",
+   "default": "30",
+   "description": "إرسال تنبيه قبل تاريخ الانتهاء بهذا العدد من الأيام"
+  },
+  {
+   "fieldname": "section_branch",
+   "fieldtype": "Section Break",
+   "label": "الفرع والشركة"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "الفرع",
+   "options": "Branch",
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "الشركة",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_docs",
+   "fieldtype": "Section Break",
+   "label": "الوثائق",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "certificate_document",
+   "fieldtype": "Attach",
+   "label": "وثيقة الشهادة (PDF)"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text Editor",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "create": 1
+  }
+ ],
+ "search_fields": "asset, certificate_type, status",
+ "title_field": "certificate_number",
+ "sort_field": "expiry_date",
+ "sort_order": "ASC"
 }

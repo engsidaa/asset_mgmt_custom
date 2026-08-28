@@ -1,165 +1,216 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Requisition",
-  "module": "Asset Mgmt Custom",
-  "autoname": "naming_series:",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "السلسلة",
-      "options": "AR-.YYYY.-",
-      "reqd": 1
-    },
-    {
-      "fieldname": "employee",
-      "fieldtype": "Link",
-      "label": "طالب الأصل",
-      "description": "الموظف أو القسم الذي يطلب الأصل",
-      "options": "Employee",
-      "reqd": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "department",
-      "fieldtype": "Link",
-      "label": "القسم",
-      "options": "Department"
-    },
-    {
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "label": "الفرع",
-      "options": "Branch"
-    },
-    {
-      "fieldname": "request_date",
-      "fieldtype": "Date",
-      "label": "تاريخ الطلب",
-      "reqd": 1,
-      "default": "Today"
-    },
-    {
-      "fieldname": "required_by",
-      "fieldtype": "Date",
-      "label": "التاريخ المطلوب",
-      "description": "التاريخ الذي يُحتاج فيه إلى الأصل"
-    },
-    {
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "الحالة",
-      "options": "Draft\nPending Approval\nApproved\nRejected\nFulfilled",
-      "default": "Draft",
-      "read_only": 1,
-      "in_list_view": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "asset_category",
-      "fieldtype": "Link",
-      "label": "فئة الأصل المطلوبة",
-      "description": "فئة الأصل الذي يتم طلبه",
-      "options": "Asset Category",
-      "reqd": 1
-    },
-    {
-      "fieldname": "item_code",
-      "fieldtype": "Link",
-      "label": "الصنف",
-      "options": "Item"
-    },
-    {
-      "fieldname": "quantity",
-      "fieldtype": "Int",
-      "label": "الكمية",
-      "default": "1"
-    },
-    {
-      "fieldname": "section_details",
-      "fieldtype": "Section Break",
-      "label": "التفاصيل"
-    },
-    {
-      "fieldname": "description",
-      "fieldtype": "Text",
-      "label": "الوصف"
-    },
-    {
-      "fieldname": "justification",
-      "fieldtype": "Text",
-      "label": "المبرر",
-      "description": "سبب الحاجة إلى هذا الأصل"
-    },
-    {
-      "fieldname": "section_spare",
-      "fieldtype": "Section Break",
-      "label": "أصل احتياطي"
-    },
-    {
-      "fieldname": "spare_available",
-      "fieldtype": "Check",
-      "label": "أصل احتياطي متاح",
-      "read_only": 1
-    },
-    {
-      "fieldname": "spare_asset",
-      "fieldtype": "Link",
-      "label": "الأصل الاحتياطي",
-      "options": "Asset",
-      "read_only": 1
-    },
-    {
-      "fieldname": "section_rejection",
-      "fieldtype": "Section Break",
-      "label": "الرفض"
-    },
-    {
-      "fieldname": "rejection_reason",
-      "fieldtype": "Small Text",
-      "label": "سبب الرفض",
-      "read_only": 1
-    },
-    {
-      "fieldname": "amended_from",
-      "fieldtype": "Link",
-      "label": "معدَّل من",
-      "options": "Asset Requisition",
-      "read_only": 1,
-      "print_hide": 1
-    }
-  ],
-  "permissions": [
-    {
-      "role": "System Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "delete": 1,
-      "submit": 1,
-      "cancel": 1,
-      "amend": 1
-    },
-    {
-      "role": "Assets Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "submit": 1,
-      "cancel": 1,
-      "amend": 1
-    },
-    {
-      "role": "Employee",
-      "read": 1,
-      "write": 1,
-      "create": 1
-    }
-  ]
+ "doctype": "DocType",
+ "name": "Asset Requisition",
+ "module": "Asset Mgmt Custom",
+ "autoname": "naming_series:",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "السلسلة",
+   "options": "AR-.YYYY.-",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "طالب الأصل",
+   "description": "الموظف أو القسم الذي يطلب الأصل",
+   "options": "Employee",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "القسم",
+   "options": "Department"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "الفرع",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "request_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الطلب",
+   "reqd": 1,
+   "default": "Today"
+  },
+  {
+   "fieldname": "required_by",
+   "fieldtype": "Date",
+   "label": "التاريخ المطلوب",
+   "description": "التاريخ الذي يُحتاج فيه إلى الأصل"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "Draft\nPending Approval\nApproved\nRejected\nFulfilled",
+   "default": "Draft",
+   "read_only": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "asset_category",
+   "fieldtype": "Link",
+   "label": "فئة الأصل المطلوبة",
+   "description": "فئة الأصل الذي يتم طلبه",
+   "options": "Asset Category",
+   "reqd": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "الصنف",
+   "options": "Item"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "label": "الكمية",
+   "default": "1"
+  },
+  {
+   "fieldname": "section_details",
+   "fieldtype": "Section Break",
+   "label": "التفاصيل"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text",
+   "label": "الوصف"
+  },
+  {
+   "fieldname": "justification",
+   "fieldtype": "Text",
+   "label": "المبرر",
+   "description": "سبب الحاجة إلى هذا الأصل"
+  },
+  {
+   "fieldname": "section_spare",
+   "fieldtype": "Section Break",
+   "label": "أصل احتياطي"
+  },
+  {
+   "fieldname": "spare_available",
+   "fieldtype": "Check",
+   "label": "أصل احتياطي متاح",
+   "read_only": 1
+  },
+  {
+   "fieldname": "spare_asset",
+   "fieldtype": "Link",
+   "label": "الأصل الاحتياطي",
+   "options": "Asset",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_rejection",
+   "fieldtype": "Section Break",
+   "label": "الرفض"
+  },
+  {
+   "fieldname": "rejection_reason",
+   "fieldtype": "Small Text",
+   "label": "سبب الرفض",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "معدَّل من",
+   "options": "Asset Requisition",
+   "read_only": 1,
+   "print_hide": 1
+  },
+  {
+   "fieldname": "material_request",
+   "fieldtype": "Link",
+   "label": "طلب المشتريات",
+   "options": "Material Request",
+   "read_only": 1,
+   "description": "طلب الشراء الذي تم إنشاؤه تلقائياً عند الموافقة على هذا الطلب."
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Employee",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ]
 }

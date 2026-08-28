@@ -1,167 +1,210 @@
 {
-  "doctype": "DocType",
-  "name": "Asset License Permit",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "naming_series:",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "Series",
-      "options": "PERMIT-.YYYY.-",
-      "default": "PERMIT-.YYYY.-"
-    },
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "options": "Asset",
-      "label": "الأصل",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "الحالة",
-      "description": "نشط / في انتظار التجديد / منتهي",
-      "options": "Active\nPending Renewal\nExpired\nCancelled",
-      "default": "Active",
-      "read_only": 1,
-      "in_list_view": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "options": "Branch",
-      "label": "الفرع",
-      "fetch_from": "asset.custom_branch"
-    },
-    {
-      "fieldname": "sec_break_permit",
-      "fieldtype": "Section Break",
-      "label": "Permit Details"
-    },
-    {
-      "fieldname": "permit_type",
-      "fieldtype": "Select",
-      "label": "نوع الترخيص/التصريح",
-      "description": "نوع الوثيقة الرسمية: رخصة، تصريح، شهادة...",
-      "options": "\nVehicle License\nOperating Permit\nMunicipal License\nHealth Certificate\nFire Safety Permit\nOther",
-      "reqd": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "license_number",
-      "fieldtype": "Data",
-      "label": "رقم الترخيص",
-      "description": "الرقم الرسمي للترخيص أو التصريح",
-      "reqd": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "col_break_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "issuing_authority",
-      "fieldtype": "Data",
-      "label": "جهة الإصدار",
-      "description": "الجهة الحكومية أو الرسمية التي أصدرت الترخيص",
-      "reqd": 1
-    },
-    {
-      "fieldname": "renewal_cost",
-      "fieldtype": "Currency",
-      "label": "Renewal Cost"
-    },
-    {
-      "fieldname": "sec_break_dates",
-      "fieldtype": "Section Break",
-      "label": "Validity"
-    },
-    {
-      "fieldname": "issue_date",
-      "fieldtype": "Date",
-      "label": "تاريخ الإصدار",
-      "reqd": 1
-    },
-    {
-      "fieldname": "expiry_date",
-      "fieldtype": "Date",
-      "label": "تاريخ الانتهاء",
-      "description": "تاريخ انتهاء صلاحية الترخيص",
-      "reqd": 1,
-      "in_list_view": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "col_break_3",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "renewal_reminder_days",
-      "fieldtype": "Int",
-      "label": "أيام التذكير قبل الانتهاء",
-      "description": "عدد الأيام التي يُرسَل فيها التنبيه قبل انتهاء الصلاحية",
-      "default": "30"
-    },
-    {
-      "fieldname": "sec_break_doc",
-      "fieldtype": "Section Break",
-      "label": "Documents"
-    },
-    {
-      "fieldname": "permit_document",
-      "fieldtype": "Attach",
-      "label": "Permit Document"
-    },
-    {
-      "fieldname": "col_break_4",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Text",
-      "label": "ملاحظات"
-    }
-  ],
-  "permissions": [
-    {
-      "role": "System Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "delete": 1
-    },
-    {
-      "role": "Asset Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1
-    },
-    {
-      "role": "Asset User",
-      "read": 1,
-      "write": 1,
-      "create": 1
-    }
-  ]
+ "doctype": "DocType",
+ "name": "Asset License Permit",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "naming_series:",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "PERMIT-.YYYY.-",
+   "default": "PERMIT-.YYYY.-"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "options": "Asset",
+   "label": "الأصل",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "description": "نشط / في انتظار التجديد / منتهي",
+   "options": "Active\nPending Renewal\nExpired\nCancelled",
+   "default": "Active",
+   "read_only": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "options": "Branch",
+   "label": "الفرع",
+   "fetch_from": "asset.custom_branch"
+  },
+  {
+   "fieldname": "sec_break_permit",
+   "fieldtype": "Section Break",
+   "label": "Permit Details"
+  },
+  {
+   "fieldname": "permit_type",
+   "fieldtype": "Select",
+   "label": "نوع الترخيص/التصريح",
+   "description": "نوع الوثيقة الرسمية: رخصة، تصريح، شهادة...",
+   "options": "\nVehicle License\nOperating Permit\nMunicipal License\nHealth Certificate\nFire Safety Permit\nOther",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "license_number",
+   "fieldtype": "Data",
+   "label": "رقم الترخيص",
+   "description": "الرقم الرسمي للترخيص أو التصريح",
+   "reqd": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "issuing_authority",
+   "fieldtype": "Data",
+   "label": "جهة الإصدار",
+   "description": "الجهة الحكومية أو الرسمية التي أصدرت الترخيص",
+   "reqd": 1
+  },
+  {
+   "fieldname": "renewal_cost",
+   "fieldtype": "Currency",
+   "label": "Renewal Cost"
+  },
+  {
+   "fieldname": "sec_break_dates",
+   "fieldtype": "Section Break",
+   "label": "Validity"
+  },
+  {
+   "fieldname": "issue_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الإصدار",
+   "reqd": 1
+  },
+  {
+   "fieldname": "expiry_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الانتهاء",
+   "description": "تاريخ انتهاء صلاحية الترخيص",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "col_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "renewal_reminder_days",
+   "fieldtype": "Int",
+   "label": "أيام التذكير قبل الانتهاء",
+   "description": "عدد الأيام التي يُرسَل فيها التنبيه قبل انتهاء الصلاحية",
+   "default": "30"
+  },
+  {
+   "fieldname": "sec_break_doc",
+   "fieldtype": "Section Break",
+   "label": "Documents"
+  },
+  {
+   "fieldname": "permit_document",
+   "fieldtype": "Attach",
+   "label": "Permit Document"
+  },
+  {
+   "fieldname": "col_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "create": 1,
+   "print": 1
+  }
+ ]
 }

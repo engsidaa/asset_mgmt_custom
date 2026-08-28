@@ -1,108 +1,167 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Meter Reading",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "naming_series:",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "سلسلة الترقيم",
-      "options": "METER-.YYYY.-.####",
-      "default": "METER-.YYYY.-.####"
-    },
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "in_list_view": 1,
-      "bold": 1,
-      "search_index": 1,
-      "description": "الأصل الذي تُسجَّل له قراءة العداد"
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "reading_date",
-      "fieldtype": "Date",
-      "label": "تاريخ القراءة",
-      "reqd": 1,
-      "default": "Today",
-      "in_list_view": 1,
-      "description": "تاريخ أخذ قراءة العداد"
-    },
-    {
-      "fieldname": "meter_type",
-      "fieldtype": "Select",
-      "label": "نوع العداد",
-      "reqd": 1,
-      "options": "كيلومترات\nساعات تشغيل\nوحدات إنتاج\nلتر وقود",
-      "description": "وحدة قياس عداد الأصل"
-    },
-    {
-      "fieldname": "sec_break_readings",
-      "fieldtype": "Section Break",
-      "label": "القراءات"
-    },
-    {
-      "fieldname": "previous_reading",
-      "fieldtype": "Float",
-      "label": "القراءة السابقة",
-      "read_only": 1,
-      "description": "آخر قراءة مسجلة للأصل (تُملأ تلقائياً)"
-    },
-    {
-      "fieldname": "current_reading",
-      "fieldtype": "Float",
-      "label": "القراءة الحالية",
-      "reqd": 1,
-      "in_list_view": 1,
-      "description": "قراءة العداد عند التسجيل الآن — يجب أن تكون أكبر من السابقة"
-    },
-    {
-      "fieldname": "units_consumed",
-      "fieldtype": "Float",
-      "label": "الوحدات المستهلكة",
-      "read_only": 1,
-      "description": "الفرق بين القراءة الحالية والسابقة (يُحسَب تلقائياً)"
-    },
-    {
-      "fieldname": "sec_break_info",
-      "fieldtype": "Section Break",
-      "label": "معلومات إضافية"
-    },
-    {
-      "fieldname": "read_by",
-      "fieldtype": "Link",
-      "label": "قُرئ بواسطة",
-      "options": "User",
-      "description": "الموظف الذي أخذ قراءة العداد"
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Text",
-      "label": "ملاحظات",
-      "description": "أي ملاحظات تتعلق بقراءة العداد أو حالة الأصل"
-    }
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset User", "read": 1, "write": 1, "create": 1, "submit": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Meter Reading",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "naming_series:",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "سلسلة الترقيم",
+   "options": "METER-.YYYY.-.####",
+   "default": "METER-.YYYY.-.####"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1,
+   "search_index": 1,
+   "description": "الأصل الذي تُسجَّل له قراءة العداد"
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reading_date",
+   "fieldtype": "Date",
+   "label": "تاريخ القراءة",
+   "reqd": 1,
+   "default": "Today",
+   "in_list_view": 1,
+   "description": "تاريخ أخذ قراءة العداد"
+  },
+  {
+   "fieldname": "meter_type",
+   "fieldtype": "Select",
+   "label": "نوع العداد",
+   "reqd": 1,
+   "options": "كيلومترات\nساعات تشغيل\nوحدات إنتاج\nلتر وقود",
+   "description": "وحدة قياس عداد الأصل"
+  },
+  {
+   "fieldname": "sec_break_readings",
+   "fieldtype": "Section Break",
+   "label": "القراءات"
+  },
+  {
+   "fieldname": "previous_reading",
+   "fieldtype": "Float",
+   "label": "القراءة السابقة",
+   "read_only": 1,
+   "description": "آخر قراءة مسجلة للأصل (تُملأ تلقائياً)"
+  },
+  {
+   "fieldname": "current_reading",
+   "fieldtype": "Float",
+   "label": "القراءة الحالية",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "قراءة العداد عند التسجيل الآن — يجب أن تكون أكبر من السابقة"
+  },
+  {
+   "fieldname": "units_consumed",
+   "fieldtype": "Float",
+   "label": "الوحدات المستهلكة",
+   "read_only": 1,
+   "description": "الفرق بين القراءة الحالية والسابقة (يُحسَب تلقائياً)"
+  },
+  {
+   "fieldname": "sec_break_info",
+   "fieldtype": "Section Break",
+   "label": "معلومات إضافية"
+  },
+  {
+   "fieldname": "read_by",
+   "fieldtype": "Link",
+   "label": "قُرئ بواسطة",
+   "options": "User",
+   "description": "الموظف الذي أخذ قراءة العداد"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "ملاحظات",
+   "description": "أي ملاحظات تتعلق بقراءة العداد أو حالة الأصل"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "print": 1
+  }
+ ]
 }

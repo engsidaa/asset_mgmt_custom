@@ -1,0 +1,220 @@
+{
+ "actions": [],
+ "autoname": "AC-.YYYY.-.####",
+ "creation": "2024-01-01 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series","asset","component_name","col_break_1","component_type","status",
+  "sec_break_hierarchy","parent_component","level","part_number",
+  "sec_break_specs","manufacturer","model_number","col_break_specs","serial_number","installation_date",
+  "sec_break_maint","asset_maintenance","maintenance_schedule_note","col_break_maint","last_service_date","next_service_date",
+  "sec_break_condition","condition","condition_score","col_break_condition","replacement_due_date","estimated_replacement_cost",
+  "sec_break_notes","notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "سلسلة الترقيم",
+   "options": "AC-.YYYY.-.####"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل الرئيسي",
+   "options": "Asset",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "الأصل الذي ينتمي إليه هذا المكون."
+  },
+  {
+   "fieldname": "component_name",
+   "fieldtype": "Data",
+   "label": "اسم المكون",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "اسم المكون أو التجميعة الفرعية (مثال: المحرك، الضاغط، نظام التبريد)."
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "component_type",
+   "fieldtype": "Select",
+   "label": "نوع المكون",
+   "options": "\nمحرك\nضاغط\nمضخة\nصمام\nلوحة تحكم\nنظام كهربائي\nنظام تبريد\nهيكل ميكانيكي\nأخرى",
+   "in_list_view": 1,
+   "description": "تصنيف نوع المكون."
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "نشط\nتحت الصيانة\nمعطل\nمستبدل\nمتقاعد",
+   "default": "نشط",
+   "in_list_view": 1,
+   "description": "الحالة التشغيلية الحالية للمكون."
+  },
+  {
+   "fieldname": "sec_break_hierarchy",
+   "fieldtype": "Section Break",
+   "label": "التسلسل الهرمي"
+  },
+  {
+   "fieldname": "parent_component",
+   "fieldtype": "Link",
+   "label": "المكون الأب",
+   "options": "Asset Component",
+   "description": "اربط بمكون أعلى مستوى لبناء شجرة مكونات هرمية (مثال: المحرك → الضاغط → الصمام)."
+  },
+  {
+   "fieldname": "level",
+   "fieldtype": "Int",
+   "label": "مستوى التسلسل",
+   "default": 1,
+   "read_only": 1,
+   "description": "مستوى المكون في الشجرة الهرمية (1=مستوى أول، 2=مستوى ثانٍ...)."
+  },
+  {
+   "fieldname": "part_number",
+   "fieldtype": "Data",
+   "label": "رقم القطعة",
+   "description": "رقم القطعة أو الرمز الفني من كتالوج الشركة المصنعة."
+  },
+  {
+   "fieldname": "sec_break_specs",
+   "fieldtype": "Section Break",
+   "label": "المواصفات التقنية"
+  },
+  {
+   "fieldname": "manufacturer",
+   "fieldtype": "Data",
+   "label": "الشركة المصنعة",
+   "description": "اسم الشركة المصنعة للمكون."
+  },
+  {
+   "fieldname": "model_number",
+   "fieldtype": "Data",
+   "label": "رقم الموديل",
+   "description": "موديل المكون من الشركة المصنعة."
+  },
+  {
+   "fieldname": "col_break_specs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "serial_number",
+   "fieldtype": "Data",
+   "label": "الرقم التسلسلي",
+   "description": "الرقم التسلسلي الفريد للمكون لتتبعه منذ التركيب."
+  },
+  {
+   "fieldname": "installation_date",
+   "fieldtype": "Date",
+   "label": "تاريخ التركيب",
+   "description": "تاريخ تركيب المكون في الأصل."
+  },
+  {
+   "fieldname": "sec_break_maint",
+   "fieldtype": "Section Break",
+   "label": "الصيانة المرتبطة"
+  },
+  {
+   "fieldname": "asset_maintenance",
+   "fieldtype": "Link",
+   "label": "جدول الصيانة",
+   "options": "Asset Maintenance",
+   "description": "اربط بجدول صيانة ERPNext المخصص لهذا المكون تحديداً — كل مكون له دورة صيانة مستقلة."
+  },
+  {
+   "fieldname": "maintenance_schedule_note",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات الصيانة",
+   "description": "تعليمات صيانة خاصة بهذا المكون."
+  },
+  {
+   "fieldname": "col_break_maint",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_service_date",
+   "fieldtype": "Date",
+   "label": "آخر صيانة",
+   "description": "تاريخ آخر صيانة أُجريت على هذا المكون."
+  },
+  {
+   "fieldname": "next_service_date",
+   "fieldtype": "Date",
+   "label": "الصيانة القادمة",
+   "description": "الموعد المخطط لصيانة هذا المكون القادمة."
+  },
+  {
+   "fieldname": "sec_break_condition",
+   "fieldtype": "Section Break",
+   "label": "الحالة والاستبدال"
+  },
+  {
+   "fieldname": "condition",
+   "fieldtype": "Select",
+   "label": "حالة المكون",
+   "options": "\nجيد جداً\nجيد\nمقبول\nيحتاج صيانة\nيحتاج استبدال",
+   "description": "تقييم الحالة الفعلية للمكون."
+  },
+  {
+   "fieldname": "condition_score",
+   "fieldtype": "Int",
+   "label": "درجة الحالة (1-10)",
+   "description": "تقييم رقمي لحالة المكون من 1 (سيء جداً) إلى 10 (ممتاز)."
+  },
+  {
+   "fieldname": "col_break_condition",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "replacement_due_date",
+   "fieldtype": "Date",
+   "label": "موعد الاستبدال المتوقع",
+   "description": "التاريخ التقديري الذي سيحتاج فيه المكون للاستبدال."
+  },
+  {
+   "fieldname": "estimated_replacement_cost",
+   "fieldtype": "Currency",
+   "label": "تكلفة الاستبدال التقديرية",
+   "description": "التكلفة التقديرية لاستبدال هذا المكون عند انتهاء عمره الافتراضي."
+  },
+  {
+   "fieldname": "sec_break_notes",
+   "fieldtype": "Section Break",
+   "label": "ملاحظات"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text Editor",
+   "label": "ملاحظات تقنية"
+  }
+ ],
+ "in_create": 0,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Asset Mgmt Custom",
+ "name": "Asset Component",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 0, "report": 1, "export": 1},
+  {"role": "Assets Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "report": 1, "export": 1},
+  {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "report": 1, "export": 1},
+  {"role": "Asset Finance Manager", "read": 1, "report": 1, "export": 1},
+  {"role": "Asset Technician", "read": 1, "write": 1, "create": 1, "report": 1},
+  {"role": "Asset User", "read": 1}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "component_name",
+ "track_changes": 1
+}

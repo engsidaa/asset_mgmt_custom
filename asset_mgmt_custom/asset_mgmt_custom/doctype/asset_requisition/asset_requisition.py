@@ -67,5 +67,10 @@ class AssetRequisition(Document):
             frappe.throw(_("Please set Item Code on the requisition before creating a purchase request."))
 
         mr.insert(ignore_permissions=True)
+        self.db_set("material_request", mr.name)
         self.db_set("status", "Fulfilled")
+        frappe.msgprint(
+            f"تم إنشاء طلب الشراء: <a href='/app/material-request/{mr.name}'>{mr.name}</a>",
+            alert=True, indicator="green"
+        )
         return mr.name

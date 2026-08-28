@@ -1,132 +1,191 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Warranty Claim",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "naming_series:",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "سلسلة الترقيم",
-      "options": "WARR-.YYYY.-",
-      "default": "WARR-.YYYY.-"
-    },
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "حالة المطالبة",
-      "options": "Open\nSubmitted\nIn Progress\nResolved\nRejected",
-      "default": "Open",
-      "read_only": 1,
-      "in_list_view": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "supplier",
-      "fieldtype": "Link",
-      "label": "المورد/الموردة",
-      "options": "Supplier",
-      "reqd": 1,
-      "in_list_view": 1,
-      "description": "الشركة أو المورد المسؤول عن الضمان"
-    },
-    {
-      "fieldname": "sec_break_claim",
-      "fieldtype": "Section Break",
-      "label": "تفاصيل المطالبة"
-    },
-    {
-      "fieldname": "claim_date",
-      "fieldtype": "Date",
-      "label": "تاريخ المطالبة",
-      "reqd": 1,
-      "in_list_view": 1,
-      "description": "تاريخ تقديم مطالبة الضمان"
-    },
-    {
-      "fieldname": "warranty_expiry_date",
-      "fieldtype": "Date",
-      "label": "تاريخ انتهاء الضمان",
-      "reqd": 1,
-      "description": "تاريخ انتهاء فترة ضمان الأصل"
-    },
-    {
-      "fieldname": "col_break_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "claim_reference",
-      "fieldtype": "Data",
-      "label": "رقم المرجع"
-    },
-    {
-      "fieldname": "issue_description",
-      "fieldtype": "Text Editor",
-      "label": "وصف المشكلة",
-      "reqd": 1,
-      "description": "تفصيل العيب أو المشكلة موضوع المطالبة"
-    },
-    {
-      "fieldname": "sec_break_resolution",
-      "fieldtype": "Section Break",
-      "label": "الحل"
-    },
-    {
-      "fieldname": "resolution_date",
-      "fieldtype": "Date",
-      "label": "تاريخ الحل"
-    },
-    {
-      "fieldname": "resolution_type",
-      "fieldtype": "Select",
-      "label": "نوع الحل",
-      "options": "\nRepaired\nReplaced\nRefunded\nRejected"
-    },
-    {
-      "fieldname": "col_break_3",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "replacement_asset",
-      "fieldtype": "Link",
-      "label": "الأصل البديل",
-      "options": "Asset"
-    },
-    {
-      "fieldname": "resolution_notes",
-      "fieldtype": "Text Editor",
-      "label": "الحل المقدم",
-      "description": "ما قدمه المورد كحل للمشكلة"
-    }
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Warranty Claim",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "naming_series:",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "سلسلة الترقيم",
+   "options": "WARR-.YYYY.-",
+   "default": "WARR-.YYYY.-"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "حالة المطالبة",
+   "options": "Open\nSubmitted\nIn Progress\nResolved\nRejected",
+   "default": "Open",
+   "read_only": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "المورد/الموردة",
+   "options": "Supplier",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "الشركة أو المورد المسؤول عن الضمان"
+  },
+  {
+   "fieldname": "sec_break_claim",
+   "fieldtype": "Section Break",
+   "label": "تفاصيل المطالبة"
+  },
+  {
+   "fieldname": "claim_date",
+   "fieldtype": "Date",
+   "label": "تاريخ المطالبة",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "تاريخ تقديم مطالبة الضمان"
+  },
+  {
+   "fieldname": "warranty_expiry_date",
+   "fieldtype": "Date",
+   "label": "تاريخ انتهاء الضمان",
+   "reqd": 1,
+   "description": "تاريخ انتهاء فترة ضمان الأصل"
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "claim_reference",
+   "fieldtype": "Data",
+   "label": "رقم المرجع"
+  },
+  {
+   "fieldname": "issue_description",
+   "fieldtype": "Text Editor",
+   "label": "وصف المشكلة",
+   "reqd": 1,
+   "description": "تفصيل العيب أو المشكلة موضوع المطالبة"
+  },
+  {
+   "fieldname": "sec_break_resolution",
+   "fieldtype": "Section Break",
+   "label": "الحل"
+  },
+  {
+   "fieldname": "resolution_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الحل"
+  },
+  {
+   "fieldname": "resolution_type",
+   "fieldtype": "Select",
+   "label": "نوع الحل",
+   "options": "\nRepaired\nReplaced\nRefunded\nRejected"
+  },
+  {
+   "fieldname": "col_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "replacement_asset",
+   "fieldtype": "Link",
+   "label": "الأصل البديل",
+   "options": "Asset"
+  },
+  {
+   "fieldname": "resolution_notes",
+   "fieldtype": "Text Editor",
+   "label": "الحل المقدم",
+   "description": "ما قدمه المورد كحل للمشكلة"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "create": 1,
+   "print": 1
+  }
+ ]
 }

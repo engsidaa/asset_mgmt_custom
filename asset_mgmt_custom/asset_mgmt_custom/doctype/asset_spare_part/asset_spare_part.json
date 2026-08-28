@@ -1,109 +1,192 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Spare Part",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "naming_series:",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "سلسلة الترقيم",
-      "options": "SPARE-.YYYY.-",
-      "default": "SPARE-.YYYY.-"
-    },
-    {
-      "fieldname": "item_name",
-      "fieldtype": "Data",
-      "label": "اسم القطعة",
-      "reqd": 1,
-      "in_list_view": 1,
-      "bold": 1,
-      "description": "اسم قطعة الغيار كما تُعرف في المخزون"
-    },
-    {
-      "fieldname": "asset_category",
-      "fieldtype": "Link",
-      "label": "فئة الأصل",
-      "options": "Asset Category",
-      "in_list_view": 1,
-      "description": "فئة الأصل الذي تنتمي إليه هذه القطعة"
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "quantity",
-      "fieldtype": "Float",
-      "label": "الكمية المتاحة",
-      "reqd": 1,
-      "in_list_view": 1,
-      "default": "0",
-      "description": "الكمية الموجودة حالياً في المخزون"
-    },
-    {
-      "fieldname": "minimum_qty",
-      "fieldtype": "Float",
-      "label": "الحد الأدنى للمخزون",
-      "in_list_view": 1,
-      "default": "1",
-      "description": "الكمية التي إذا نزلنا دونها يتم التنبيه"
-    },
-    {
-      "fieldname": "unit",
-      "fieldtype": "Data",
-      "label": "وحدة القياس",
-      "default": "Nos"
-    },
-    {
-      "fieldname": "sec_break_location",
-      "fieldtype": "Section Break",
-      "label": "التخزين والمورد"
-    },
-    {
-      "fieldname": "location",
-      "fieldtype": "Link",
-      "label": "الموقع",
-      "options": "Location",
-      "description": "مكان تخزين القطعة"
-    },
-    {
-      "fieldname": "supplier",
-      "fieldtype": "Link",
-      "label": "المورد المعتمد",
-      "options": "Supplier"
-    },
-    {
-      "fieldname": "col_break_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "unit_cost",
-      "fieldtype": "Currency",
-      "label": "تكلفة الوحدة"
-    },
-    {
-      "fieldname": "last_replenished",
-      "fieldtype": "Date",
-      "label": "تاريخ آخر تعبئة"
-    },
-    {
-      "fieldname": "sec_break_notes",
-      "fieldtype": "Section Break",
-      "label": "ملاحظات"
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Text",
-      "label": "ملاحظات"
-    }
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
-    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1},
-    {"role": "Asset User", "read": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Spare Part",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "naming_series:",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "سلسلة الترقيم",
+   "options": "SPARE-.YYYY.-",
+   "default": "SPARE-.YYYY.-"
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "اسم القطعة",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1,
+   "description": "اسم قطعة الغيار كما تُعرف في المخزون"
+  },
+  {
+   "fieldname": "asset_category",
+   "fieldtype": "Link",
+   "label": "فئة الأصل",
+   "options": "Asset Category",
+   "in_list_view": 1,
+   "description": "فئة الأصل الذي تنتمي إليه هذه القطعة"
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Float",
+   "label": "الكمية المتاحة",
+   "reqd": 1,
+   "in_list_view": 1,
+   "default": "0",
+   "description": "الكمية الموجودة حالياً في المخزون"
+  },
+  {
+   "fieldname": "minimum_qty",
+   "fieldtype": "Float",
+   "label": "الحد الأدنى للمخزون",
+   "in_list_view": 1,
+   "default": "1",
+   "description": "الكمية التي إذا نزلنا دونها يتم التنبيه"
+  },
+  {
+   "fieldname": "unit",
+   "fieldtype": "Data",
+   "label": "وحدة القياس",
+   "default": "Nos"
+  },
+  {
+   "fieldname": "sec_break_location",
+   "fieldtype": "Section Break",
+   "label": "التخزين والمورد"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "الموقع",
+   "options": "Location",
+   "description": "مكان تخزين القطعة"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "المورد المعتمد",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "sec_break_erp",
+   "fieldtype": "Section Break",
+   "label": "ربط ERPNext — المخزون",
+   "description": "اربط قطعة الغيار بصنف ERPNext لتتبع المخزون الفعلي وإنشاء حركات المخزن تلقائياً."
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "الصنف في ERPNext",
+   "options": "Item",
+   "description": "الصنف المقابل في وحدة المخزون — يُستخدم لإنشاء Stock Entry عند الاستهلاك."
+  },
+  {
+   "fieldname": "col_break_erp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "المستودع",
+   "options": "Warehouse",
+   "description": "المستودع الذي تُخزَّن فيه قطعة الغيار هذه للمقارنة مع المخزون الفعلي."
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "unit_cost",
+   "fieldtype": "Currency",
+   "label": "تكلفة الوحدة"
+  },
+  {
+   "fieldname": "last_replenished",
+   "fieldtype": "Date",
+   "label": "تاريخ آخر تعبئة"
+  },
+  {
+   "fieldname": "sec_break_notes",
+   "fieldtype": "Section Break",
+   "label": "ملاحظات"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "print": 1
+  }
+ ]
 }

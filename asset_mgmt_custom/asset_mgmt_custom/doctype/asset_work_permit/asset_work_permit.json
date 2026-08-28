@@ -1,136 +1,195 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Work Permit",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "naming_series:",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "سلسلة الترقيم",
-      "options": "WP-.YYYY.-.####",
-      "default": "WP-.YYYY.-.####"
-    },
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "bold": 1,
-      "in_list_view": 1,
-      "search_index": 1,
-      "description": "الأصل الذي ستُجرى عليه الأعمال"
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "permit_type",
-      "fieldtype": "Select",
-      "label": "نوع التصريح",
-      "reqd": 1,
-      "in_list_view": 1,
-      "options": "أعمال كهربائية\nلحام وقطع\nأعمال على الارتفاع\nأعمال حفر\nدخول أماكن محصورة\nأعمال عامة",
-      "description": "فئة التصريح بناءً على طبيعة العمل وخطورته"
-    },
-    {
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "الحالة",
-      "options": "مسودة\nصالح\nمستخدم\nمنتهي\nملغي",
-      "default": "مسودة",
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "sec_break_details",
-      "fieldtype": "Section Break",
-      "label": "تفاصيل العمل"
-    },
-    {
-      "fieldname": "work_description",
-      "fieldtype": "Long Text",
-      "label": "وصف العمل",
-      "reqd": 1,
-      "description": "شرح تفصيلي للأعمال التي ستُنفَّذ بموجب هذا التصريح"
-    },
-    {
-      "fieldname": "contractor",
-      "fieldtype": "Data",
-      "label": "المقاول / الفني",
-      "description": "اسم المقاول أو الفني الذي سيُنفِّذ العمل"
-    },
-    {
-      "fieldname": "sec_break_validity",
-      "fieldtype": "Section Break",
-      "label": "صلاحية التصريح"
-    },
-    {
-      "fieldname": "valid_from",
-      "fieldtype": "Datetime",
-      "label": "صالح من",
-      "reqd": 1,
-      "description": "تاريخ ووقت بدء صلاحية التصريح"
-    },
-    {
-      "fieldname": "valid_to",
-      "fieldtype": "Datetime",
-      "label": "صالح حتى",
-      "reqd": 1,
-      "description": "تاريخ ووقت انتهاء صلاحية التصريح"
-    },
-    {
-      "fieldname": "col_break_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "issued_by",
-      "fieldtype": "Link",
-      "label": "أصدره",
-      "options": "User",
-      "description": "الموظف المسؤول عن إصدار التصريح"
-    },
-    {
-      "fieldname": "approved_by",
-      "fieldtype": "Link",
-      "label": "اعتمده",
-      "options": "User",
-      "description": "المشرف أو مسؤول السلامة الذي وافق على التصريح"
-    },
-    {
-      "fieldname": "sec_break_safety",
-      "fieldtype": "Section Break",
-      "label": "اشتراطات السلامة"
-    },
-    {
-      "fieldname": "safety_requirements",
-      "fieldtype": "Long Text",
-      "label": "اشتراطات السلامة",
-      "description": "قائمة متطلبات وإجراءات السلامة الواجب توافرها قبل البدء في العمل"
-    },
-    {
-      "fieldname": "work_order",
-      "fieldtype": "Link",
-      "label": "أمر العمل المرتبط",
-      "options": "Asset Work Order",
-      "description": "أمر العمل الذي يستلزم هذا التصريح"
-    }
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset User", "read": 1, "write": 1, "create": 1, "submit": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Work Permit",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "naming_series:",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "سلسلة الترقيم",
+   "options": "WP-.YYYY.-.####",
+   "default": "WP-.YYYY.-.####"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "bold": 1,
+   "in_list_view": 1,
+   "search_index": 1,
+   "description": "الأصل الذي ستُجرى عليه الأعمال"
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "permit_type",
+   "fieldtype": "Select",
+   "label": "نوع التصريح",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "أعمال كهربائية\nلحام وقطع\nأعمال على الارتفاع\nأعمال حفر\nدخول أماكن محصورة\nأعمال عامة",
+   "description": "فئة التصريح بناءً على طبيعة العمل وخطورته"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "مسودة\nصالح\nمستخدم\nمنتهي\nملغي",
+   "default": "مسودة",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "sec_break_details",
+   "fieldtype": "Section Break",
+   "label": "تفاصيل العمل"
+  },
+  {
+   "fieldname": "work_description",
+   "fieldtype": "Long Text",
+   "label": "وصف العمل",
+   "reqd": 1,
+   "description": "شرح تفصيلي للأعمال التي ستُنفَّذ بموجب هذا التصريح"
+  },
+  {
+   "fieldname": "contractor",
+   "fieldtype": "Data",
+   "label": "المقاول / الفني",
+   "description": "اسم المقاول أو الفني الذي سيُنفِّذ العمل"
+  },
+  {
+   "fieldname": "sec_break_validity",
+   "fieldtype": "Section Break",
+   "label": "صلاحية التصريح"
+  },
+  {
+   "fieldname": "valid_from",
+   "fieldtype": "Datetime",
+   "label": "صالح من",
+   "reqd": 1,
+   "description": "تاريخ ووقت بدء صلاحية التصريح"
+  },
+  {
+   "fieldname": "valid_to",
+   "fieldtype": "Datetime",
+   "label": "صالح حتى",
+   "reqd": 1,
+   "description": "تاريخ ووقت انتهاء صلاحية التصريح"
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "issued_by",
+   "fieldtype": "Link",
+   "label": "أصدره",
+   "options": "User",
+   "description": "الموظف المسؤول عن إصدار التصريح"
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Link",
+   "label": "اعتمده",
+   "options": "User",
+   "description": "المشرف أو مسؤول السلامة الذي وافق على التصريح"
+  },
+  {
+   "fieldname": "sec_break_safety",
+   "fieldtype": "Section Break",
+   "label": "اشتراطات السلامة"
+  },
+  {
+   "fieldname": "safety_requirements",
+   "fieldtype": "Long Text",
+   "label": "اشتراطات السلامة",
+   "description": "قائمة متطلبات وإجراءات السلامة الواجب توافرها قبل البدء في العمل"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "أمر العمل المرتبط",
+   "options": "Asset Work Order",
+   "description": "أمر العمل الذي يستلزم هذا التصريح"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "create": 1,
+   "print": 1
+  }
+ ]
 }

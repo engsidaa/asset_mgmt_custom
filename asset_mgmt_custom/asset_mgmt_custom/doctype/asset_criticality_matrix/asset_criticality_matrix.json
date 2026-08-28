@@ -1,121 +1,169 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Criticality Matrix",
-  "module": "Asset Mgmt Custom",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "autoname": "format:ACM-{asset}",
-  "fields": [
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "unique": 1
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1
-    },
-    {
-      "fieldname": "asset_category",
-      "fieldtype": "Link",
-      "label": "فئة الأصل",
-      "options": "Asset Category",
-      "fetch_from": "asset.asset_category",
-      "read_only": 1
-    },
-    {
-      "fieldname": "criticality_level",
-      "fieldtype": "Select",
-      "label": "مستوى الحرجية",
-      "description": "مدى تأثير توقف الأصل على العمليات",
-      "options": "Low\nMedium\nHigh\nCritical",
-      "reqd": 1
-    },
-    {
-      "fieldname": "business_impact",
-      "fieldtype": "Select",
-      "label": "الأثر على الأعمال",
-      "description": "الأثر المتوقع عند تعطل الأصل",
-      "options": "Minimal\nModerate\nSignificant\nSevere"
-    },
-    {
-      "fieldname": "failure_probability",
-      "fieldtype": "Select",
-      "label": "احتمالية العطل",
-      "description": "احتمالية حدوث عطل في الأصل",
-      "options": "Unlikely\nPossible\nLikely\nAlmost Certain"
-    },
-    {
-      "fieldname": "has_backup",
-      "fieldtype": "Check",
-      "label": "يوجد أصل احتياطي"
-    },
-    {
-      "fieldname": "backup_asset",
-      "fieldtype": "Link",
-      "label": "الأصل الاحتياطي",
-      "description": "الأصل البديل عند تعطل هذا الأصل",
-      "options": "Asset",
-      "depends_on": "has_backup"
-    },
-    {
-      "fieldname": "mttr_hours",
-      "fieldtype": "Float",
-      "label": "متوسط وقت الإصلاح (ساعات)",
-      "description": "MTTR: متوسط الوقت اللازم لإصلاح العطل"
-    },
-    {
-      "fieldname": "mtbf_days",
-      "fieldtype": "Float",
-      "label": "متوسط وقت بين الأعطال (أيام)",
-      "description": "MTBF: متوسط الوقت بين كل عطلين"
-    },
-    {
-      "fieldname": "critical_spare_parts",
-      "fieldtype": "Small Text",
-      "label": "قطع الغيار الحرجة",
-      "description": "قطع الغيار الأساسية التي يجب توفرها دائماً"
-    },
-    {
-      "fieldname": "emergency_vendor",
-      "fieldtype": "Link",
-      "label": "مورد الطوارئ",
-      "description": "المورد الذي يُتصل به في حالات الطوارئ",
-      "options": "Supplier"
-    },
-    {
-      "fieldname": "recovery_plan",
-      "fieldtype": "Text",
-      "label": "خطة الاسترداد",
-      "description": "الخطوات المتبعة عند توقف الأصل"
-    },
-    {
-      "fieldname": "last_reviewed",
-      "fieldtype": "Date",
-      "label": "تاريخ آخر مراجعة"
-    },
-    {
-      "fieldname": "reviewed_by",
-      "fieldtype": "Link",
-      "label": "تمت المراجعة بواسطة",
-      "options": "Employee"
-    }
-  ],
-  "permissions": [
-    {
-      "role": "System Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "submit": 0,
-      "cancel": 0,
-      "delete": 1
-    }
-  ]
+ "doctype": "DocType",
+ "name": "Asset Criticality Matrix",
+ "module": "Asset Mgmt Custom",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "autoname": "format:ACM-{asset}",
+ "fields": [
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "asset_category",
+   "fieldtype": "Link",
+   "label": "فئة الأصل",
+   "options": "Asset Category",
+   "fetch_from": "asset.asset_category",
+   "read_only": 1
+  },
+  {
+   "fieldname": "criticality_level",
+   "fieldtype": "Select",
+   "label": "مستوى الحرجية",
+   "description": "مدى تأثير توقف الأصل على العمليات",
+   "options": "Low\nMedium\nHigh\nCritical",
+   "reqd": 1
+  },
+  {
+   "fieldname": "business_impact",
+   "fieldtype": "Select",
+   "label": "الأثر على الأعمال",
+   "description": "الأثر المتوقع عند تعطل الأصل",
+   "options": "Minimal\nModerate\nSignificant\nSevere"
+  },
+  {
+   "fieldname": "failure_probability",
+   "fieldtype": "Select",
+   "label": "احتمالية العطل",
+   "description": "احتمالية حدوث عطل في الأصل",
+   "options": "Unlikely\nPossible\nLikely\nAlmost Certain"
+  },
+  {
+   "fieldname": "has_backup",
+   "fieldtype": "Check",
+   "label": "يوجد أصل احتياطي"
+  },
+  {
+   "fieldname": "backup_asset",
+   "fieldtype": "Link",
+   "label": "الأصل الاحتياطي",
+   "description": "الأصل البديل عند تعطل هذا الأصل",
+   "options": "Asset",
+   "depends_on": "has_backup"
+  },
+  {
+   "fieldname": "mttr_hours",
+   "fieldtype": "Float",
+   "label": "متوسط وقت الإصلاح (ساعات)",
+   "description": "MTTR: متوسط الوقت اللازم لإصلاح العطل"
+  },
+  {
+   "fieldname": "mtbf_days",
+   "fieldtype": "Float",
+   "label": "متوسط وقت بين الأعطال (أيام)",
+   "description": "MTBF: متوسط الوقت بين كل عطلين"
+  },
+  {
+   "fieldname": "critical_spare_parts",
+   "fieldtype": "Small Text",
+   "label": "قطع الغيار الحرجة",
+   "description": "قطع الغيار الأساسية التي يجب توفرها دائماً"
+  },
+  {
+   "fieldname": "emergency_vendor",
+   "fieldtype": "Link",
+   "label": "مورد الطوارئ",
+   "description": "المورد الذي يُتصل به في حالات الطوارئ",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "recovery_plan",
+   "fieldtype": "Text",
+   "label": "خطة الاسترداد",
+   "description": "الخطوات المتبعة عند توقف الأصل"
+  },
+  {
+   "fieldname": "last_reviewed",
+   "fieldtype": "Date",
+   "label": "تاريخ آخر مراجعة"
+  },
+  {
+   "fieldname": "reviewed_by",
+   "fieldtype": "Link",
+   "label": "تمت المراجعة بواسطة",
+   "options": "Employee"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1
+  }
+ ]
 }

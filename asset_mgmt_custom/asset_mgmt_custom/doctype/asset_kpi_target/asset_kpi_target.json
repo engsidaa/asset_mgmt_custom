@@ -1,81 +1,129 @@
 {
-  "doctype": "DocType",
-  "name": "Asset KPI Target",
-  "module": "Asset Mgmt Custom",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "autoname": "format:KPI-{asset_category}-{fiscal_year}",
-  "fields": [
-    {
-      "fieldname": "asset_category",
-      "fieldtype": "Link",
-      "label": "فئة الأصل",
-      "description": "تُطبَّق هذه الأهداف على جميع أصول هذه الفئة",
-      "options": "Asset Category",
-      "reqd": 1
-    },
-    {
-      "fieldname": "fiscal_year",
-      "fieldtype": "Link",
-      "label": "السنة المالية",
-      "options": "Fiscal Year",
-      "reqd": 1
-    },
-    {
-      "fieldname": "target_utilization_pct",
-      "fieldtype": "Float",
-      "label": "الحد الأدنى لنسبة الاستخدام %",
-      "description": "أقل نسبة استخدام مقبولة لهذه الفئة"
-    },
-    {
-      "fieldname": "max_downtime_hours_monthly",
-      "fieldtype": "Float",
-      "label": "أقصى ساعات عطل شهرياً",
-      "description": "الحد الأقصى المسموح به من ساعات العطل في الشهر"
-    },
-    {
-      "fieldname": "max_maintenance_cost_monthly",
-      "fieldtype": "Currency",
-      "label": "أقصى تكلفة صيانة شهرياً",
-      "description": "الحد الأقصى للإنفاق على الصيانة في الشهر"
-    },
-    {
-      "fieldname": "min_condition_score",
-      "fieldtype": "Select",
-      "label": "الحد الأدنى لمستوى الحالة",
-      "description": "أقل مستوى مقبول لحالة الأصل",
-      "options": "Excellent\nGood\nFair"
-    },
-    {
-      "fieldname": "target_mtbf_days",
-      "fieldtype": "Float",
-      "label": "هدف متوسط الوقت بين الأعطال (أيام)"
-    },
-    {
-      "fieldname": "target_mttr_hours",
-      "fieldtype": "Float",
-      "label": "هدف متوسط وقت الإصلاح (ساعات)"
-    },
-    {
-      "fieldname": "max_incidents_monthly",
-      "fieldtype": "Int",
-      "label": "أقصى عدد حوادث شهرياً"
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Small Text",
-      "label": "ملاحظات"
-    }
-  ],
-  "permissions": [
-    {
-      "role": "System Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "submit": 0,
-      "cancel": 0,
-      "delete": 1
-    }
-  ]
+ "doctype": "DocType",
+ "name": "Asset KPI Target",
+ "module": "Asset Mgmt Custom",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "autoname": "format:KPI-{asset_category}-{fiscal_year}",
+ "fields": [
+  {
+   "fieldname": "asset_category",
+   "fieldtype": "Link",
+   "label": "فئة الأصل",
+   "description": "تُطبَّق هذه الأهداف على جميع أصول هذه الفئة",
+   "options": "Asset Category",
+   "reqd": 1
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "السنة المالية",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "target_utilization_pct",
+   "fieldtype": "Float",
+   "label": "الحد الأدنى لنسبة الاستخدام %",
+   "description": "أقل نسبة استخدام مقبولة لهذه الفئة"
+  },
+  {
+   "fieldname": "max_downtime_hours_monthly",
+   "fieldtype": "Float",
+   "label": "أقصى ساعات عطل شهرياً",
+   "description": "الحد الأقصى المسموح به من ساعات العطل في الشهر"
+  },
+  {
+   "fieldname": "max_maintenance_cost_monthly",
+   "fieldtype": "Currency",
+   "label": "أقصى تكلفة صيانة شهرياً",
+   "description": "الحد الأقصى للإنفاق على الصيانة في الشهر"
+  },
+  {
+   "fieldname": "min_condition_score",
+   "fieldtype": "Select",
+   "label": "الحد الأدنى لمستوى الحالة",
+   "description": "أقل مستوى مقبول لحالة الأصل",
+   "options": "Excellent\nGood\nFair"
+  },
+  {
+   "fieldname": "target_mtbf_days",
+   "fieldtype": "Float",
+   "label": "هدف متوسط الوقت بين الأعطال (أيام)"
+  },
+  {
+   "fieldname": "target_mttr_hours",
+   "fieldtype": "Float",
+   "label": "هدف متوسط وقت الإصلاح (ساعات)"
+  },
+  {
+   "fieldname": "max_incidents_monthly",
+   "fieldtype": "Int",
+   "label": "أقصى عدد حوادث شهرياً"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1
+  }
+ ]
 }

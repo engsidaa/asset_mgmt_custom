@@ -1,111 +1,169 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Energy Log",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "Expression",
-  "autoname": "format:ENERGY-{asset}-{log_month}",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1,
-      "bold": 1
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "label": "الفرع",
-      "options": "Branch",
-      "fetch_from": "asset.custom_branch",
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "log_month",
-      "fieldtype": "Data",
-      "label": "الشهر",
-      "reqd": 1,
-      "in_list_view": 1,
-      "bold": 1,
-      "description": "الشهر الذي يخص هذا السجل"
-    },
-    {
-      "fieldname": "meter_number",
-      "fieldtype": "Data",
-      "label": "رقم العداد"
-    },
-    {
-      "fieldname": "sec_break_readings",
-      "fieldtype": "Section Break",
-      "label": "قراءات العداد"
-    },
-    {
-      "fieldname": "reading_start",
-      "fieldtype": "Float",
-      "label": "قراءة العداد - البداية",
-      "description": "قراءة العداد في بداية الشهر"
-    },
-    {
-      "fieldname": "reading_end",
-      "fieldtype": "Float",
-      "label": "قراءة العداد - النهاية",
-      "description": "قراءة العداد في نهاية الشهر"
-    },
-    {
-      "fieldname": "col_break_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "units_consumed",
-      "fieldtype": "Float",
-      "label": "الوحدات المستهلكة",
-      "read_only": 1,
-      "description": "يُحسب تلقائياً: الفرق بين القراءتين"
-    },
-    {
-      "fieldname": "unit_rate",
-      "fieldtype": "Currency",
-      "label": "سعر الوحدة",
-      "description": "تكلفة كل وحدة طاقة"
-    },
-    {
-      "fieldname": "total_cost",
-      "fieldtype": "Currency",
-      "label": "التكلفة الإجمالية",
-      "read_only": 1,
-      "description": "يُحسب تلقائياً: الوحدات × السعر"
-    },
-    {
-      "fieldname": "sec_break_notes",
-      "fieldtype": "Section Break",
-      "label": "ملاحظات"
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Text",
-      "label": "ملاحظات"
-    }
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
-    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1},
-    {"role": "Asset User", "read": 1, "write": 1, "create": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Energy Log",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "Expression",
+ "autoname": "format:ENERGY-{asset}-{log_month}",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "الفرع",
+   "options": "Branch",
+   "fetch_from": "asset.custom_branch",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "log_month",
+   "fieldtype": "Data",
+   "label": "الشهر",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1,
+   "description": "الشهر الذي يخص هذا السجل"
+  },
+  {
+   "fieldname": "meter_number",
+   "fieldtype": "Data",
+   "label": "رقم العداد"
+  },
+  {
+   "fieldname": "sec_break_readings",
+   "fieldtype": "Section Break",
+   "label": "قراءات العداد"
+  },
+  {
+   "fieldname": "reading_start",
+   "fieldtype": "Float",
+   "label": "قراءة العداد - البداية",
+   "description": "قراءة العداد في بداية الشهر"
+  },
+  {
+   "fieldname": "reading_end",
+   "fieldtype": "Float",
+   "label": "قراءة العداد - النهاية",
+   "description": "قراءة العداد في نهاية الشهر"
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "units_consumed",
+   "fieldtype": "Float",
+   "label": "الوحدات المستهلكة",
+   "read_only": 1,
+   "description": "يُحسب تلقائياً: الفرق بين القراءتين"
+  },
+  {
+   "fieldname": "unit_rate",
+   "fieldtype": "Currency",
+   "label": "سعر الوحدة",
+   "description": "تكلفة كل وحدة طاقة"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Currency",
+   "label": "التكلفة الإجمالية",
+   "read_only": 1,
+   "description": "يُحسب تلقائياً: الوحدات × السعر"
+  },
+  {
+   "fieldname": "sec_break_notes",
+   "fieldtype": "Section Break",
+   "label": "ملاحظات"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "create": 1
+  }
+ ]
 }

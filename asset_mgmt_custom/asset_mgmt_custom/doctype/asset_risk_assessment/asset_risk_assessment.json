@@ -1,98 +1,157 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Risk Assessment",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "By \"Naming Series\" field",
-  "autoname": "naming_series:",
-  "is_submittable": 0,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "naming_series",
-      "fieldtype": "Select",
-      "label": "سلسلة الترقيم",
-      "options": "RISK-.YYYY.-.####",
-      "default": "RISK-.YYYY.-.####"
-    },
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "label": "الأصل",
-      "options": "Asset",
-      "reqd": 1,
-      "bold": 1,
-      "in_list_view": 1,
-      "search_index": 1,
-      "description": "الأصل الذي يُجرى له تقييم المخاطر"
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "col_break_1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "assessment_date",
-      "fieldtype": "Date",
-      "label": "تاريخ التقييم",
-      "reqd": 1,
-      "default": "Today",
-      "description": "تاريخ إجراء تقييم المخاطر"
-    },
-    {
-      "fieldname": "assessed_by",
-      "fieldtype": "Link",
-      "label": "المقيِّم",
-      "options": "User",
-      "description": "الموظف المسؤول عن إجراء التقييم"
-    },
-    {
-      "fieldname": "overall_risk_level",
-      "fieldtype": "Select",
-      "label": "مستوى الخطر الإجمالي",
-      "options": "منخفض\nمتوسط\nعالٍ\nحرج",
-      "in_list_view": 1,
-      "description": "التقدير الإجمالي لمستوى خطر الأصل"
-    },
-    {
-      "fieldname": "sec_break_risks",
-      "fieldtype": "Section Break",
-      "label": "تفاصيل المخاطر"
-    },
-    {
-      "fieldname": "risk_items",
-      "fieldtype": "Table",
-      "label": "بنود المخاطر",
-      "options": "Asset Risk Assessment Item",
-      "description": "قائمة بجميع المخاطر المحددة مع تقييمها وإجراءات التخفيف"
-    },
-    {
-      "fieldname": "sec_break_plan",
-      "fieldtype": "Section Break",
-      "label": "خطة المعالجة"
-    },
-    {
-      "fieldname": "mitigation_plan",
-      "fieldtype": "Long Text",
-      "label": "خطة التخفيف الإجمالية",
-      "description": "خطة شاملة لمعالجة المخاطر المحددة وتقليلها إلى مستوى مقبول"
-    },
-    {
-      "fieldname": "next_review_date",
-      "fieldtype": "Date",
-      "label": "تاريخ المراجعة التالية",
-      "description": "الموعد المحدد لإعادة تقييم المخاطر"
-    }
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "amend": 1},
-    {"role": "Asset User", "read": 1, "write": 1, "create": 1, "submit": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Risk Assessment",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By \"Naming Series\" field",
+ "autoname": "naming_series:",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "سلسلة الترقيم",
+   "options": "RISK-.YYYY.-.####",
+   "default": "RISK-.YYYY.-.####"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "label": "الأصل",
+   "options": "Asset",
+   "reqd": 1,
+   "bold": 1,
+   "in_list_view": 1,
+   "search_index": 1,
+   "description": "الأصل الذي يُجرى له تقييم المخاطر"
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "assessment_date",
+   "fieldtype": "Date",
+   "label": "تاريخ التقييم",
+   "reqd": 1,
+   "default": "Today",
+   "description": "تاريخ إجراء تقييم المخاطر"
+  },
+  {
+   "fieldname": "assessed_by",
+   "fieldtype": "Link",
+   "label": "المقيِّم",
+   "options": "User",
+   "description": "الموظف المسؤول عن إجراء التقييم"
+  },
+  {
+   "fieldname": "overall_risk_level",
+   "fieldtype": "Select",
+   "label": "مستوى الخطر الإجمالي",
+   "options": "منخفض\nمتوسط\nعالٍ\nحرج",
+   "in_list_view": 1,
+   "description": "التقدير الإجمالي لمستوى خطر الأصل"
+  },
+  {
+   "fieldname": "sec_break_risks",
+   "fieldtype": "Section Break",
+   "label": "تفاصيل المخاطر"
+  },
+  {
+   "fieldname": "risk_items",
+   "fieldtype": "Table",
+   "label": "بنود المخاطر",
+   "options": "Asset Risk Assessment Item",
+   "description": "قائمة بجميع المخاطر المحددة مع تقييمها وإجراءات التخفيف"
+  },
+  {
+   "fieldname": "sec_break_plan",
+   "fieldtype": "Section Break",
+   "label": "خطة المعالجة"
+  },
+  {
+   "fieldname": "mitigation_plan",
+   "fieldtype": "Long Text",
+   "label": "خطة التخفيف الإجمالية",
+   "description": "خطة شاملة لمعالجة المخاطر المحددة وتقليلها إلى مستوى مقبول"
+  },
+  {
+   "fieldname": "next_review_date",
+   "fieldtype": "Date",
+   "label": "تاريخ المراجعة التالية",
+   "description": "الموعد المحدد لإعادة تقييم المخاطر"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "create": 1,
+   "print": 1
+  }
+ ]
 }

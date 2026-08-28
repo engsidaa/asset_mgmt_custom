@@ -1,27 +1,177 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Spare Part Request",
-  "module": "Asset Mgmt Custom",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "naming_rule": "By \"Naming Series\" field",
-  "fields": [
-    {"fieldname": "naming_series", "fieldtype": "Select", "label": "Series", "options": "SPR-.YYYY.-"},
-    {"fieldname": "asset", "fieldtype": "Link", "options": "Asset", "label": "الأصل", "reqd": 1},
-    {"fieldname": "asset_name", "fieldtype": "Data", "label": "اسم الأصل", "fetch_from": "asset.asset_name", "read_only": 1},
-    {"fieldname": "requested_by", "fieldtype": "Link", "options": "Employee", "label": "طالب القطعة", "description": "الموظف الذي يطلب قطعة الغيار", "reqd": 1},
-    {"fieldname": "department", "fieldtype": "Link", "options": "Department", "label": "القسم", "fetch_from": "requested_by.department", "read_only": 1},
-    {"fieldname": "request_date", "fieldtype": "Date", "label": "تاريخ الطلب", "reqd": 1, "default": "Today"},
-    {"fieldname": "spare_part", "fieldtype": "Link", "options": "Asset Spare Part", "label": "قطعة الغيار", "description": "اختر القطعة من المخزون", "reqd": 1},
-    {"fieldname": "spare_part_name", "fieldtype": "Data", "label": "اسم القطعة", "fetch_from": "spare_part.item_name", "read_only": 1},
-    {"fieldname": "quantity_requested", "fieldtype": "Float", "label": "الكمية المطلوبة", "reqd": 1, "default": "1"},
-    {"fieldname": "quantity_issued", "fieldtype": "Float", "label": "الكمية الصادرة", "read_only": 1, "default": "0"},
-    {"fieldname": "purpose", "fieldtype": "Small Text", "label": "السبب/الغرض", "description": "سبب طلب القطعة أو الجهاز المعطل"},
-    {"fieldname": "status", "fieldtype": "Select", "label": "الحالة", "options": "Pending\nApproved\nIssued\nRejected\nCancelled", "default": "Pending"},
-    {"fieldname": "approved_by", "fieldtype": "Link", "options": "User", "label": "معتمد من", "read_only": 1},
-    {"fieldname": "notes", "fieldtype": "Small Text", "label": "ملاحظات"}
-  ],
-  "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1, "delete": 0}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Spare Part Request",
+ "module": "Asset Mgmt Custom",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "naming_rule": "By \"Naming Series\" field",
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "SPR-.YYYY.-"
+  },
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "options": "Asset",
+   "label": "الأصل",
+   "reqd": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "requested_by",
+   "fieldtype": "Link",
+   "options": "Employee",
+   "label": "طالب القطعة",
+   "description": "الموظف الذي يطلب قطعة الغيار",
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "options": "Department",
+   "label": "القسم",
+   "fetch_from": "requested_by.department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "request_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الطلب",
+   "reqd": 1,
+   "default": "Today"
+  },
+  {
+   "fieldname": "spare_part",
+   "fieldtype": "Link",
+   "options": "Asset Spare Part",
+   "label": "قطعة الغيار",
+   "description": "اختر القطعة من المخزون",
+   "reqd": 1
+  },
+  {
+   "fieldname": "spare_part_name",
+   "fieldtype": "Data",
+   "label": "اسم القطعة",
+   "fetch_from": "spare_part.item_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "quantity_requested",
+   "fieldtype": "Float",
+   "label": "الكمية المطلوبة",
+   "reqd": 1,
+   "default": "1"
+  },
+  {
+   "fieldname": "quantity_issued",
+   "fieldtype": "Float",
+   "label": "الكمية الصادرة",
+   "read_only": 1,
+   "default": "0"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Small Text",
+   "label": "السبب/الغرض",
+   "description": "سبب طلب القطعة أو الجهاز المعطل"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "Pending\nApproved\nIssued\nRejected\nCancelled",
+   "default": "Pending"
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "معتمد من",
+   "read_only": 1
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Employee",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ]
 }

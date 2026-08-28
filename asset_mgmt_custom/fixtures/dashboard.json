@@ -1,63 +1,63 @@
 [
-  {
-    "doctype": "Dashboard",
-    "name": "Asset Management",
-    "dashboard_name": "Asset Management",
-    "module": "Asset Mgmt Custom",
-    "is_standard": 0,
-    "is_default": 0,
-    "cards": [
-      {
-        "card": "Total Active Assets"
-      },
-      {
-        "card": "Pending Asset Requests"
-      },
-      {
-        "card": "Assets In Transit"
-      },
-      {
-        "card": "Assets Under Repair"
-      },
-      {
-        "card": "Overdue Checkouts"
-      },
-      {
-        "card": "Open Incidents"
-      },
-      {
-        "card": "Expired Compliance Certs"
-      },
-      {
-        "card": "Low Stock Spare Parts"
-      },
-      {
-        "card": "Under Warranty Assets"
-      },
-      {
-        "card": "Active Bookings"
-      },
-      {
-        "card": "Software Licenses Expiring"
-      },
-      {
-        "card": "Overdue PM Schedules"
-      },
-      {
-        "card": "Critical Assets"
-      },
-      {
-        "card": "Open Work Orders"
-      },
-      {
-        "card": "Expired Work Permits"
-      }
-    ],
-    "charts": [
-      {
-        "chart": "Asset Value Analytics",
-        "width": "Full"
-      }
-    ]
-  }
+ {
+  "doctype": "Dashboard",
+  "name": "Asset Management",
+  "dashboard_name": "Asset Management",
+  "module": "Asset Mgmt Custom",
+  "is_standard": 0,
+  "is_default": 0,
+  "cards": [
+   {
+    "card": "Total Active Assets"
+   },
+   {
+    "card": "Pending Asset Requests"
+   },
+   {
+    "card": "Assets In Transit"
+   },
+   {
+    "card": "Assets Under Repair"
+   },
+   {
+    "card": "Overdue Checkouts"
+   },
+   {
+    "card": "Open Incidents"
+   },
+   {
+    "card": "Expired Compliance Certs"
+   },
+   {
+    "card": "Low Stock Spare Parts"
+   },
+   {
+    "card": "Under Warranty Assets"
+   },
+   {
+    "card": "Active Bookings"
+   },
+   {
+    "card": "Software Licenses Expiring"
+   },
+   {
+    "card": "Overdue Maintenance Tasks"
+   },
+   {
+    "card": "Critical Assets"
+   },
+   {
+    "card": "Open Work Orders"
+   },
+   {
+    "card": "Expired Work Permits"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Asset Value Analytics",
+    "width": "Full"
+   }
+  ]
+ }
 ]

@@ -1,132 +1,183 @@
 {
-  "doctype": "DocType",
-  "name": "Asset CapEx Budget",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "Expression",
-  "autoname": "format:CAPEX-{fiscal_year}-{branch}",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "fiscal_year",
-      "fieldtype": "Link",
-      "label": "السنة المالية",
-      "options": "Fiscal Year",
-      "reqd": 1,
-      "in_list_view": 1,
-      "bold": 1,
-      "search_index": 1
-    },
-    {
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "label": "Branch",
-      "options": "Branch",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1
-    },
-    {
-      "fieldname": "col1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "company",
-      "fieldtype": "Link",
-      "label": "Company",
-      "options": "Company",
-      "reqd": 1
-    },
-    {
-      "fieldname": "status",
-      "fieldtype": "Select",
-      "label": "الحالة",
-      "options": "Draft\nApproved\nClosed",
-      "default": "Draft",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "section_totals",
-      "fieldtype": "Section Break",
-      "label": "Budget Totals"
-    },
-    {
-      "fieldname": "total_capex_budget",
-      "fieldtype": "Currency",
-      "label": "إجمالي ميزانية رأس المال",
-      "description": "الميزانية الإجمالية المخصصة للإنفاق الرأسمالي",
-      "reqd": 1,
-      "bold": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "new_acquisition_budget",
-      "fieldtype": "Currency",
-      "label": "ميزانية الاقتناء الجديد",
-      "description": "الميزانية المخصصة لشراء أصول جديدة"
-    },
-    {
-      "fieldname": "col2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "replacement_budget",
-      "fieldtype": "Currency",
-      "label": "ميزانية الاستبدال",
-      "description": "الميزانية المخصصة لاستبدال الأصول القديمة"
-    },
-    {
-      "fieldname": "upgrade_budget",
-      "fieldtype": "Currency",
-      "label": "ميزانية الترقية",
-      "description": "الميزانية المخصصة لتطوير وتحديث الأصول"
-    },
-    {
-      "fieldname": "section_items",
-      "fieldtype": "Section Break",
-      "label": "Planned CapEx Items"
-    },
-    {
-      "fieldname": "items",
-      "fieldtype": "Table",
-      "label": "بنود الميزانية",
-      "description": "تفاصيل الأصول المخطط اقتناؤها أو استبدالها",
-      "options": "Asset CapEx Budget Item"
-    },
-    {
-      "fieldname": "section_notes",
-      "fieldtype": "Section Break",
-      "label": "Notes",
-      "collapsible": 1
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Text Editor",
-      "label": "ملاحظات"
-    }
-  ],
-  "permissions": [
-    {
-      "role": "Assets Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "delete": 0,
-      "submit": 1,
-      "cancel": 1
-    },
-    {
-      "role": "System Manager",
-      "read": 1,
-      "write": 1,
-      "create": 1,
-      "delete": 1,
-      "submit": 1,
-      "cancel": 1
-    }
-  ],
-  "search_fields": "fiscal_year, branch",
-  "sort_field": "fiscal_year",
-  "sort_order": "DESC"
+ "doctype": "DocType",
+ "name": "Asset CapEx Budget",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "Expression",
+ "autoname": "format:CAPEX-{fiscal_year}-{branch}",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "السنة المالية",
+   "options": "Fiscal Year",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "Draft\nApproved\nClosed",
+   "default": "Draft",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "section_totals",
+   "fieldtype": "Section Break",
+   "label": "Budget Totals"
+  },
+  {
+   "fieldname": "total_capex_budget",
+   "fieldtype": "Currency",
+   "label": "إجمالي ميزانية رأس المال",
+   "description": "الميزانية الإجمالية المخصصة للإنفاق الرأسمالي",
+   "reqd": 1,
+   "bold": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "new_acquisition_budget",
+   "fieldtype": "Currency",
+   "label": "ميزانية الاقتناء الجديد",
+   "description": "الميزانية المخصصة لشراء أصول جديدة"
+  },
+  {
+   "fieldname": "col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "replacement_budget",
+   "fieldtype": "Currency",
+   "label": "ميزانية الاستبدال",
+   "description": "الميزانية المخصصة لاستبدال الأصول القديمة"
+  },
+  {
+   "fieldname": "upgrade_budget",
+   "fieldtype": "Currency",
+   "label": "ميزانية الترقية",
+   "description": "الميزانية المخصصة لتطوير وتحديث الأصول"
+  },
+  {
+   "fieldname": "section_items",
+   "fieldtype": "Section Break",
+   "label": "Planned CapEx Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "بنود الميزانية",
+   "description": "تفاصيل الأصول المخطط اقتناؤها أو استبدالها",
+   "options": "Asset CapEx Budget Item"
+  },
+  {
+   "fieldname": "section_notes",
+   "fieldtype": "Section Break",
+   "label": "Notes",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text Editor",
+   "label": "ملاحظات"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "مركز التكلفة",
+   "options": "Cost Center",
+   "description": "مركز التكلفة المسؤول عن هذه الميزانية الرأسمالية."
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "report": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1
+  }
+ ],
+ "search_fields": "fiscal_year, branch",
+ "sort_field": "fiscal_year",
+ "sort_order": "DESC"
 }

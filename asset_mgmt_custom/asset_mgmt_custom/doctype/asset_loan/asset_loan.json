@@ -1,44 +1,196 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Loan",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "Expression",
-  "autoname": "format:LOAN-{asset}-{#####}",
-  "is_submittable": 1,
-  "track_changes": 1,
-  "fields": [
-    {"fieldname": "asset", "fieldtype": "Link", "options": "Asset", "label": "الأصل", "reqd": 1, "in_list_view": 1, "search_index": 1},
-    {"fieldname": "asset_name", "fieldtype": "Data", "label": "اسم الأصل", "fetch_from": "asset.asset_name", "read_only": 1},
-    {"fieldname": "col1", "fieldtype": "Column Break"},
-    {"fieldname": "status", "fieldtype": "Select", "label": "الحالة", "options": "Active\nReturned\nOverdue", "default": "Active", "in_list_view": 1, "read_only": 1},
-    {"fieldname": "loan_details_section", "fieldtype": "Section Break", "label": "تفاصيل الإقراض"},
-    {
-      "fieldname": "loaned_to",
-      "fieldtype": "Link",
-      "options": "Employee",
-      "label": "المقترض",
-      "description": "الشخص أو الجهة التي اقترضت الأصل",
-      "reqd": 1,
-      "in_list_view": 1
-    },
-    {"fieldname": "loaned_to_name", "fieldtype": "Data", "label": "اسم الموظف", "fetch_from": "loaned_to.employee_name", "read_only": 1},
-    {"fieldname": "col2", "fieldtype": "Column Break"},
-    {"fieldname": "loan_date", "fieldtype": "Date", "label": "تاريخ الإقراض", "reqd": 1, "default": "Today"},
-    {"fieldname": "expected_return_date", "fieldtype": "Date", "label": "تاريخ الإعادة المتوقع", "reqd": 1},
-    {"fieldname": "purpose_section", "fieldtype": "Section Break", "label": "الغرض والملاحظات"},
-    {"fieldname": "purpose", "fieldtype": "Data", "label": "غرض الإقراض"},
-    {"fieldname": "col3", "fieldtype": "Column Break"},
-    {"fieldname": "notes", "fieldtype": "Small Text", "label": "ملاحظات"},
-    {"fieldname": "return_section", "fieldtype": "Section Break", "label": "معلومات الإعادة"},
-    {"fieldname": "actual_return_date", "fieldtype": "Date", "label": "تاريخ الإعادة الفعلي"},
-    {"fieldname": "col4", "fieldtype": "Column Break"},
-    {"fieldname": "return_condition", "fieldtype": "Select", "label": "حالة الإعادة", "options": "\nGood\nDamaged\nLost"},
-    {"fieldname": "original_custodian", "fieldtype": "Link", "options": "Employee", "label": "المسؤول الأصلي (للاسترداد)", "hidden": 1}
-  ],
-  "permissions": [
-    {"role": "Assets Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1},
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1}
-  ],
-  "links": [],
-  "actions": []
+ "doctype": "DocType",
+ "name": "Asset Loan",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "Expression",
+ "autoname": "format:LOAN-{asset}-{#####}",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "options": "Asset",
+   "label": "الأصل",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "options": "Active\nReturned\nOverdue",
+   "default": "Active",
+   "in_list_view": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "loan_details_section",
+   "fieldtype": "Section Break",
+   "label": "تفاصيل الإقراض"
+  },
+  {
+   "fieldname": "loaned_to",
+   "fieldtype": "Link",
+   "options": "Employee",
+   "label": "المقترض",
+   "description": "الشخص أو الجهة التي اقترضت الأصل",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "loaned_to_name",
+   "fieldtype": "Data",
+   "label": "اسم الموظف",
+   "fetch_from": "loaned_to.employee_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "loan_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الإقراض",
+   "reqd": 1,
+   "default": "Today"
+  },
+  {
+   "fieldname": "expected_return_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الإعادة المتوقع",
+   "reqd": 1
+  },
+  {
+   "fieldname": "purpose_section",
+   "fieldtype": "Section Break",
+   "label": "الغرض والملاحظات"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Data",
+   "label": "غرض الإقراض"
+  },
+  {
+   "fieldname": "col3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات"
+  },
+  {
+   "fieldname": "return_section",
+   "fieldtype": "Section Break",
+   "label": "معلومات الإعادة"
+  },
+  {
+   "fieldname": "actual_return_date",
+   "fieldtype": "Date",
+   "label": "تاريخ الإعادة الفعلي"
+  },
+  {
+   "fieldname": "col4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "return_condition",
+   "fieldtype": "Select",
+   "label": "حالة الإعادة",
+   "options": "\nGood\nDamaged\nLost"
+  },
+  {
+   "fieldname": "original_custodian",
+   "fieldtype": "Link",
+   "options": "Employee",
+   "label": "المسؤول الأصلي (للاسترداد)",
+   "hidden": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Employee",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ],
+ "links": [],
+ "actions": []
 }

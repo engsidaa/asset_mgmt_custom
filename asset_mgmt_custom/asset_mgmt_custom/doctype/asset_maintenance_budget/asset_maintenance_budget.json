@@ -1,87 +1,154 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Maintenance Budget",
-  "module": "Asset Mgmt Custom",
-  "naming_rule": "Expression",
-  "autoname": "format:AMB-{fiscal_year}-{branch}",
-  "track_changes": 1,
-  "fields": [
-    {
-      "fieldname": "fiscal_year",
-      "fieldtype": "Link",
-      "options": "Fiscal Year",
-      "label": "سنة الميزانية",
-      "description": "السنة المالية المرتبطة بهذه الميزانية",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1
-    },
-    {
-      "fieldname": "branch",
-      "fieldtype": "Link",
-      "options": "Branch",
-      "label": "الفرع",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1
-    },
-    {
-      "fieldname": "col1",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "company",
-      "fieldtype": "Link",
-      "options": "Company",
-      "label": "الشركة",
-      "reqd": 1,
-      "default": "{frappe.defaults.get_user_default('Company')}"
-    },
-    {
-      "fieldname": "budget_section",
-      "fieldtype": "Section Break",
-      "label": "تخصيص الميزانية"
-    },
-    {
-      "fieldname": "total_budget",
-      "fieldtype": "Currency",
-      "label": "تكلفة الصيانة المخططة",
-      "description": "إجمالي ميزانية الصيانة المخصصة للسنة المالية",
-      "reqd": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "preventive_budget",
-      "fieldtype": "Currency",
-      "label": "ميزانية الصيانة الوقائية"
-    },
-    {
-      "fieldname": "col2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "corrective_budget",
-      "fieldtype": "Currency",
-      "label": "ميزانية الصيانة التصحيحية"
-    },
-    {
-      "fieldname": "amc_budget",
-      "fieldtype": "Currency",
-      "label": "ميزانية عقود الصيانة"
-    },
-    {
-      "fieldname": "notes_section",
-      "fieldtype": "Section Break",
-      "label": "ملاحظات"
-    },
-    {
-      "fieldname": "notes",
-      "fieldtype": "Small Text",
-      "label": "ملاحظات"
-    }
-  ],
-  "permissions": [
-    {"role": "Assets Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "print": 1},
-    {"role": "Asset User", "read": 1}
-  ]
+ "doctype": "DocType",
+ "name": "Asset Maintenance Budget",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "Expression",
+ "autoname": "format:AMB-{fiscal_year}-{branch}",
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "options": "Fiscal Year",
+   "label": "سنة الميزانية",
+   "description": "السنة المالية المرتبطة بهذه الميزانية",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "options": "Branch",
+   "label": "الفرع",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "options": "Company",
+   "label": "الشركة",
+   "reqd": 1,
+   "default": "{frappe.defaults.get_user_default('Company')}"
+  },
+  {
+   "fieldname": "budget_section",
+   "fieldtype": "Section Break",
+   "label": "تخصيص الميزانية"
+  },
+  {
+   "fieldname": "total_budget",
+   "fieldtype": "Currency",
+   "label": "تكلفة الصيانة المخططة",
+   "description": "إجمالي ميزانية الصيانة المخصصة للسنة المالية",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "مركز التكلفة",
+   "options": "Cost Center",
+   "description": "مركز التكلفة لتتبع مصاريف الصيانة."
+  },
+  {
+   "fieldname": "preventive_budget",
+   "fieldtype": "Currency",
+   "label": "ميزانية الصيانة الوقائية"
+  },
+  {
+   "fieldname": "col2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "corrective_budget",
+   "fieldtype": "Currency",
+   "label": "ميزانية الصيانة التصحيحية"
+  },
+  {
+   "fieldname": "amc_budget",
+   "fieldtype": "Currency",
+   "label": "ميزانية عقود الصيانة"
+  },
+  {
+   "fieldname": "notes_section",
+   "fieldtype": "Section Break",
+   "label": "ملاحظات"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "report": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1
+  }
+ ]
 }

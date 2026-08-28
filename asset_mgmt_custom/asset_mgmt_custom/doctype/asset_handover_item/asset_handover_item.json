@@ -1,55 +1,104 @@
 {
-  "doctype": "DocType",
-  "name": "Asset Handover Item",
-  "module": "Asset Mgmt Custom",
-  "istable": 1,
-  "fields": [
-    {
-      "fieldname": "asset",
-      "fieldtype": "Link",
-      "options": "Asset",
-      "label": "الأصل",
-      "reqd": 1,
-      "in_list_view": 1,
-      "search_index": 1
-    },
-    {
-      "fieldname": "asset_name",
-      "fieldtype": "Data",
-      "label": "اسم الأصل",
-      "fetch_from": "asset.asset_name",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "asset_category",
-      "fieldtype": "Data",
-      "label": "Category",
-      "fetch_from": "asset.asset_category",
-      "read_only": 1,
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "serial_no",
-      "fieldtype": "Data",
-      "label": "Serial No",
-      "in_list_view": 1
-    },
-    {
-      "fieldname": "condition",
-      "fieldtype": "Select",
-      "label": "الحالة",
-      "description": "حالة الأصل عند التسليم",
-      "options": "Good\nFair\nDamaged\nMissing",
-      "default": "Good",
-      "in_list_view": 1,
-      "reqd": 1
-    },
-    {
-      "fieldname": "remarks",
-      "fieldtype": "Data",
-      "label": "ملاحظات",
-      "in_list_view": 1
-    }
-  ]
+ "doctype": "DocType",
+ "name": "Asset Handover Item",
+ "module": "Asset Mgmt Custom",
+ "istable": 1,
+ "fields": [
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "options": "Asset",
+   "label": "الأصل",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "asset_category",
+   "fieldtype": "Data",
+   "label": "Category",
+   "fetch_from": "asset.asset_category",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "serial_no",
+   "fieldtype": "Data",
+   "label": "Serial No",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "condition",
+   "fieldtype": "Select",
+   "label": "الحالة",
+   "description": "حالة الأصل عند التسليم",
+   "options": "Good\nFair\nDamaged\nMissing",
+   "default": "Good",
+   "in_list_view": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "label": "ملاحظات",
+   "in_list_view": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Assets Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ]
 }
