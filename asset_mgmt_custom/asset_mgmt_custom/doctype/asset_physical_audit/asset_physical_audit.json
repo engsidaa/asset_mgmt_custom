@@ -33,7 +33,7 @@
   {
    "fieldname": "audit_date",
    "fieldtype": "Date",
-   "label": "Audit Date",
+   "label": "تاريخ الجرد",
    "reqd": 1,
    "default": "Today",
    "in_list_view": 1
@@ -45,7 +45,7 @@
   {
    "fieldname": "cost_center",
    "fieldtype": "Link",
-   "label": "Branch / Cost Center",
+   "label": "الفرع",
    "options": "Cost Center",
    "reqd": 1,
    "in_list_view": 1,
@@ -54,7 +54,8 @@
   {
    "fieldname": "audited_by",
    "fieldtype": "Link",
-   "label": "Audited By",
+   "label": "أجرى الجرد",
+   "description": "الموظف أو الفريق المسؤول عن إجراء الجرد",
    "options": "User",
    "reqd": 1,
    "default": "__user"
@@ -66,7 +67,7 @@
   {
    "fieldname": "audit_status",
    "fieldtype": "Select",
-   "label": "Audit Status",
+   "label": "الحالة",
    "options": "Draft\nIn Progress\nCompleted",
    "default": "Draft",
    "in_list_view": 1
@@ -79,7 +80,8 @@
   {
    "fieldname": "items",
    "fieldtype": "Table",
-   "label": "Assets",
+   "label": "بنود الجرد",
+   "description": "قائمة الأصول التي شملها الجرد",
    "options": "Asset Physical Audit Item"
   },
   {

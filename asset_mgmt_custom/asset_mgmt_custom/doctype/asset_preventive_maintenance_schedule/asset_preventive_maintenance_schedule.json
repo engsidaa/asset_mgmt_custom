@@ -16,21 +16,21 @@
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1
     },
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1
     },
     {
       "fieldname": "asset_category",
       "fieldtype": "Link",
-      "label": "Asset Category",
+      "label": "فئة الأصل",
       "options": "Asset Category",
       "fetch_from": "asset.asset_category",
       "read_only": 1
@@ -38,59 +38,66 @@
     {
       "fieldname": "maintenance_type",
       "fieldtype": "Select",
-      "label": "Maintenance Type",
+      "label": "نوع الصيانة",
+      "description": "تكرار الصيانة: يومي أو أسبوعي أو شهري...",
       "options": "Daily\nWeekly\nMonthly\nQuarterly\nSemi-Annual\nAnnual\nUsage-Based",
       "reqd": 1
     },
     {
       "fieldname": "maintenance_task",
       "fieldtype": "Data",
-      "label": "Maintenance Task Description",
+      "label": "مهمة الصيانة",
+      "description": "وصف المهمة أو الإجراء المطلوب تنفيذه",
       "reqd": 1
     },
     {
       "fieldname": "assigned_to",
       "fieldtype": "Link",
-      "label": "Assigned To",
+      "label": "مسؤول الصيانة",
+      "description": "الموظف المكلف بتنفيذ هذه الصيانة",
       "options": "Employee"
     },
     {
       "fieldname": "last_done_date",
       "fieldtype": "Date",
-      "label": "Last Done Date"
+      "label": "تاريخ آخر تنفيذ"
     },
     {
       "fieldname": "next_due_date",
       "fieldtype": "Date",
-      "label": "Next Due Date",
+      "label": "تاريخ الاستحقاق القادم",
+      "description": "التاريخ المحدد للصيانة القادمة",
       "reqd": 1
     },
     {
       "fieldname": "frequency_days",
       "fieldtype": "Int",
-      "label": "Frequency (Days)"
+      "label": "التكرار (بالأيام)",
+      "description": "عدد الأيام بين كل دورة صيانة"
     },
     {
       "fieldname": "estimated_duration_hours",
       "fieldtype": "Float",
-      "label": "Estimated Duration (Hours)"
+      "label": "المدة التقديرية (ساعات)",
+      "description": "الوقت المتوقع لتنفيذ مهمة الصيانة"
     },
     {
       "fieldname": "checklist",
       "fieldtype": "Text",
-      "label": "Maintenance Checklist"
+      "label": "قائمة المراجعة",
+      "description": "خطوات الصيانة التفصيلية يُدرَج كل بند في سطر"
     },
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Active\nOverdue\nCompleted\nSuspended",
       "default": "Active"
     },
     {
       "fieldname": "auto_create_repair",
       "fieldtype": "Check",
-      "label": "Auto-create Repair Order on Due Date"
+      "label": "إنشاء أمر إصلاح تلقائياً عند الاستحقاق"
     }
   ],
   "permissions": [

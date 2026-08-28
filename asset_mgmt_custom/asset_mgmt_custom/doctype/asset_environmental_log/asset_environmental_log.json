@@ -9,83 +9,87 @@
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1
     },
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1
     },
     {
       "fieldname": "log_date",
       "fieldtype": "Date",
-      "label": "Log Date",
+      "label": "تاريخ السجل",
       "reqd": 1,
       "default": "Today"
     },
     {
       "fieldname": "logged_by",
       "fieldtype": "Link",
-      "label": "Logged By",
+      "label": "سجَّله",
       "options": "Employee",
       "reqd": 1
     },
     {
       "fieldname": "co2_emissions_kg",
       "fieldtype": "Float",
-      "label": "CO₂ Emissions (kg)"
+      "label": "انبعاثات ثاني أكسيد الكربون (كجم)",
+      "description": "كمية غاز CO₂ المُنبعَث من تشغيل الأصل"
     },
     {
       "fieldname": "fuel_consumption_liters",
       "fieldtype": "Float",
-      "label": "Fuel Consumption (Liters)"
+      "label": "استهلاك الوقود (لتر)"
     },
     {
       "fieldname": "waste_generated_kg",
       "fieldtype": "Float",
-      "label": "Waste Generated (kg)"
+      "label": "النفايات المتولّدة (كجم)"
     },
     {
       "fieldname": "water_consumption_liters",
       "fieldtype": "Float",
-      "label": "Water Consumption (Liters)"
+      "label": "استهلاك المياه (لتر)"
     },
     {
       "fieldname": "noise_level_db",
       "fieldtype": "Float",
-      "label": "Noise Level (dB)"
+      "label": "مستوى الضجيج (ديسيبل)"
     },
     {
       "fieldname": "compliance_standard",
       "fieldtype": "Select",
-      "label": "Compliance Standard",
+      "label": "معيار الامتثال",
+      "description": "المعيار أو اللائحة التي يتم تقييم الامتثال لها",
       "options": "ISO 14001\nISO 50001\nLocal Regulation\nOther\nNone"
     },
     {
       "fieldname": "is_compliant",
       "fieldtype": "Check",
-      "label": "Is Compliant",
+      "label": "مستوفٍ للمعايير",
       "default": "1"
     },
     {
       "fieldname": "non_compliance_details",
       "fieldtype": "Small Text",
-      "label": "Non-Compliance Details",
+      "label": "تفاصيل عدم الامتثال",
+      "description": "وصف الانتهاكات أو الجوانب التي لا تستوفي المعيار",
       "depends_on": "eval:!doc.is_compliant"
     },
     {
       "fieldname": "corrective_action",
       "fieldtype": "Small Text",
-      "label": "Corrective Action Taken"
+      "label": "الإجراء التصحيحي",
+      "description": "الخطوات المتخذة لمعالجة حالات عدم الامتثال"
     },
     {
       "fieldname": "notes",
       "fieldtype": "Small Text",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

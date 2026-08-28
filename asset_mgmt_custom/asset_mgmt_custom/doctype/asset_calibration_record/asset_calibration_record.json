@@ -11,7 +11,7 @@
       "fieldname": "asset",
       "fieldtype": "Link",
       "options": "Asset",
-      "label": "Asset",
+      "label": "الأصل",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1,
@@ -20,7 +20,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -53,7 +53,7 @@
     {
       "fieldname": "calibration_date",
       "fieldtype": "Date",
-      "label": "Calibration Date",
+      "label": "تاريخ المعايرة",
       "reqd": 1,
       "in_list_view": 1,
       "bold": 1
@@ -61,7 +61,8 @@
     {
       "fieldname": "next_calibration_date",
       "fieldtype": "Date",
-      "label": "Next Calibration Date",
+      "label": "تاريخ المعايرة القادمة",
+      "description": "الموعد المحدد للمعايرة التالية",
       "in_list_view": 1,
       "bold": 1
     },
@@ -72,13 +73,15 @@
     {
       "fieldname": "calibrated_by",
       "fieldtype": "Data",
-      "label": "Calibrated By (Name/Company)",
+      "label": "المعايِر",
+      "description": "الشركة أو الموظف المسؤول عن المعايرة",
       "reqd": 1
     },
     {
       "fieldname": "calibration_standard",
       "fieldtype": "Data",
-      "label": "Calibration Standard / Reference"
+      "label": "معيار المعايرة",
+      "description": "المعيار أو المواصفة المستخدمة في المعايرة"
     },
     {
       "fieldname": "sec_break_result",
@@ -88,7 +91,8 @@
     {
       "fieldname": "result",
       "fieldtype": "Select",
-      "label": "Result",
+      "label": "نتيجة المعايرة",
+      "description": "هل اجتاز الأصل المعايرة أم لا",
       "options": "\nPass\nFail\nAdjusted",
       "reqd": 1,
       "in_list_view": 1,
@@ -97,7 +101,7 @@
     {
       "fieldname": "certificate_number",
       "fieldtype": "Data",
-      "label": "Calibration Certificate Number"
+      "label": "رقم شهادة المعايرة"
     },
     {
       "fieldname": "col_break_3",
@@ -121,7 +125,7 @@
     {
       "fieldname": "notes",
       "fieldtype": "Text",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

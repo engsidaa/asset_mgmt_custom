@@ -25,14 +25,15 @@
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "label": "Series",
+   "label": "السلسلة",
    "options": "AMC-.YYYY.-",
    "reqd": 1
   },
   {
    "fieldname": "supplier",
    "fieldtype": "Link",
-   "label": "Supplier",
+   "label": "شركة الصيانة",
+   "description": "الشركة أو المورد المسؤول عن الصيانة",
    "options": "Supplier",
    "reqd": 1,
    "in_list_view": 1,
@@ -45,7 +46,7 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
-   "label": "Status",
+   "label": "الحالة",
    "options": "Active\nExpired\nCancelled",
    "default": "Active",
    "in_list_view": 1
@@ -53,19 +54,19 @@
   {
    "fieldname": "contract_details_section",
    "fieldtype": "Section Break",
-   "label": "Contract Details"
+   "label": "تفاصيل العقد"
   },
   {
    "fieldname": "start_date",
    "fieldtype": "Date",
-   "label": "Start Date",
+   "label": "تاريخ بدء العقد",
    "reqd": 1,
    "in_list_view": 1
   },
   {
    "fieldname": "end_date",
    "fieldtype": "Date",
-   "label": "End Date",
+   "label": "تاريخ انتهاء العقد",
    "reqd": 1,
    "in_list_view": 1
   },
@@ -76,35 +77,36 @@
   {
    "fieldname": "contract_value",
    "fieldtype": "Currency",
-   "label": "Annual Contract Value"
+   "label": "قيمة العقد الإجمالية"
   },
   {
    "fieldname": "coverage_type",
    "fieldtype": "Select",
-   "label": "Coverage Type",
+   "label": "نطاق التغطية",
+   "description": "نوع الصيانة المشمولة: شاملة، وقائية، تصحيحية",
    "options": "\nComprehensive\nParts Only\nLabor Only\nPreventive Only"
   },
   {
    "fieldname": "assets_section",
    "fieldtype": "Section Break",
-   "label": "Covered Assets"
+   "label": "الأصول المشمولة"
   },
   {
    "fieldname": "assets",
    "fieldtype": "Table",
-   "label": "Assets",
+   "label": "الأصول المشمولة",
    "options": "Asset Maintenance Contract Item"
   },
   {
    "fieldname": "notes_section",
    "fieldtype": "Section Break",
-   "label": "Notes",
+   "label": "ملاحظات",
    "collapsible": 1
   },
   {
    "fieldname": "notes",
    "fieldtype": "Text Editor",
-   "label": "Notes"
+   "label": "ملاحظات"
   }
  ],
  "links": [],

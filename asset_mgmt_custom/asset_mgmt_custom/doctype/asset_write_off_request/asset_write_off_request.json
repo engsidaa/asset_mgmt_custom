@@ -10,14 +10,14 @@
     {
       "fieldname": "naming_series",
       "fieldtype": "Select",
-      "label": "Naming Series",
+      "label": "السلسلة",
       "options": "WO-.YYYY.-",
       "default": "WO-.YYYY.-"
     },
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1,
       "in_list_view": 1,
@@ -27,7 +27,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -39,7 +39,7 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Draft\nPending Approval\nApproved\nRejected",
       "default": "Draft",
       "read_only": 1,
@@ -49,18 +49,19 @@
     {
       "fieldname": "write_off_date",
       "fieldtype": "Date",
-      "label": "Write-off Date",
+      "label": "تاريخ الشطب",
       "reqd": 1
     },
     {
       "fieldname": "sec_break_reason",
       "fieldtype": "Section Break",
-      "label": "Write-off Details"
+      "label": "تفاصيل الشطب"
     },
     {
       "fieldname": "reason",
       "fieldtype": "Select",
-      "label": "Reason",
+      "label": "سبب الشطب",
+      "description": "المبرر الرئيسي لشطب هذا الأصل من السجلات",
       "options": "\nLost\nDestroyed\nStolen\nBeyond Economical Repair\nObsolete\nOther",
       "reqd": 1,
       "in_list_view": 1
@@ -68,7 +69,7 @@
     {
       "fieldname": "police_report_no",
       "fieldtype": "Data",
-      "label": "Police Report Number",
+      "label": "رقم بلاغ الشرطة",
       "depends_on": "eval:in_list(['Lost','Stolen'], doc.reason)"
     },
     {
@@ -78,29 +79,30 @@
     {
       "fieldname": "estimated_loss_value",
       "fieldtype": "Currency",
-      "label": "Estimated Loss Value"
+      "label": "القيمة الدفترية",
+      "description": "القيمة الحالية للأصل في السجلات المحاسبية"
     },
     {
       "fieldname": "description",
       "fieldtype": "Text Editor",
-      "label": "Description",
+      "label": "الوصف التفصيلي",
       "reqd": 1
     },
     {
       "fieldname": "sec_break_approval",
       "fieldtype": "Section Break",
-      "label": "Approval"
+      "label": "الاعتماد"
     },
     {
       "fieldname": "approved_by",
       "fieldtype": "Data",
-      "label": "Approved By",
+      "label": "معتمد من",
       "read_only": 1
     },
     {
       "fieldname": "approval_date",
       "fieldtype": "Date",
-      "label": "Approval Date",
+      "label": "تاريخ الاعتماد",
       "read_only": 1
     },
     {
@@ -110,7 +112,7 @@
     {
       "fieldname": "rejection_reason",
       "fieldtype": "Text",
-      "label": "Rejection Reason",
+      "label": "سبب الرفض",
       "read_only": 1
     }
   ],

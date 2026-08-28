@@ -9,21 +9,21 @@
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1
     },
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1
     },
     {
       "fieldname": "branch",
       "fieldtype": "Link",
-      "label": "Branch",
+      "label": "الفرع",
       "options": "Branch",
       "fetch_from": "asset.branch",
       "read_only": 1
@@ -31,55 +31,61 @@
     {
       "fieldname": "log_date",
       "fieldtype": "Date",
-      "label": "Log Date",
+      "label": "تاريخ السجل",
       "reqd": 1,
       "default": "Today"
     },
     {
       "fieldname": "total_capacity_hours",
       "fieldtype": "Float",
-      "label": "Total Capacity Hours (in day)",
+      "label": "إجمالي ساعات الطاقة",
+      "description": "إجمالي الساعات المتاحة للتشغيل في اليوم",
       "reqd": 1
     },
     {
       "fieldname": "actual_used_hours",
       "fieldtype": "Float",
-      "label": "Actual Used Hours",
+      "label": "ساعات الاستخدام الفعلية",
+      "description": "عدد الساعات التي عمل فيها الأصل فعلاً",
       "reqd": 1
     },
     {
       "fieldname": "idle_hours",
       "fieldtype": "Float",
-      "label": "Idle Hours",
+      "label": "ساعات التوقف",
+      "description": "يُحسب تلقائياً: الطاقة ناقص الاستخدام",
       "read_only": 1
     },
     {
       "fieldname": "utilization_pct",
       "fieldtype": "Float",
-      "label": "Utilization %",
+      "label": "نسبة الاستخدام %",
+      "description": "يُحسب تلقائياً: الاستخدام ÷ الطاقة × 100",
       "read_only": 1
     },
     {
       "fieldname": "downtime_hours",
       "fieldtype": "Float",
-      "label": "Downtime Hours",
+      "label": "ساعات العطل",
+      "description": "ساعات التوقف بسبب عطل أو صيانة",
       "default": "0"
     },
     {
       "fieldname": "downtime_reason",
       "fieldtype": "Small Text",
-      "label": "Downtime Reason"
+      "label": "سبب العطل"
     },
     {
       "fieldname": "operator",
       "fieldtype": "Link",
-      "label": "Operator",
+      "label": "المشغّل",
+      "description": "الموظف الذي يشغّل الأصل",
       "options": "Employee"
     },
     {
       "fieldname": "notes",
       "fieldtype": "Small Text",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

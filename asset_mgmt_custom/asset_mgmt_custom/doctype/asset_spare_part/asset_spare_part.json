@@ -10,24 +10,26 @@
     {
       "fieldname": "naming_series",
       "fieldtype": "Select",
-      "label": "Naming Series",
+      "label": "سلسلة الترقيم",
       "options": "SPARE-.YYYY.-",
       "default": "SPARE-.YYYY.-"
     },
     {
       "fieldname": "item_name",
       "fieldtype": "Data",
-      "label": "Part Name",
+      "label": "اسم القطعة",
       "reqd": 1,
       "in_list_view": 1,
-      "bold": 1
+      "bold": 1,
+      "description": "اسم قطعة الغيار كما تُعرف في المخزون"
     },
     {
       "fieldname": "asset_category",
       "fieldtype": "Link",
-      "label": "Asset Category",
+      "label": "فئة الأصل",
       "options": "Asset Category",
-      "in_list_view": 1
+      "in_list_view": 1,
+      "description": "فئة الأصل الذي تنتمي إليه هذه القطعة"
     },
     {
       "fieldname": "col_break_1",
@@ -36,39 +38,42 @@
     {
       "fieldname": "quantity",
       "fieldtype": "Float",
-      "label": "Current Quantity",
+      "label": "الكمية المتاحة",
       "reqd": 1,
       "in_list_view": 1,
-      "default": "0"
+      "default": "0",
+      "description": "الكمية الموجودة حالياً في المخزون"
     },
     {
       "fieldname": "minimum_qty",
       "fieldtype": "Float",
-      "label": "Minimum Quantity",
+      "label": "الحد الأدنى للمخزون",
       "in_list_view": 1,
-      "default": "1"
+      "default": "1",
+      "description": "الكمية التي إذا نزلنا دونها يتم التنبيه"
     },
     {
       "fieldname": "unit",
       "fieldtype": "Data",
-      "label": "Unit of Measure",
+      "label": "وحدة القياس",
       "default": "Nos"
     },
     {
       "fieldname": "sec_break_location",
       "fieldtype": "Section Break",
-      "label": "Storage & Supplier"
+      "label": "التخزين والمورد"
     },
     {
       "fieldname": "location",
       "fieldtype": "Link",
-      "label": "Storage Location",
-      "options": "Location"
+      "label": "الموقع",
+      "options": "Location",
+      "description": "مكان تخزين القطعة"
     },
     {
       "fieldname": "supplier",
       "fieldtype": "Link",
-      "label": "Supplier",
+      "label": "المورد المعتمد",
       "options": "Supplier"
     },
     {
@@ -78,22 +83,22 @@
     {
       "fieldname": "unit_cost",
       "fieldtype": "Currency",
-      "label": "Unit Cost"
+      "label": "تكلفة الوحدة"
     },
     {
       "fieldname": "last_replenished",
       "fieldtype": "Date",
-      "label": "Last Replenished"
+      "label": "تاريخ آخر تعبئة"
     },
     {
       "fieldname": "sec_break_notes",
       "fieldtype": "Section Break",
-      "label": "Notes"
+      "label": "ملاحظات"
     },
     {
       "fieldname": "notes",
       "fieldtype": "Text",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

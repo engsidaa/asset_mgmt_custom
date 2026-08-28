@@ -18,7 +18,7 @@
       "fieldname": "asset",
       "fieldtype": "Link",
       "options": "Asset",
-      "label": "Asset",
+      "label": "الأصل",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1,
@@ -27,7 +27,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -39,7 +39,8 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
+      "description": "نشط / في انتظار التجديد / منتهي",
       "options": "Active\nPending Renewal\nExpired\nCancelled",
       "default": "Active",
       "read_only": 1,
@@ -50,7 +51,7 @@
       "fieldname": "branch",
       "fieldtype": "Link",
       "options": "Branch",
-      "label": "Branch",
+      "label": "الفرع",
       "fetch_from": "asset.custom_branch"
     },
     {
@@ -61,7 +62,8 @@
     {
       "fieldname": "permit_type",
       "fieldtype": "Select",
-      "label": "Permit Type",
+      "label": "نوع الترخيص/التصريح",
+      "description": "نوع الوثيقة الرسمية: رخصة، تصريح، شهادة...",
       "options": "\nVehicle License\nOperating Permit\nMunicipal License\nHealth Certificate\nFire Safety Permit\nOther",
       "reqd": 1,
       "in_list_view": 1
@@ -69,7 +71,8 @@
     {
       "fieldname": "license_number",
       "fieldtype": "Data",
-      "label": "License / Permit Number",
+      "label": "رقم الترخيص",
+      "description": "الرقم الرسمي للترخيص أو التصريح",
       "reqd": 1,
       "bold": 1
     },
@@ -80,7 +83,8 @@
     {
       "fieldname": "issuing_authority",
       "fieldtype": "Data",
-      "label": "Issuing Authority",
+      "label": "جهة الإصدار",
+      "description": "الجهة الحكومية أو الرسمية التي أصدرت الترخيص",
       "reqd": 1
     },
     {
@@ -96,13 +100,14 @@
     {
       "fieldname": "issue_date",
       "fieldtype": "Date",
-      "label": "Issue Date",
+      "label": "تاريخ الإصدار",
       "reqd": 1
     },
     {
       "fieldname": "expiry_date",
       "fieldtype": "Date",
-      "label": "Expiry Date",
+      "label": "تاريخ الانتهاء",
+      "description": "تاريخ انتهاء صلاحية الترخيص",
       "reqd": 1,
       "in_list_view": 1,
       "bold": 1
@@ -114,7 +119,8 @@
     {
       "fieldname": "renewal_reminder_days",
       "fieldtype": "Int",
-      "label": "Remind Before (days)",
+      "label": "أيام التذكير قبل الانتهاء",
+      "description": "عدد الأيام التي يُرسَل فيها التنبيه قبل انتهاء الصلاحية",
       "default": "30"
     },
     {
@@ -134,7 +140,7 @@
     {
       "fieldname": "notes",
       "fieldtype": "Text",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

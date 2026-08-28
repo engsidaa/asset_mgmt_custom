@@ -10,83 +10,87 @@
     {
       "fieldname": "naming_series",
       "fieldtype": "Select",
-      "label": "Series",
+      "label": "السلسلة",
       "options": "LER-.YYYY.-"
     },
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1
     },
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1
     },
     {
       "fieldname": "current_expected_disposal_date",
       "fieldtype": "Date",
-      "label": "Current Expected Disposal Date",
+      "label": "تاريخ التخلص الحالي المتوقع",
       "fetch_from": "asset.disposal_date",
       "read_only": 1
     },
     {
       "fieldname": "requested_by",
       "fieldtype": "Link",
-      "label": "Requested By",
+      "label": "مقدِّم الطلب",
       "options": "Employee",
       "reqd": 1
     },
     {
       "fieldname": "request_date",
       "fieldtype": "Date",
-      "label": "Request Date",
+      "label": "تاريخ الطلب",
       "reqd": 1,
       "default": "Today"
     },
     {
       "fieldname": "requested_extension_years",
       "fieldtype": "Float",
-      "label": "Extension Requested (Years)",
+      "label": "مدة التمديد المطلوبة (سنوات)",
+      "description": "عدد السنوات التي يُطلب تمديد عمر الأصل بها",
       "reqd": 1
     },
     {
       "fieldname": "new_expected_disposal_date",
       "fieldtype": "Date",
-      "label": "New Expected Disposal Date",
+      "label": "تاريخ التخلص المقترح الجديد",
       "reqd": 1
     },
     {
       "fieldname": "justification",
       "fieldtype": "Text",
-      "label": "Justification",
+      "label": "مبرر الطلب",
+      "description": "الأسباب التقنية والاقتصادية لتمديد عمر الأصل",
       "reqd": 1
     },
     {
       "fieldname": "condition_report",
       "fieldtype": "Small Text",
-      "label": "Current Condition Report"
+      "label": "تقرير الحالة الحالية",
+      "description": "وصف مختصر للحالة الراهنة للأصل"
     },
     {
       "fieldname": "estimated_extension_cost",
       "fieldtype": "Currency",
-      "label": "Estimated Extension Cost"
+      "label": "تكلفة التمديد التقديرية",
+      "description": "التكاليف المتوقعة للحفاظ على الأصل لفترة إضافية"
     },
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Pending\nApproved\nRejected",
       "default": "Pending"
     },
     {
       "fieldname": "decision_notes",
       "fieldtype": "Small Text",
-      "label": "Decision Notes"
+      "label": "ملاحظات القرار"
     }
   ],
   "permissions": [

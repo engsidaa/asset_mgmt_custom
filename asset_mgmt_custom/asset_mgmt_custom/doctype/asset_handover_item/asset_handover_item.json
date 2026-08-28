@@ -8,7 +8,7 @@
       "fieldname": "asset",
       "fieldtype": "Link",
       "options": "Asset",
-      "label": "Asset",
+      "label": "الأصل",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1
@@ -16,7 +16,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -38,7 +38,8 @@
     {
       "fieldname": "condition",
       "fieldtype": "Select",
-      "label": "Condition",
+      "label": "الحالة",
+      "description": "حالة الأصل عند التسليم",
       "options": "Good\nFair\nDamaged\nMissing",
       "default": "Good",
       "in_list_view": 1,
@@ -47,7 +48,7 @@
     {
       "fieldname": "remarks",
       "fieldtype": "Data",
-      "label": "Remarks",
+      "label": "ملاحظات",
       "in_list_view": 1
     }
   ]

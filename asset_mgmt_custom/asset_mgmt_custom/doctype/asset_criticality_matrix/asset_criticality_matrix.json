@@ -9,7 +9,7 @@
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1,
       "unique": 1
@@ -17,14 +17,14 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1
     },
     {
       "fieldname": "asset_category",
       "fieldtype": "Link",
-      "label": "Asset Category",
+      "label": "فئة الأصل",
       "options": "Asset Category",
       "fetch_from": "asset.asset_category",
       "read_only": 1
@@ -32,69 +32,78 @@
     {
       "fieldname": "criticality_level",
       "fieldtype": "Select",
-      "label": "Criticality Level",
+      "label": "مستوى الحرجية",
+      "description": "مدى تأثير توقف الأصل على العمليات",
       "options": "Low\nMedium\nHigh\nCritical",
       "reqd": 1
     },
     {
       "fieldname": "business_impact",
       "fieldtype": "Select",
-      "label": "Business Impact if Fails",
+      "label": "الأثر على الأعمال",
+      "description": "الأثر المتوقع عند تعطل الأصل",
       "options": "Minimal\nModerate\nSignificant\nSevere"
     },
     {
       "fieldname": "failure_probability",
       "fieldtype": "Select",
-      "label": "Failure Probability",
+      "label": "احتمالية العطل",
+      "description": "احتمالية حدوث عطل في الأصل",
       "options": "Unlikely\nPossible\nLikely\nAlmost Certain"
     },
     {
       "fieldname": "has_backup",
       "fieldtype": "Check",
-      "label": "Has Backup/Standby Asset"
+      "label": "يوجد أصل احتياطي"
     },
     {
       "fieldname": "backup_asset",
       "fieldtype": "Link",
-      "label": "Backup Asset",
+      "label": "الأصل الاحتياطي",
+      "description": "الأصل البديل عند تعطل هذا الأصل",
       "options": "Asset",
       "depends_on": "has_backup"
     },
     {
       "fieldname": "mttr_hours",
       "fieldtype": "Float",
-      "label": "MTTR (Mean Time to Repair) Hours"
+      "label": "متوسط وقت الإصلاح (ساعات)",
+      "description": "MTTR: متوسط الوقت اللازم لإصلاح العطل"
     },
     {
       "fieldname": "mtbf_days",
       "fieldtype": "Float",
-      "label": "MTBF (Mean Time Between Failures) Days"
+      "label": "متوسط وقت بين الأعطال (أيام)",
+      "description": "MTBF: متوسط الوقت بين كل عطلين"
     },
     {
       "fieldname": "critical_spare_parts",
       "fieldtype": "Small Text",
-      "label": "Critical Spare Parts to Keep"
+      "label": "قطع الغيار الحرجة",
+      "description": "قطع الغيار الأساسية التي يجب توفرها دائماً"
     },
     {
       "fieldname": "emergency_vendor",
       "fieldtype": "Link",
-      "label": "Emergency Vendor",
+      "label": "مورد الطوارئ",
+      "description": "المورد الذي يُتصل به في حالات الطوارئ",
       "options": "Supplier"
     },
     {
       "fieldname": "recovery_plan",
       "fieldtype": "Text",
-      "label": "Recovery/Contingency Plan"
+      "label": "خطة الاسترداد",
+      "description": "الخطوات المتبعة عند توقف الأصل"
     },
     {
       "fieldname": "last_reviewed",
       "fieldtype": "Date",
-      "label": "Last Reviewed"
+      "label": "تاريخ آخر مراجعة"
     },
     {
       "fieldname": "reviewed_by",
       "fieldtype": "Link",
-      "label": "Reviewed By",
+      "label": "تمت المراجعة بواسطة",
       "options": "Employee"
     }
   ],

@@ -10,7 +10,7 @@
     {
       "fieldname": "fiscal_year",
       "fieldtype": "Link",
-      "label": "Fiscal Year",
+      "label": "السنة المالية",
       "options": "Fiscal Year",
       "reqd": 1,
       "in_list_view": 1,
@@ -40,7 +40,7 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Draft\nApproved\nClosed",
       "default": "Draft",
       "read_only": 1,
@@ -54,7 +54,8 @@
     {
       "fieldname": "total_capex_budget",
       "fieldtype": "Currency",
-      "label": "Total CapEx Budget",
+      "label": "إجمالي ميزانية رأس المال",
+      "description": "الميزانية الإجمالية المخصصة للإنفاق الرأسمالي",
       "reqd": 1,
       "bold": 1,
       "in_list_view": 1
@@ -62,7 +63,8 @@
     {
       "fieldname": "new_acquisition_budget",
       "fieldtype": "Currency",
-      "label": "New Acquisition Budget"
+      "label": "ميزانية الاقتناء الجديد",
+      "description": "الميزانية المخصصة لشراء أصول جديدة"
     },
     {
       "fieldname": "col2",
@@ -71,12 +73,14 @@
     {
       "fieldname": "replacement_budget",
       "fieldtype": "Currency",
-      "label": "Replacement Budget"
+      "label": "ميزانية الاستبدال",
+      "description": "الميزانية المخصصة لاستبدال الأصول القديمة"
     },
     {
       "fieldname": "upgrade_budget",
       "fieldtype": "Currency",
-      "label": "Upgrade / Refurbishment Budget"
+      "label": "ميزانية الترقية",
+      "description": "الميزانية المخصصة لتطوير وتحديث الأصول"
     },
     {
       "fieldname": "section_items",
@@ -86,7 +90,8 @@
     {
       "fieldname": "items",
       "fieldtype": "Table",
-      "label": "CapEx Items",
+      "label": "بنود الميزانية",
+      "description": "تفاصيل الأصول المخطط اقتناؤها أو استبدالها",
       "options": "Asset CapEx Budget Item"
     },
     {
@@ -98,7 +103,7 @@
     {
       "fieldname": "notes",
       "fieldtype": "Text Editor",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

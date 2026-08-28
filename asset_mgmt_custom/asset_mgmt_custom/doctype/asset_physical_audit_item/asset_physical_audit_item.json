@@ -17,7 +17,7 @@
   {
    "fieldname": "asset",
    "fieldtype": "Link",
-   "label": "Asset",
+   "label": "الأصل",
    "options": "Asset",
    "reqd": 1,
    "in_list_view": 1,
@@ -26,7 +26,7 @@
   {
    "fieldname": "asset_name",
    "fieldtype": "Data",
-   "label": "Asset Name",
+   "label": "اسم الأصل",
    "fetch_from": "asset.asset_name",
    "read_only": 1,
    "in_list_view": 1
@@ -42,7 +42,7 @@
   {
    "fieldname": "expected_location",
    "fieldtype": "Link",
-   "label": "Expected Location",
+   "label": "الموقع المتوقع",
    "options": "Location",
    "fetch_from": "asset.location",
    "read_only": 1
@@ -50,21 +50,21 @@
   {
    "fieldname": "audit_result",
    "fieldtype": "Select",
-   "label": "Result",
+   "label": "الحالة عند الجرد",
    "options": "\nFound\nMissing\nDamaged",
    "in_list_view": 1
   },
   {
    "fieldname": "actual_location",
    "fieldtype": "Link",
-   "label": "Actual Location",
+   "label": "الموقع الفعلي",
    "options": "Location",
    "depends_on": "eval:doc.audit_result != 'Missing'"
   },
   {
    "fieldname": "remarks",
    "fieldtype": "Data",
-   "label": "Remarks",
+   "label": "ملاحظات",
    "in_list_view": 1
   }
  ],

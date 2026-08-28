@@ -10,27 +10,27 @@
     {
       "fieldname": "naming_series",
       "fieldtype": "Select",
-      "label": "Series",
+      "label": "السلسلة",
       "options": "DCERT-.YYYY.-"
     },
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1
     },
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1
     },
     {
       "fieldname": "asset_category",
       "fieldtype": "Link",
-      "label": "Asset Category",
+      "label": "فئة الأصل",
       "options": "Asset Category",
       "fetch_from": "asset.asset_category",
       "read_only": 1
@@ -38,56 +38,59 @@
     {
       "fieldname": "disposal_date",
       "fieldtype": "Date",
-      "label": "Disposal Date",
+      "label": "تاريخ التخلص",
       "reqd": 1
     },
     {
       "fieldname": "disposal_method",
       "fieldtype": "Select",
-      "label": "Disposal Method",
+      "label": "أسلوب التخلص",
       "options": "Sold\nScrapped\nDonated\nTransferred\nDestroyed",
       "reqd": 1
     },
     {
       "fieldname": "disposal_value",
       "fieldtype": "Currency",
-      "label": "Disposal/Salvage Value"
+      "label": "قيمة التخلص/الإنقاذ",
+      "description": "المبلغ المحصَّل أو القيمة التقديرية للأصل عند التخلص"
     },
     {
       "fieldname": "disposed_by",
       "fieldtype": "Link",
-      "label": "Disposed By",
+      "label": "نفَّذه",
       "options": "Employee",
       "reqd": 1
     },
     {
       "fieldname": "authorized_by",
       "fieldtype": "Link",
-      "label": "Authorized By",
+      "label": "مُخوَّل من",
+      "description": "الشخص الذي اعتمد إجراء التخلص",
       "options": "User",
       "reqd": 1
     },
     {
       "fieldname": "buyer_name",
       "fieldtype": "Data",
-      "label": "Buyer/Recipient Name",
+      "label": "اسم المشتري/المستفيد",
       "depends_on": "eval:in_list(['Sold','Donated','Transferred'], doc.disposal_method)"
     },
     {
       "fieldname": "certificate_number",
       "fieldtype": "Data",
-      "label": "Certificate Number",
+      "label": "رقم الشهادة",
+      "description": "يُولَّد تلقائياً عند الإرسال",
       "read_only": 1
     },
     {
       "fieldname": "remarks",
       "fieldtype": "Small Text",
-      "label": "Remarks"
+      "label": "ملاحظات"
     },
     {
       "fieldname": "attachment",
       "fieldtype": "Attach",
-      "label": "Supporting Document"
+      "label": "وثيقة داعمة"
     }
   ],
   "permissions": [

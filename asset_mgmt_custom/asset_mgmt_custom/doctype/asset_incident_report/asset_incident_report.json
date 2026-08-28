@@ -10,14 +10,14 @@
     {
       "fieldname": "naming_series",
       "fieldtype": "Select",
-      "label": "Naming Series",
+      "label": "سلسلة الترقيم",
       "options": "INCIDENT-.YYYY.-",
       "default": "INCIDENT-.YYYY.-"
     },
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1,
       "in_list_view": 1,
@@ -27,7 +27,7 @@
     {
       "fieldname": "branch",
       "fieldtype": "Link",
-      "label": "Branch",
+      "label": "الفرع",
       "options": "Branch",
       "fetch_from": "asset.custom_branch",
       "in_list_view": 1
@@ -39,7 +39,7 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Open\nUnder Investigation\nResolved\nClosed",
       "default": "Open",
       "read_only": 1,
@@ -49,28 +49,29 @@
     {
       "fieldname": "severity",
       "fieldtype": "Select",
-      "label": "Severity",
+      "label": "درجة الخطورة",
       "options": "\nLow\nMedium\nHigh\nCritical",
       "reqd": 1,
       "in_list_view": 1,
-      "bold": 1
+      "bold": 1,
+      "description": "مستوى خطورة الحادث: منخفض، متوسط، عالٍ، حرج"
     },
     {
       "fieldname": "sec_break_incident",
       "fieldtype": "Section Break",
-      "label": "Incident Details"
+      "label": "تفاصيل الحادث"
     },
     {
       "fieldname": "incident_date",
       "fieldtype": "Datetime",
-      "label": "Incident Date & Time",
+      "label": "تاريخ الحادث ووقته",
       "reqd": 1,
       "in_list_view": 1
     },
     {
       "fieldname": "incident_type",
       "fieldtype": "Select",
-      "label": "Incident Type",
+      "label": "نوع الحادث",
       "options": "\nAccident\nDamage\nTheft\nFire\nEquipment Failure\nNear Miss\nOther",
       "reqd": 1,
       "in_list_view": 1
@@ -82,39 +83,41 @@
     {
       "fieldname": "reported_by",
       "fieldtype": "Data",
-      "label": "Reported By",
-      "reqd": 1
+      "label": "المُبلِّغ",
+      "reqd": 1,
+      "description": "الشخص الذي أبلغ عن الحادث"
     },
     {
       "fieldname": "injury_involved",
       "fieldtype": "Check",
-      "label": "Injury Involved"
+      "label": "إصابة بشرية"
     },
     {
       "fieldname": "estimated_damage_cost",
       "fieldtype": "Currency",
-      "label": "Estimated Damage Cost"
+      "label": "تكلفة الضرر المقدرة"
     },
     {
       "fieldname": "sec_break_desc",
       "fieldtype": "Section Break",
-      "label": "Description"
+      "label": "وصف الحادث"
     },
     {
       "fieldname": "incident_description",
       "fieldtype": "Text Editor",
-      "label": "Incident Description",
-      "reqd": 1
+      "label": "وصف الحادث",
+      "reqd": 1,
+      "description": "وصف تفصيلي لما حدث وكيف وقع"
     },
     {
       "fieldname": "sec_break_photos",
       "fieldtype": "Section Break",
-      "label": "Photos"
+      "label": "الصور"
     },
     {
       "fieldname": "photo_1",
       "fieldtype": "Attach Image",
-      "label": "Photo 1"
+      "label": "صورة 1"
     },
     {
       "fieldname": "col_break_photos",
@@ -123,17 +126,18 @@
     {
       "fieldname": "photo_2",
       "fieldtype": "Attach Image",
-      "label": "Photo 2"
+      "label": "صورة 2"
     },
     {
       "fieldname": "sec_break_resolution",
       "fieldtype": "Section Break",
-      "label": "Resolution"
+      "label": "الحل والتصحيح"
     },
     {
       "fieldname": "action_taken",
       "fieldtype": "Text Editor",
-      "label": "Action Taken"
+      "label": "الإجراء الفوري",
+      "description": "الخطوات التي اتُّخذت فوراً بعد الحادث"
     },
     {
       "fieldname": "col_break_res",
@@ -142,12 +146,12 @@
     {
       "fieldname": "resolved_date",
       "fieldtype": "Date",
-      "label": "Resolved Date"
+      "label": "تاريخ الحل"
     },
     {
       "fieldname": "resolved_by",
       "fieldtype": "Data",
-      "label": "Resolved By"
+      "label": "حُلَّ بواسطة"
     }
   ],
   "permissions": [

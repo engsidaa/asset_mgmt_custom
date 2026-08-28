@@ -7,23 +7,25 @@
     {
       "fieldname": "check_item",
       "fieldtype": "Data",
-      "label": "Check Item",
+      "label": "بند الفحص",
       "reqd": 1,
       "in_list_view": 1,
-      "bold": 1
+      "bold": 1,
+      "description": "اسم أو وصف البند المراد فحصه"
     },
     {
       "fieldname": "result",
       "fieldtype": "Select",
-      "label": "Result",
+      "label": "النتيجة",
       "options": "\nPass\nFail\nN/A",
       "reqd": 1,
-      "in_list_view": 1
+      "in_list_view": 1,
+      "description": "نتيجة الفحص: ناجح / فاشل / غير منطبق"
     },
     {
       "fieldname": "remarks",
       "fieldtype": "Data",
-      "label": "Remarks",
+      "label": "ملاحظات",
       "in_list_view": 1
     }
   ],

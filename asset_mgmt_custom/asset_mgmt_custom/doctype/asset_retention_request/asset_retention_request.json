@@ -9,14 +9,14 @@
     {
       "fieldname": "naming_series",
       "fieldtype": "Select",
-      "label": "Series",
+      "label": "السلسلة",
       "options": "ARR-.YYYY.-",
       "reqd": 1
     },
     {
       "fieldname": "employee",
       "fieldtype": "Link",
-      "label": "Employee",
+      "label": "الموظف",
       "options": "Employee",
       "reqd": 1,
       "in_list_view": 1
@@ -24,7 +24,7 @@
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1,
       "in_list_view": 1
@@ -32,7 +32,7 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Draft\nPending Approval\nApproved\nRejected",
       "default": "Draft",
       "read_only": 1,
@@ -46,46 +46,47 @@
     {
       "fieldname": "travel_start",
       "fieldtype": "Date",
-      "label": "Travel Start Date",
+      "label": "تاريخ بداية السفر",
       "reqd": 1
     },
     {
       "fieldname": "travel_end",
       "fieldtype": "Date",
-      "label": "Travel End Date",
+      "label": "تاريخ نهاية السفر",
       "reqd": 1
     },
     {
       "fieldname": "destination",
       "fieldtype": "Data",
-      "label": "Destination"
+      "label": "الوجهة"
     },
     {
       "fieldname": "section_justification",
       "fieldtype": "Section Break",
-      "label": "Justification"
+      "label": "المبرر"
     },
     {
       "fieldname": "justification",
       "fieldtype": "Text",
-      "label": "Justification",
+      "label": "سبب الاحتفاظ",
+      "description": "مبرر الاحتفاظ بالأصل بعد انتهاء صلاحيته",
       "reqd": 1
     },
     {
       "fieldname": "section_rejection",
       "fieldtype": "Section Break",
-      "label": "Rejection"
+      "label": "الرفض"
     },
     {
       "fieldname": "rejection_reason",
       "fieldtype": "Small Text",
-      "label": "Rejection Reason",
+      "label": "سبب الرفض",
       "read_only": 1
     },
     {
       "fieldname": "amended_from",
       "fieldtype": "Link",
-      "label": "Amended From",
+      "label": "معدَّل من",
       "options": "Asset Retention Request",
       "read_only": 1,
       "print_hide": 1

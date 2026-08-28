@@ -9,14 +9,15 @@
     {
       "fieldname": "naming_series",
       "fieldtype": "Select",
-      "label": "Series",
+      "label": "السلسلة",
       "options": "AR-.YYYY.-",
       "reqd": 1
     },
     {
       "fieldname": "employee",
       "fieldtype": "Link",
-      "label": "Employee",
+      "label": "طالب الأصل",
+      "description": "الموظف أو القسم الذي يطلب الأصل",
       "options": "Employee",
       "reqd": 1,
       "in_list_view": 1
@@ -24,31 +25,32 @@
     {
       "fieldname": "department",
       "fieldtype": "Link",
-      "label": "Department",
+      "label": "القسم",
       "options": "Department"
     },
     {
       "fieldname": "branch",
       "fieldtype": "Link",
-      "label": "Branch",
+      "label": "الفرع",
       "options": "Branch"
     },
     {
       "fieldname": "request_date",
       "fieldtype": "Date",
-      "label": "Request Date",
+      "label": "تاريخ الطلب",
       "reqd": 1,
       "default": "Today"
     },
     {
       "fieldname": "required_by",
       "fieldtype": "Date",
-      "label": "Required By"
+      "label": "التاريخ المطلوب",
+      "description": "التاريخ الذي يُحتاج فيه إلى الأصل"
     },
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Draft\nPending Approval\nApproved\nRejected\nFulfilled",
       "default": "Draft",
       "read_only": 1,
@@ -62,70 +64,72 @@
     {
       "fieldname": "asset_category",
       "fieldtype": "Link",
-      "label": "Asset Category",
+      "label": "فئة الأصل المطلوبة",
+      "description": "فئة الأصل الذي يتم طلبه",
       "options": "Asset Category",
       "reqd": 1
     },
     {
       "fieldname": "item_code",
       "fieldtype": "Link",
-      "label": "Item",
+      "label": "الصنف",
       "options": "Item"
     },
     {
       "fieldname": "quantity",
       "fieldtype": "Int",
-      "label": "Quantity",
+      "label": "الكمية",
       "default": "1"
     },
     {
       "fieldname": "section_details",
       "fieldtype": "Section Break",
-      "label": "Details"
+      "label": "التفاصيل"
     },
     {
       "fieldname": "description",
       "fieldtype": "Text",
-      "label": "Description"
+      "label": "الوصف"
     },
     {
       "fieldname": "justification",
       "fieldtype": "Text",
-      "label": "Justification (المبرر)"
+      "label": "المبرر",
+      "description": "سبب الحاجة إلى هذا الأصل"
     },
     {
       "fieldname": "section_spare",
       "fieldtype": "Section Break",
-      "label": "Spare Asset"
+      "label": "أصل احتياطي"
     },
     {
       "fieldname": "spare_available",
       "fieldtype": "Check",
-      "label": "Spare Asset Available",
+      "label": "أصل احتياطي متاح",
       "read_only": 1
     },
     {
       "fieldname": "spare_asset",
       "fieldtype": "Link",
-      "label": "Spare Asset",
+      "label": "الأصل الاحتياطي",
       "options": "Asset",
       "read_only": 1
     },
     {
       "fieldname": "section_rejection",
       "fieldtype": "Section Break",
-      "label": "Rejection"
+      "label": "الرفض"
     },
     {
       "fieldname": "rejection_reason",
       "fieldtype": "Small Text",
-      "label": "Rejection Reason",
+      "label": "سبب الرفض",
       "read_only": 1
     },
     {
       "fieldname": "amended_from",
       "fieldtype": "Link",
-      "label": "Amended From",
+      "label": "معدَّل من",
       "options": "Asset Requisition",
       "read_only": 1,
       "print_hide": 1

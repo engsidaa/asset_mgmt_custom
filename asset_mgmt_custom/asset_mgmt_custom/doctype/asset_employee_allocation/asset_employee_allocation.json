@@ -18,7 +18,7 @@
       "fieldname": "asset",
       "fieldtype": "Link",
       "options": "Asset",
-      "label": "Asset",
+      "label": "الأصل",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1,
@@ -27,7 +27,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -39,7 +39,7 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Active\nReturned\nOverdue",
       "default": "Active",
       "read_only": 1,
@@ -62,7 +62,8 @@
       "fieldname": "employee",
       "fieldtype": "Link",
       "options": "Employee",
-      "label": "Employee",
+      "label": "الموظف",
+      "description": "الموظف الذي سيُخصَّص له الأصل",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1
@@ -83,14 +84,15 @@
       "fieldname": "department",
       "fieldtype": "Link",
       "options": "Department",
-      "label": "Department",
+      "label": "القسم",
       "fetch_from": "employee.department",
       "read_only": 1
     },
     {
       "fieldname": "allocation_date",
       "fieldtype": "Date",
-      "label": "Allocation Date",
+      "label": "تاريخ التخصيص",
+      "description": "تاريخ بدء مسؤولية الموظف عن الأصل",
       "reqd": 1
     },
     {
@@ -101,7 +103,8 @@
     {
       "fieldname": "expected_return_date",
       "fieldtype": "Date",
-      "label": "Expected Return Date",
+      "label": "تاريخ الإعادة المتوقع",
+      "description": "التاريخ المتوقع لإعادة الأصل",
       "in_list_view": 1
     },
     {
@@ -116,13 +119,13 @@
     {
       "fieldname": "return_date",
       "fieldtype": "Date",
-      "label": "Return Date",
+      "label": "تاريخ الإعادة الفعلي",
       "read_only": 1
     },
     {
       "fieldname": "condition_on_return",
       "fieldtype": "Select",
-      "label": "Condition on Return",
+      "label": "الحالة عند الإعادة",
       "options": "\nGood\nDamaged\nLost"
     },
     {
@@ -139,7 +142,8 @@
     {
       "fieldname": "signature_attachment",
       "fieldtype": "Attach Image",
-      "label": "Employee Signature / Acknowledgement"
+      "label": "توقيع الاستلام",
+      "description": "صورة توقيع الموظف كإقرار باستلام الأصل"
     }
   ],
   "permissions": [

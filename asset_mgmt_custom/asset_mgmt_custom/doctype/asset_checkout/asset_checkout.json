@@ -10,14 +10,14 @@
     {
       "fieldname": "naming_series",
       "fieldtype": "Select",
-      "label": "Naming Series",
+      "label": "سلسلة الترقيم",
       "options": "CHKOUT-.YYYY.-",
       "default": "CHKOUT-.YYYY.-"
     },
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1,
       "in_list_view": 1,
@@ -27,7 +27,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -39,7 +39,7 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Checked Out\nReturned\nOverdue",
       "default": "Checked Out",
       "read_only": 1,
@@ -49,27 +49,28 @@
     {
       "fieldname": "branch",
       "fieldtype": "Link",
-      "label": "Branch",
+      "label": "الفرع",
       "options": "Branch",
       "fetch_from": "asset.custom_branch"
     },
     {
       "fieldname": "sec_break_checkout",
       "fieldtype": "Section Break",
-      "label": "Checkout Details"
+      "label": "تفاصيل الاستعارة"
     },
     {
       "fieldname": "checked_out_by",
       "fieldtype": "Link",
-      "label": "Checked Out By",
+      "label": "مُستعار من قِبل",
       "options": "Employee",
       "reqd": 1,
-      "in_list_view": 1
+      "in_list_view": 1,
+      "description": "الشخص أو الجهة التي استعارت الأصل"
     },
     {
       "fieldname": "checkout_datetime",
       "fieldtype": "Datetime",
-      "label": "Checkout Date & Time",
+      "label": "تاريخ الاستعارة ووقتها",
       "reqd": 1
     },
     {
@@ -79,29 +80,29 @@
     {
       "fieldname": "expected_return",
       "fieldtype": "Datetime",
-      "label": "Expected Return",
+      "label": "تاريخ الإعادة المتوقع",
       "reqd": 1
     },
     {
       "fieldname": "purpose",
       "fieldtype": "Text",
-      "label": "Purpose"
+      "label": "غرض الاستعارة"
     },
     {
       "fieldname": "sec_break_return",
       "fieldtype": "Section Break",
-      "label": "Return Details"
+      "label": "تفاصيل الإعادة"
     },
     {
       "fieldname": "actual_return_datetime",
       "fieldtype": "Datetime",
-      "label": "Actual Return Date & Time",
+      "label": "تاريخ الإعادة الفعلي",
       "read_only": 1
     },
     {
       "fieldname": "condition_on_return",
       "fieldtype": "Select",
-      "label": "Condition on Return",
+      "label": "الحالة عند الإعادة",
       "options": "\nGood\nDamaged\nLost"
     },
     {
@@ -111,7 +112,7 @@
     {
       "fieldname": "return_notes",
       "fieldtype": "Text",
-      "label": "Return Notes"
+      "label": "ملاحظات الإعادة"
     }
   ],
   "permissions": [

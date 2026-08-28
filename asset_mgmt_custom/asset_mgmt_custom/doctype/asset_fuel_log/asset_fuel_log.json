@@ -11,7 +11,7 @@
       "fieldname": "asset",
       "fieldtype": "Link",
       "options": "Asset",
-      "label": "Asset",
+      "label": "الأصل",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1,
@@ -20,7 +20,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -33,14 +33,14 @@
       "fieldname": "branch",
       "fieldtype": "Link",
       "options": "Branch",
-      "label": "Branch",
+      "label": "الفرع",
       "fetch_from": "asset.custom_branch",
       "in_list_view": 1
     },
     {
       "fieldname": "log_date",
       "fieldtype": "Date",
-      "label": "Log Date",
+      "label": "تاريخ السجل",
       "reqd": 1,
       "in_list_view": 1,
       "bold": 1
@@ -58,12 +58,14 @@
     {
       "fieldname": "opening_meter",
       "fieldtype": "Float",
-      "label": "Opening Meter (km/hrs)"
+      "label": "قراءة العداد - البداية",
+      "description": "قراءة عداد المسافة في بداية الرحلة/الفترة"
     },
     {
       "fieldname": "closing_meter",
       "fieldtype": "Float",
-      "label": "Closing Meter (km/hrs)"
+      "label": "قراءة العداد - النهاية",
+      "description": "قراءة عداد المسافة في نهاية الرحلة/الفترة"
     },
     {
       "fieldname": "col_break_2",
@@ -72,13 +74,14 @@
     {
       "fieldname": "km_driven",
       "fieldtype": "Float",
-      "label": "Distance / Hours",
+      "label": "المسافة المقطوعة (كم)",
+      "description": "يُحسب تلقائياً: الفرق بين القراءتين",
       "read_only": 1
     },
     {
       "fieldname": "fuel_type",
       "fieldtype": "Select",
-      "label": "Fuel Type",
+      "label": "نوع الوقود",
       "options": "\nDiesel\nPetrol\nNatural Gas\nElectric",
       "reqd": 1
     },
@@ -90,13 +93,14 @@
     {
       "fieldname": "liters_filled",
       "fieldtype": "Float",
-      "label": "Liters Filled",
+      "label": "كمية الوقود (لتر)",
+      "description": "كمية الوقود التي تم تعبئتها",
       "reqd": 1
     },
     {
       "fieldname": "unit_cost",
       "fieldtype": "Currency",
-      "label": "Cost per Liter"
+      "label": "تكلفة اللتر"
     },
     {
       "fieldname": "col_break_3",
@@ -105,7 +109,8 @@
     {
       "fieldname": "total_cost",
       "fieldtype": "Currency",
-      "label": "Total Cost",
+      "label": "التكلفة الإجمالية",
+      "description": "يُحسب تلقائياً: الكمية × السعر",
       "read_only": 1
     },
     {
@@ -121,7 +126,7 @@
     {
       "fieldname": "notes",
       "fieldtype": "Text",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

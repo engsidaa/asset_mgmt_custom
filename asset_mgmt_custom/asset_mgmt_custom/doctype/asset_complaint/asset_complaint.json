@@ -18,7 +18,7 @@
       "fieldname": "asset",
       "fieldtype": "Link",
       "options": "Asset",
-      "label": "Asset",
+      "label": "الأصل",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1,
@@ -27,7 +27,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -39,7 +39,8 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
+      "description": "مفتوحة / قيد المعالجة / محلولة / مغلقة",
       "options": "Open\nIn Progress\nResolved\nClosed",
       "default": "Open",
       "in_list_view": 1,
@@ -61,7 +62,7 @@
     {
       "fieldname": "complaint_date",
       "fieldtype": "Date",
-      "label": "Complaint Date",
+      "label": "تاريخ الشكوى",
       "reqd": 1,
       "in_list_view": 1,
       "bold": 1
@@ -69,7 +70,8 @@
     {
       "fieldname": "reported_by",
       "fieldtype": "Data",
-      "label": "Reported By",
+      "label": "مقدِّم الشكوى",
+      "description": "الشخص أو الجهة التي قدمت الشكوى",
       "reqd": 1
     },
     {
@@ -87,7 +89,8 @@
     {
       "fieldname": "priority",
       "fieldtype": "Select",
-      "label": "Priority",
+      "label": "الأولوية",
+      "description": "درجة أهمية الشكوى: منخفضة، متوسطة، عالية، عاجلة",
       "options": "Low\nMedium\nHigh\nUrgent",
       "default": "Medium",
       "in_list_view": 1,
@@ -101,7 +104,8 @@
     {
       "fieldname": "description",
       "fieldtype": "Text Editor",
-      "label": "Description",
+      "label": "وصف الشكوى",
+      "description": "تفصيل المشكلة أو التقصير الذي تم إبلاغه",
       "reqd": 1
     },
     {
@@ -117,7 +121,7 @@
     {
       "fieldname": "resolution_date",
       "fieldtype": "Date",
-      "label": "Resolution Date"
+      "label": "تاريخ الحل"
     },
     {
       "fieldname": "col_break_3",
@@ -126,7 +130,8 @@
     {
       "fieldname": "resolution_notes",
       "fieldtype": "Text Editor",
-      "label": "Resolution Notes"
+      "label": "الحل المقدم",
+      "description": "الخطوات التي اتُّخذت لحل الشكوى"
     }
   ],
   "permissions": [

@@ -17,7 +17,7 @@
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1,
       "in_list_view": 1,
@@ -27,7 +27,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -39,7 +39,7 @@
     {
       "fieldname": "renewal_status",
       "fieldtype": "Select",
-      "label": "Renewal Status",
+      "label": "حالة التجديد",
       "options": "Draft\nPending\nRenewed\nCancelled",
       "default": "Draft",
       "read_only": 1,
@@ -85,12 +85,13 @@
     {
       "fieldname": "new_insurer",
       "fieldtype": "Data",
-      "label": "New Insurer"
+      "label": "شركة التأمين الجديدة",
+      "description": "اسم شركة التأمين التي سيُجدَّد معها العقد"
     },
     {
       "fieldname": "new_policy_number",
       "fieldtype": "Data",
-      "label": "New Policy Number"
+      "label": "رقم وثيقة التأمين الجديدة"
     },
     {
       "fieldname": "new_premium",
@@ -104,12 +105,12 @@
     {
       "fieldname": "new_start_date",
       "fieldtype": "Date",
-      "label": "New Start Date"
+      "label": "تاريخ بدء التأمين الجديد"
     },
     {
       "fieldname": "new_end_date",
       "fieldtype": "Date",
-      "label": "New End Date",
+      "label": "تاريخ انتهاء التأمين الجديد",
       "in_list_view": 1
     },
     {

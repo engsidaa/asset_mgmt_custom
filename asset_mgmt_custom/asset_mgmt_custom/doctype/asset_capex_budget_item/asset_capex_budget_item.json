@@ -9,7 +9,7 @@
     {
       "fieldname": "asset_category",
       "fieldtype": "Link",
-      "label": "Asset Category",
+      "label": "فئة الأصل",
       "options": "Asset Category",
       "reqd": 1,
       "in_list_view": 1
@@ -17,7 +17,7 @@
     {
       "fieldname": "description",
       "fieldtype": "Data",
-      "label": "Description",
+      "label": "اسم/وصف الأصل",
       "in_list_view": 1
     },
     {
@@ -30,20 +30,20 @@
     {
       "fieldname": "quantity",
       "fieldtype": "Int",
-      "label": "Qty",
+      "label": "الكمية",
       "default": "1",
       "in_list_view": 1
     },
     {
       "fieldname": "unit_cost",
       "fieldtype": "Currency",
-      "label": "Unit Cost",
+      "label": "تكلفة الوحدة",
       "in_list_view": 1
     },
     {
       "fieldname": "total_cost",
       "fieldtype": "Currency",
-      "label": "Total Cost",
+      "label": "التكلفة الإجمالية",
       "read_only": 1,
       "in_list_view": 1
     },

@@ -4,9 +4,9 @@
   "module": "Asset Mgmt Custom",
   "istable": 1,
   "fields": [
-    {"fieldname": "asset", "fieldtype": "Link", "label": "Asset", "options": "Asset", "reqd": 1, "in_list_view": 1, "bold": 1},
-    {"fieldname": "asset_name", "fieldtype": "Data", "label": "Asset Name", "fetch_from": "asset.asset_name", "read_only": 1, "in_list_view": 1},
-    {"fieldname": "asset_category", "fieldtype": "Link", "label": "Asset Category", "options": "Asset Category", "fetch_from": "asset.asset_category", "read_only": 1, "in_list_view": 1}
+    {"fieldname": "asset", "fieldtype": "Link", "label": "الأصل", "options": "Asset", "reqd": 1, "in_list_view": 1, "bold": 1},
+    {"fieldname": "asset_name", "fieldtype": "Data", "label": "اسم الأصل", "fetch_from": "asset.asset_name", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "asset_category", "fieldtype": "Link", "label": "فئة الأصل", "options": "Asset Category", "fetch_from": "asset.asset_category", "read_only": 1, "in_list_view": 1}
   ],
   "permissions": []
 }

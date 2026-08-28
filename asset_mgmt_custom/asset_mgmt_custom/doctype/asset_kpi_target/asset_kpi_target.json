@@ -9,57 +9,62 @@
     {
       "fieldname": "asset_category",
       "fieldtype": "Link",
-      "label": "Asset Category",
+      "label": "فئة الأصل",
+      "description": "تُطبَّق هذه الأهداف على جميع أصول هذه الفئة",
       "options": "Asset Category",
       "reqd": 1
     },
     {
       "fieldname": "fiscal_year",
       "fieldtype": "Link",
-      "label": "Fiscal Year",
+      "label": "السنة المالية",
       "options": "Fiscal Year",
       "reqd": 1
     },
     {
       "fieldname": "target_utilization_pct",
       "fieldtype": "Float",
-      "label": "Target Utilization % (Min)"
+      "label": "الحد الأدنى لنسبة الاستخدام %",
+      "description": "أقل نسبة استخدام مقبولة لهذه الفئة"
     },
     {
       "fieldname": "max_downtime_hours_monthly",
       "fieldtype": "Float",
-      "label": "Max Downtime Hours/Month"
+      "label": "أقصى ساعات عطل شهرياً",
+      "description": "الحد الأقصى المسموح به من ساعات العطل في الشهر"
     },
     {
       "fieldname": "max_maintenance_cost_monthly",
       "fieldtype": "Currency",
-      "label": "Max Maintenance Cost/Month"
+      "label": "أقصى تكلفة صيانة شهرياً",
+      "description": "الحد الأقصى للإنفاق على الصيانة في الشهر"
     },
     {
       "fieldname": "min_condition_score",
       "fieldtype": "Select",
-      "label": "Minimum Condition Level",
+      "label": "الحد الأدنى لمستوى الحالة",
+      "description": "أقل مستوى مقبول لحالة الأصل",
       "options": "Excellent\nGood\nFair"
     },
     {
       "fieldname": "target_mtbf_days",
       "fieldtype": "Float",
-      "label": "Target MTBF (Days)"
+      "label": "هدف متوسط الوقت بين الأعطال (أيام)"
     },
     {
       "fieldname": "target_mttr_hours",
       "fieldtype": "Float",
-      "label": "Target MTTR (Hours)"
+      "label": "هدف متوسط وقت الإصلاح (ساعات)"
     },
     {
       "fieldname": "max_incidents_monthly",
       "fieldtype": "Int",
-      "label": "Max Incidents/Month"
+      "label": "أقصى عدد حوادث شهرياً"
     },
     {
       "fieldname": "notes",
       "fieldtype": "Small Text",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

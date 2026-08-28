@@ -10,7 +10,7 @@
     {
       "fieldname": "naming_series",
       "fieldtype": "Select",
-      "label": "Series",
+      "label": "السلسلة",
       "options": "MNTLOG-.YYYY.-",
       "default": "MNTLOG-.YYYY.-"
     },
@@ -18,7 +18,7 @@
       "fieldname": "asset",
       "fieldtype": "Link",
       "options": "Asset",
-      "label": "Asset",
+      "label": "الأصل",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1,
@@ -27,7 +27,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -40,14 +40,14 @@
       "fieldname": "branch",
       "fieldtype": "Link",
       "options": "Branch",
-      "label": "Branch",
+      "label": "الفرع",
       "fetch_from": "asset.custom_branch",
       "in_list_view": 1
     },
     {
       "fieldname": "maintenance_date",
       "fieldtype": "Date",
-      "label": "Maintenance Date",
+      "label": "تاريخ الصيانة",
       "reqd": 1,
       "in_list_view": 1,
       "bold": 1
@@ -55,12 +55,13 @@
     {
       "fieldname": "sec_break_maint",
       "fieldtype": "Section Break",
-      "label": "Maintenance Details"
+      "label": "تفاصيل الصيانة"
     },
     {
       "fieldname": "maintenance_type",
       "fieldtype": "Select",
-      "label": "Maintenance Type",
+      "label": "نوع الصيانة",
+      "description": "وقائية، تصحيحية، طارئة...",
       "options": "\nPreventive\nCorrective\nEmergency\nPredictive\nOverhaul",
       "reqd": 1,
       "in_list_view": 1
@@ -68,7 +69,8 @@
     {
       "fieldname": "performed_by",
       "fieldtype": "Data",
-      "label": "Performed By (Company)",
+      "label": "نفَّذ الصيانة",
+      "description": "الفني أو الشركة التي أجرت الصيانة",
       "reqd": 1
     },
     {
@@ -78,32 +80,33 @@
     {
       "fieldname": "technician_name",
       "fieldtype": "Data",
-      "label": "Technician Name"
+      "label": "اسم الفني"
     },
     {
       "fieldname": "duration_hours",
       "fieldtype": "Float",
-      "label": "Duration (Hours)"
+      "label": "المدة (ساعات)"
     },
     {
       "fieldname": "maintenance_cost",
       "fieldtype": "Currency",
-      "label": "Cost"
+      "label": "التكلفة"
     },
     {
       "fieldname": "sec_break_work",
       "fieldtype": "Section Break",
-      "label": "Work Details"
+      "label": "تفاصيل العمل"
     },
     {
       "fieldname": "findings",
       "fieldtype": "Text Editor",
-      "label": "Findings / Problem Description"
+      "label": "النتائج / وصف المشكلة"
     },
     {
       "fieldname": "work_done",
       "fieldtype": "Text Editor",
-      "label": "Work Done"
+      "label": "وصف العمل المنجز",
+      "description": "تفاصيل أعمال الصيانة التي تمت"
     },
     {
       "fieldname": "col_break_3",
@@ -112,22 +115,22 @@
     {
       "fieldname": "spare_parts_used",
       "fieldtype": "Text",
-      "label": "Spare Parts Used"
+      "label": "قطع الغيار المستخدمة"
     },
     {
       "fieldname": "next_maintenance_date",
       "fieldtype": "Date",
-      "label": "Next Scheduled Maintenance"
+      "label": "تاريخ الصيانة القادمة"
     },
     {
       "fieldname": "sec_break_notes",
       "fieldtype": "Section Break",
-      "label": "Notes"
+      "label": "ملاحظات"
     },
     {
       "fieldname": "notes",
       "fieldtype": "Text",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

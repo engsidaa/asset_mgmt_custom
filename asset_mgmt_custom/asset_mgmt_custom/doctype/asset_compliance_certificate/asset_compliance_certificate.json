@@ -10,7 +10,7 @@
     {
       "fieldname": "certificate_number",
       "fieldtype": "Data",
-      "label": "Certificate Number",
+      "label": "رقم الشهادة",
       "reqd": 1,
       "in_list_view": 1,
       "bold": 1,
@@ -19,7 +19,7 @@
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1,
       "in_list_view": 1,
@@ -28,7 +28,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1
     },
@@ -39,7 +39,8 @@
     {
       "fieldname": "certificate_type",
       "fieldtype": "Select",
-      "label": "Certificate Type",
+      "label": "نوع الشهادة",
+      "description": "نوع شهادة الامتثال أو الترخيص",
       "options": "\nFire Safety\nElectrical Safety\nPressure Vessel\nLift/Elevator\nFood Safety\nHealth & Safety\nEnvironmental\nOther",
       "reqd": 1,
       "in_list_view": 1,
@@ -48,7 +49,8 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
+      "description": "سارية / منتهية / معلقة",
       "options": "Active\nExpired\nPending Renewal\nCancelled",
       "default": "Active",
       "in_list_view": 1,
@@ -57,18 +59,18 @@
     {
       "fieldname": "section_dates",
       "fieldtype": "Section Break",
-      "label": "Certificate Details"
+      "label": "تفاصيل الشهادة"
     },
     {
       "fieldname": "issuing_authority",
       "fieldtype": "Data",
-      "label": "Issuing Authority",
+      "label": "جهة الإصدار",
       "reqd": 1
     },
     {
       "fieldname": "issue_date",
       "fieldtype": "Date",
-      "label": "Issue Date",
+      "label": "تاريخ الإصدار",
       "reqd": 1
     },
     {
@@ -78,7 +80,8 @@
     {
       "fieldname": "expiry_date",
       "fieldtype": "Date",
-      "label": "Expiry Date",
+      "label": "تاريخ الانتهاء",
+      "description": "تاريخ انتهاء صلاحية الشهادة",
       "reqd": 1,
       "in_list_view": 1,
       "bold": 1
@@ -86,19 +89,19 @@
     {
       "fieldname": "renewal_reminder_days",
       "fieldtype": "Int",
-      "label": "Remind Before Expiry (Days)",
+      "label": "التذكير قبل الانتهاء (أيام)",
       "default": "30",
-      "description": "Send alert this many days before expiry date"
+      "description": "إرسال تنبيه قبل تاريخ الانتهاء بهذا العدد من الأيام"
     },
     {
       "fieldname": "section_branch",
       "fieldtype": "Section Break",
-      "label": "Branch & Company"
+      "label": "الفرع والشركة"
     },
     {
       "fieldname": "branch",
       "fieldtype": "Link",
-      "label": "Branch",
+      "label": "الفرع",
       "options": "Branch",
       "in_list_view": 1,
       "search_index": 1
@@ -106,25 +109,25 @@
     {
       "fieldname": "company",
       "fieldtype": "Link",
-      "label": "Company",
+      "label": "الشركة",
       "options": "Company",
       "reqd": 1
     },
     {
       "fieldname": "section_docs",
       "fieldtype": "Section Break",
-      "label": "Documentation",
+      "label": "الوثائق",
       "collapsible": 1
     },
     {
       "fieldname": "certificate_document",
       "fieldtype": "Attach",
-      "label": "Certificate Document (PDF)"
+      "label": "وثيقة الشهادة (PDF)"
     },
     {
       "fieldname": "notes",
       "fieldtype": "Text Editor",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

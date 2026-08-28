@@ -10,7 +10,7 @@
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1,
       "in_list_view": 1,
@@ -20,7 +20,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -32,7 +32,7 @@
     {
       "fieldname": "branch",
       "fieldtype": "Link",
-      "label": "Branch",
+      "label": "الفرع",
       "options": "Branch",
       "fetch_from": "asset.custom_branch",
       "in_list_view": 1
@@ -40,20 +40,21 @@
     {
       "fieldname": "inspection_type",
       "fieldtype": "Select",
-      "label": "Inspection Type",
+      "label": "نوع التفتيش",
       "options": "Fire Safety\nElectrical Safety\nStructural Safety\nHygiene & Sanitation\nGeneral Safety\nOther",
       "reqd": 1,
-      "in_list_view": 1
+      "in_list_view": 1,
+      "description": "نوع فحص السلامة المُجرى"
     },
     {
       "fieldname": "sec_break_1",
       "fieldtype": "Section Break",
-      "label": "Inspection Details"
+      "label": "بيانات التفتيش"
     },
     {
       "fieldname": "inspection_date",
       "fieldtype": "Date",
-      "label": "Inspection Date",
+      "label": "تاريخ التفتيش",
       "reqd": 1,
       "in_list_view": 1,
       "bold": 1
@@ -61,8 +62,9 @@
     {
       "fieldname": "inspector",
       "fieldtype": "Data",
-      "label": "Inspector",
-      "reqd": 1
+      "label": "المفتش",
+      "reqd": 1,
+      "description": "الموظف المسؤول عن إجراء فحص السلامة"
     },
     {
       "fieldname": "col_break_2",
@@ -71,37 +73,39 @@
     {
       "fieldname": "overall_result",
       "fieldtype": "Select",
-      "label": "Overall Result",
+      "label": "النتيجة الإجمالية",
       "options": "\nPass\nFail\nNeeds Action",
       "reqd": 1,
       "in_list_view": 1,
-      "bold": 1
+      "bold": 1,
+      "description": "الحكم النهائي على سلامة الأصل"
     },
     {
       "fieldname": "next_inspection_date",
       "fieldtype": "Date",
-      "label": "Next Inspection Date"
+      "label": "تاريخ الفحص القادم"
     },
     {
       "fieldname": "sec_break_items",
       "fieldtype": "Section Break",
-      "label": "Checklist Items"
+      "label": "نتيجة الفحص"
     },
     {
       "fieldname": "items",
       "fieldtype": "Table",
-      "label": "Checklist Items",
-      "options": "Asset Safety Inspection Item"
+      "label": "بنود الفحص",
+      "options": "Asset Safety Inspection Item",
+      "description": "قائمة تفصيلية بكل بند من بنود فحص السلامة"
     },
     {
       "fieldname": "sec_break_notes",
       "fieldtype": "Section Break",
-      "label": "Notes"
+      "label": "ملاحظات"
     },
     {
       "fieldname": "notes",
       "fieldtype": "Text Editor",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

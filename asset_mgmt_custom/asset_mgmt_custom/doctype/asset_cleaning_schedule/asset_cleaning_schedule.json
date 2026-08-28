@@ -10,7 +10,7 @@
     {
       "fieldname": "asset",
       "fieldtype": "Link",
-      "label": "Asset",
+      "label": "الأصل",
       "options": "Asset",
       "reqd": 1,
       "in_list_view": 1,
@@ -20,7 +20,7 @@
     {
       "fieldname": "asset_name",
       "fieldtype": "Data",
-      "label": "Asset Name",
+      "label": "اسم الأصل",
       "fetch_from": "asset.asset_name",
       "read_only": 1,
       "in_list_view": 1
@@ -32,7 +32,7 @@
     {
       "fieldname": "branch",
       "fieldtype": "Link",
-      "label": "Branch",
+      "label": "الفرع",
       "options": "Branch",
       "fetch_from": "asset.custom_branch",
       "in_list_view": 1
@@ -40,29 +40,32 @@
     {
       "fieldname": "cleaning_type",
       "fieldtype": "Select",
-      "label": "Cleaning Type",
+      "label": "نوع التنظيف",
       "options": "\nDaily Clean\nDeep Clean\nSanitization\nDescaling\nFilter Clean\nOther",
       "reqd": 1,
-      "in_list_view": 1
+      "in_list_view": 1,
+      "description": "نوع عملية التنظيف: يومي، أسبوعي، عميق..."
     },
     {
       "fieldname": "sec_break_schedule",
       "fieldtype": "Section Break",
-      "label": "Schedule"
+      "label": "الجدول الزمني"
     },
     {
       "fieldname": "scheduled_date",
       "fieldtype": "Date",
-      "label": "Scheduled Date",
+      "label": "التاريخ المحدد",
       "reqd": 1,
       "in_list_view": 1,
-      "bold": 1
+      "bold": 1,
+      "description": "التاريخ المجدول لتنفيذ عملية التنظيف"
     },
     {
       "fieldname": "assigned_to",
       "fieldtype": "Data",
-      "label": "Assigned To",
-      "reqd": 1
+      "label": "المسؤول",
+      "reqd": 1,
+      "description": "الموظف المكلف بتنفيذ التنظيف"
     },
     {
       "fieldname": "col_break_2",
@@ -71,28 +74,29 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Scheduled\nCompleted\nMissed\nSkipped",
       "default": "Scheduled",
       "reqd": 1,
       "in_list_view": 1,
-      "bold": 1
+      "bold": 1,
+      "description": "مجدول / منجز / فائت / مُلغى"
     },
     {
       "fieldname": "completed_date",
       "fieldtype": "Date",
-      "label": "Completed Date",
+      "label": "تاريخ الإنجاز",
       "depends_on": "eval:doc.status === 'Completed'"
     },
     {
       "fieldname": "sec_break_notes",
       "fieldtype": "Section Break",
-      "label": "Notes"
+      "label": "ملاحظات"
     },
     {
       "fieldname": "cleaning_notes",
       "fieldtype": "Text",
-      "label": "Cleaning Notes"
+      "label": "ملاحظات"
     },
     {
       "fieldname": "col_break_3",
@@ -101,7 +105,7 @@
     {
       "fieldname": "verified_by",
       "fieldtype": "Data",
-      "label": "Verified By"
+      "label": "تم التحقق بواسطة"
     }
   ],
   "permissions": [

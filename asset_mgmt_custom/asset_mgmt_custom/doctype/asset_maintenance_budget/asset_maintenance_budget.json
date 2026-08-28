@@ -10,7 +10,8 @@
       "fieldname": "fiscal_year",
       "fieldtype": "Link",
       "options": "Fiscal Year",
-      "label": "Fiscal Year",
+      "label": "سنة الميزانية",
+      "description": "السنة المالية المرتبطة بهذه الميزانية",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1
@@ -19,7 +20,7 @@
       "fieldname": "branch",
       "fieldtype": "Link",
       "options": "Branch",
-      "label": "Branch",
+      "label": "الفرع",
       "reqd": 1,
       "in_list_view": 1,
       "search_index": 1
@@ -32,26 +33,27 @@
       "fieldname": "company",
       "fieldtype": "Link",
       "options": "Company",
-      "label": "Company",
+      "label": "الشركة",
       "reqd": 1,
       "default": "{frappe.defaults.get_user_default('Company')}"
     },
     {
       "fieldname": "budget_section",
       "fieldtype": "Section Break",
-      "label": "Budget Allocation"
+      "label": "تخصيص الميزانية"
     },
     {
       "fieldname": "total_budget",
       "fieldtype": "Currency",
-      "label": "Total Maintenance Budget",
+      "label": "تكلفة الصيانة المخططة",
+      "description": "إجمالي ميزانية الصيانة المخصصة للسنة المالية",
       "reqd": 1,
       "in_list_view": 1
     },
     {
       "fieldname": "preventive_budget",
       "fieldtype": "Currency",
-      "label": "Preventive Maintenance Budget"
+      "label": "ميزانية الصيانة الوقائية"
     },
     {
       "fieldname": "col2",
@@ -60,22 +62,22 @@
     {
       "fieldname": "corrective_budget",
       "fieldtype": "Currency",
-      "label": "Corrective / Repair Budget"
+      "label": "ميزانية الصيانة التصحيحية"
     },
     {
       "fieldname": "amc_budget",
       "fieldtype": "Currency",
-      "label": "AMC Contracts Budget"
+      "label": "ميزانية عقود الصيانة"
     },
     {
       "fieldname": "notes_section",
       "fieldtype": "Section Break",
-      "label": "Notes"
+      "label": "ملاحظات"
     },
     {
       "fieldname": "notes",
       "fieldtype": "Small Text",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [

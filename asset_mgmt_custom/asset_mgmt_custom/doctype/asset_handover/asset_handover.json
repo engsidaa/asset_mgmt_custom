@@ -19,7 +19,7 @@
     {
       "fieldname": "handover_date",
       "fieldtype": "Date",
-      "label": "Handover Date",
+      "label": "تاريخ التسليم",
       "reqd": 1,
       "default": "Today",
       "in_list_view": 1
@@ -31,7 +31,7 @@
     {
       "fieldname": "status",
       "fieldtype": "Select",
-      "label": "Status",
+      "label": "الحالة",
       "options": "Draft\nPending Signatures\nCompleted",
       "default": "Draft",
       "read_only": 1,
@@ -45,7 +45,8 @@
     {
       "fieldname": "outgoing_manager",
       "fieldtype": "Data",
-      "label": "Outgoing Manager",
+      "label": "الموظف المسلِّم",
+      "description": "الموظف الذي يسلّم الأصول",
       "reqd": 1,
       "in_list_view": 1
     },
@@ -61,7 +62,8 @@
     {
       "fieldname": "incoming_manager",
       "fieldtype": "Data",
-      "label": "Incoming Manager",
+      "label": "الموظف المستلِم",
+      "description": "الموظف الذي يستلم الأصول",
       "reqd": 1,
       "in_list_view": 1
     },
@@ -78,7 +80,8 @@
     {
       "fieldname": "items",
       "fieldtype": "Table",
-      "label": "Assets",
+      "label": "الأصول المُسلَّمة",
+      "description": "قائمة الأصول التي تم تسليمها",
       "options": "Asset Handover Item",
       "reqd": 1
     },
@@ -121,7 +124,7 @@
     {
       "fieldname": "notes",
       "fieldtype": "Text Editor",
-      "label": "Notes"
+      "label": "ملاحظات"
     }
   ],
   "permissions": [
