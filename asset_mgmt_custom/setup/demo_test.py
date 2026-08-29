@@ -7,9 +7,14 @@ Requisition، القيد المحاسبي التلقائي لـ Asset Repair، �
 بالعهدة في Full and Final Statement) على بيانات وهمية، وطباعة النتيجة
 خطوة بخطوة في الـ console — بدون ترك أي أثر حقيقي في قاعدة البيانات.
 
+النظام كان فاضي تماماً من بيانات الأصول عند أول تشغيل (لا فئات أصول، لا
+أصول معتمدة، لا عهد) — فالسكريبت بيحاول أولاً يستخدم بيانات حقيقية موجودة،
+ولو معدومة كلياً بيجهّز الحد الأدنى من بيانات تجريبية بنفسه (فئة أصل، صنف،
+موقع، أصل) عشان نقدر نختبر المنطق الفعلي، مش بس نكتفي بتخطي كل حاجة.
+
 مهم جداً: كل التغييرات بتترجع (frappe.db.rollback) في نهاية السكريبت
-تلقائياً، حتى لو نجح كل شيء. فمفيش أي بيانات وهمية هتفضل موجودة بعد
-التشغيل — الهدف فقط قراءة الـ output والتأكد إن المنطق شغال صح.
+تلقائياً، حتى لو نجح كل شيء — سواء البيانات اللي استخدمها كانت موجودة
+أصلاً أو تم تجهيزها هنا. مفيش أي بيانات وهمية هتفضل موجودة بعد التشغيل.
 
 طريقة التشغيل من السيرفر:
     cd ~/frappe-bench
@@ -17,7 +22,7 @@ Requisition، القيد المحاسبي التلقائي لـ Asset Repair، �
 """
 
 import frappe
-from frappe.utils import today, add_days
+from frappe.utils import today, add_days, now_datetime
 
 
 def _ok(msg):
@@ -32,6 +37,10 @@ def _fail(msg, exc=None):
 
 def _skip(msg):
     print(f"⏭️  تخطي: {msg}")
+
+
+def _info(msg):
+    print(f"ℹ️  {msg}")
 
 
 def _header(title):
@@ -94,23 +103,169 @@ def _test_roles():
 
 
 # ---------------------------------------------------------------------------
+# تجهيز بيانات تجريبية عند الحاجة (فقط لو مفيش بيانات حقيقية أصلاً)
+# ---------------------------------------------------------------------------
+
+def _get_default_company():
+    company = frappe.defaults.get_global_default("company")
+    if company and frappe.db.exists("Company", company):
+        return company
+    return frappe.db.get_value("Company", {}, "name")
+
+
+def _get_or_create_location():
+    loc = frappe.db.get_value("Location", {}, "name")
+    if loc:
+        return loc
+    doc = frappe.get_doc({
+        "doctype": "Location",
+        "location_name": "موقع تجريبي - Demo Test",
+    })
+    doc.insert(ignore_permissions=True)
+    _info(f"تم إنشاء موقع تجريبي مؤقت: {doc.name} (لم يكن يوجد أي Location في النظام)")
+    return doc.name
+
+
+def _get_or_create_asset_category(company):
+    """يحاول يلاقي فئة أصل حقيقية موجودة أولاً. لو مفيش، بيجهّز فئة تجريبية
+    مربوطة بأي حساب Fixed Asset حقيقي موجود في شجرة الحسابات — لو معندناش
+    حتى حساب Fixed Asset واحد، بنتوقف هنا بوضوح (ده إعداد أساسي ناقص فعلاً،
+    مش حاجة نقدر نخترعها بأمان)."""
+    existing = frappe.db.get_value("Asset Category", {}, "name")
+    if existing:
+        return existing, False
+
+    fixed_asset_account = frappe.db.get_value(
+        "Account",
+        {"company": company, "account_type": "Fixed Asset", "is_group": 0},
+        "name",
+    )
+    if not fixed_asset_account:
+        _skip(f"لا توجد أي فئة أصول ولا أي حساب من نوع 'Fixed Asset' في شجرة حسابات "
+              f"الشركة '{company}' — هذا إعداد أساسي لازم يُضاف يدوياً قبل استخدام "
+              f"وحدة الأصول فعلياً (Chart of Accounts)")
+        return None, False
+
+    cat = frappe.get_doc({
+        "doctype": "Asset Category",
+        "asset_category_name": "فئة تجريبية - Demo Test",
+        "accounts": [{
+            "company_name": company,
+            "fixed_asset_account": fixed_asset_account,
+        }],
+    })
+    cat.insert(ignore_permissions=True)
+    _info(f"تم إنشاء فئة أصل تجريبية مؤقتة: {cat.name} (لم تكن توجد أي فئة أصول في النظام)")
+    return cat.name, True
+
+
+def _get_or_create_fixed_asset_item(asset_category):
+    code = "DEMO-TEST-FIXED-ASSET-ITEM"
+    if frappe.db.exists("Item", code):
+        return code
+
+    item_group = frappe.db.get_value("Item Group", {}, "name")
+    if not item_group:
+        _skip("لا توجد أي مجموعة أصناف (Item Group) في النظام — لا يمكن تجهيز صنف تجريبي")
+        return None
+
+    item = frappe.get_doc({
+        "doctype": "Item",
+        "item_code": code,
+        "item_name": "صنف أصل تجريبي - Demo Test",
+        "item_group": item_group,
+        "stock_uom": "Nos",
+        "is_stock_item": 0,
+        "is_fixed_asset": 1,
+        "asset_category": asset_category,
+    })
+    item.insert(ignore_permissions=True)
+    _info(f"تم إنشاء صنف أصل ثابت تجريبي مؤقت: {item.name}")
+    return item.name
+
+
+def _create_demo_asset(company, location, item_code, asset_category):
+    asset = frappe.get_doc({
+        "doctype": "Asset",
+        "asset_name": "أصل تجريبي - Demo Test",
+        "item_code": item_code,
+        "asset_category": asset_category,
+        "company": company,
+        "location": location,
+        "is_existing_asset": 1,
+        "calculate_depreciation": 0,
+        "gross_purchase_amount": 10000,
+        "available_for_use_date": today(),
+        "asset_quantity": 1,
+    })
+    asset.insert(ignore_permissions=True)
+    asset.submit()
+    _info(f"تم إنشاء أصل تجريبي مؤقت ومعتمَد: {asset.name}")
+    return asset.name
+
+
+def _get_or_create_submitted_asset():
+    """يرجع (اسم أصل معتمد، اسم فئته) — يستخدم أصل حقيقي موجود لو فيه،
+    وإلا يجهّز واحد تجريبياً بالكامل (فئة + صنف + موقع + أصل)."""
+    asset = frappe.db.get_value(
+        "Asset", {"docstatus": 1, "status": ["not in", ["Scrapped", "Sold"]]}, "name"
+    )
+    if asset:
+        return asset, False
+
+    company = _get_default_company()
+    if not company:
+        _skip("لا توجد أي شركة (Company) في النظام على الإطلاق")
+        return None, False
+
+    category, _created_cat = _get_or_create_asset_category(company)
+    if not category:
+        return None, False
+
+    item_code = _get_or_create_fixed_asset_item(category)
+    if not item_code:
+        return None, False
+
+    location = _get_or_create_location()
+
+    try:
+        asset = _create_demo_asset(company, location, item_code, category)
+        return asset, True
+    except Exception as e:
+        _fail("تعذّر إنشاء أصل تجريبي للاختبار", e)
+        return None, False
+
+
+def _get_active_employee(company=None):
+    filters = {"status": "Active"}
+    if company:
+        filters["company"] = company
+        emp = frappe.db.get_value("Employee", filters, "name")
+        if emp:
+            return emp
+    return frappe.db.get_value("Employee", {"status": "Active"}, "name")
+
+
+# ---------------------------------------------------------------------------
 # اختبار 2: سلسلة اعتماد Asset Requisition (3 مراحل) + الرفض
 # ---------------------------------------------------------------------------
 
 def _test_asset_requisition_chain():
     _header("2) سلسلة اعتماد Asset Requisition (تمويل ← مدير فرع ← مدير أصول)")
     try:
-        employee = frappe.db.get_value("Employee", {"status": "Active"}, "name")
-        category = frappe.db.get_value("Asset Category", {}, "name")
-
+        employee = _get_active_employee()
         if not employee:
-            _skip("لا يوجد موظف نشط (Active Employee) في النظام لتجربة الطلب عليه")
-            return
-        if not category:
-            _skip("لا توجد فئة أصول (Asset Category) في النظام")
+            _skip("لا يوجد موظف نشط (Active Employee) في النظام لتجربة الطلب عليه — "
+                  "هذا يحتاج بيانات موارد بشرية حقيقية، لا يمكن تجهيزه تلقائياً بأمان")
             return
 
-        _ok(f"استخدام الموظف: {employee} | فئة الأصل: {category}")
+        company = _get_default_company()
+        category, created = _get_or_create_asset_category(company) if company else (None, False)
+        if not category:
+            return
+
+        _ok(f"استخدام الموظف: {employee} | فئة الأصل: {category}"
+            f"{' (تم إنشاؤها تجريبياً)' if created else ''}")
 
         # --- المسار الأول: اعتماد كامل حتى النهاية ---
         doc = frappe.new_doc("Asset Requisition")
@@ -178,15 +333,13 @@ def _test_asset_requisition_chain():
 def _test_asset_repair_gl():
     _header("3) القيد المحاسبي التلقائي لتكلفة إصلاح أصل (بدون فاتورة شراء)")
     try:
-        asset = frappe.db.get_value(
-            "Asset", {"docstatus": 1, "status": ["not in", ["Scrapped", "Sold"]]}, "name"
-        )
+        asset, created = _get_or_create_submitted_asset()
         if not asset:
-            _skip("لا يوجد أي أصل مُعتمَد (Submitted) في النظام لتجربة الإصلاح عليه")
             return
 
         asset_doc = frappe.get_doc("Asset", asset)
-        _ok(f"استخدام الأصل: {asset} (الفئة: {asset_doc.asset_category})")
+        _ok(f"استخدام الأصل: {asset} (الفئة: {asset_doc.asset_category})"
+            f"{' (تم إنشاؤه تجريبياً)' if created else ''}")
 
         category_account = frappe.db.get_value(
             "Asset Category Account",
@@ -200,6 +353,13 @@ def _test_asset_repair_gl():
                   f"'{asset_doc.asset_category}' / شركة '{asset_doc.company}' — "
                   f"لازم يُضاف قبل ما نقدر نختبر القيد المحاسبي")
             return
+
+        if not category_account.custom_maintenance_expense_account:
+            _info("ملاحظة: 'Maintenance Expense Account' غير مُعرَّف على هذه الفئة "
+                  "— اختبار OpEx هيُتخطى تلقائياً لو حصل")
+        if not category_account.custom_capital_maintenance_wip_account:
+            _info("ملاحظة: 'Capital Maintenance WIP Account' (حساب الوساطة 110902) غير "
+                  "مُعرَّف على هذه الفئة — اختبار CapEx هيُتخطى تلقائياً لو حصل")
 
         # --- OpEx: إصلاح عادي بدون رسملة ---
         repair = frappe.new_doc("Asset Repair")
@@ -224,7 +384,7 @@ def _test_asset_repair_gl():
             if total_debit == total_credit == 500:
                 _ok("OpEx: المبالغ متزنة ومطابقة لتكلفة الإصلاح (500)")
             else:
-                _fail(f"OpEx: المبالغ غير متزنة أو غير مطابقة (متوقع 500)")
+                _fail("OpEx: المبالغ غير متزنة أو غير مطابقة (متوقع 500)")
         else:
             _skip("OpEx: لم يُنشأ قيد يومية — على الأغلب معندهاش custom_maintenance_expense_account "
                   "أو default_payable_account مُعرَّفين")
@@ -295,13 +455,39 @@ def _test_retention_and_ff_exemption():
             """,
             as_dict=True,
         )
-        if not row:
-            _skip("لا يوجد أي أصل بعهدة موظف حالياً (Asset Movement مع to_employee) — "
-                  "لا يمكن تجربة هذا السيناريو بدون بيانات عهدة حقيقية")
-            return
+        employee = asset = None
+        created_custody = False
 
-        employee, asset = row[0].employee, row[0].asset
-        _ok(f"استخدام الموظف: {employee} | الأصل بعهدته: {asset}")
+        if row:
+            employee, asset = row[0].employee, row[0].asset
+        else:
+            asset, created_asset = _get_or_create_submitted_asset()
+            if not asset:
+                return
+            asset_doc = frappe.get_doc("Asset", asset)
+            employee = _get_active_employee(asset_doc.company)
+            if not employee:
+                _skip("لا يوجد موظف نشط لتخصيص عهدة تجريبية له — "
+                      "هذا يحتاج بيانات موارد بشرية حقيقية")
+                return
+            try:
+                am = frappe.get_doc({
+                    "doctype": "Asset Movement",
+                    "purpose": "Issue",
+                    "company": asset_doc.company,
+                    "transaction_date": now_datetime(),
+                    "assets": [{"asset": asset, "to_employee": employee}],
+                })
+                am.insert(ignore_permissions=True)
+                am.submit()
+                created_custody = True
+                _info(f"تم إنشاء عهدة تجريبية مؤقتة: الأصل {asset} للموظف {employee} عبر {am.name}")
+            except Exception as e:
+                _fail("تعذّر إنشاء عهدة تجريبية (Asset Movement) للاختبار", e)
+                return
+
+        _ok(f"استخدام الموظف: {employee} | الأصل بعهدته: {asset}"
+            f"{' (عهدة تجريبية جديدة)' if created_custody else ''}")
 
         retention = frappe.new_doc("Asset Retention Request")
         retention.employee = employee
@@ -326,9 +512,9 @@ def _test_retention_and_ff_exemption():
         )
         if not target_row:
             _skip("الأصل المُحتفَظ به لم يظهر في جدول assets_allocated — "
-                  "غالباً لأن سجل Asset Movement القديم غير مرتبط بشكل يسمح لـ HRMS "
+                  "غالباً لأن سجل Asset Movement غير مرتبط بشكل يسمح لـ HRMS "
                   "بربطه تلقائياً (سلوك طبيعي حسب البيانات الفعلية، وليس بالضرورة خطأ)")
-        elif target_row.action == "Recover Cost" and flt_zero(target_row.cost):
+        elif target_row.action == "Recover Cost" and _flt_zero(target_row.cost):
             _ok("الأصل المحتفَظ به تم استثناؤه بنجاح: action='Recover Cost', cost=0 "
                 "— لن يمنع اعتماد المخالصة")
         else:
@@ -339,7 +525,7 @@ def _test_retention_and_ff_exemption():
         _fail("فشل اختبار استثناء الاحتفاظ بالعهدة", e)
 
 
-def flt_zero(value):
+def _flt_zero(value):
     try:
         return float(value or 0) == 0
     except (TypeError, ValueError):
