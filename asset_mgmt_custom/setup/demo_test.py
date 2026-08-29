@@ -185,6 +185,9 @@ def _get_or_create_fixed_asset_item(asset_category):
 
 
 def _create_demo_asset(company, location, item_code, asset_category):
+    cost_center = frappe.db.get_value(
+        "Cost Center", {"company": company, "is_group": 0}, "name"
+    )
     asset = frappe.get_doc({
         "doctype": "Asset",
         "asset_name": "أصل تجريبي - Demo Test",
@@ -192,6 +195,7 @@ def _create_demo_asset(company, location, item_code, asset_category):
         "asset_category": asset_category,
         "company": company,
         "location": location,
+        "cost_center": cost_center,
         "is_existing_asset": 1,
         "calculate_depreciation": 0,
         "gross_purchase_amount": 10000,
