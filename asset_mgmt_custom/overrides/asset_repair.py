@@ -234,8 +234,8 @@ def _post_repair_cost_gl_entry(doc):
             "account": wip_account,
             "credit_in_account_currency": total_cost,
             "cost_center": doc.cost_center or None,
-            "reference_type": doc.doctype,
-            "reference_name": doc.name,
+            "reference_type": "Asset",
+            "reference_name": doc.asset,
         })
     else:
         expense_account = category_account.custom_maintenance_expense_account
@@ -267,8 +267,8 @@ def _post_repair_cost_gl_entry(doc):
             "account": payable_account,
             "credit_in_account_currency": total_cost,
             "cost_center": doc.cost_center or None,
-            "reference_type": doc.doctype,
-            "reference_name": doc.name,
+            "reference_type": "Asset",
+            "reference_name": doc.asset,
         })
 
     je.insert(ignore_permissions=True)

@@ -607,6 +607,49 @@ def diagnose_accounts():
               f"is_group={r.is_group}  |  root_type={r.root_type}")
 
 
+def diagnose_payable_accounts():
+    """قراءة فقط — bootstrap لقى إنه مفيش أي حساب مُصنَّف account_type='Payable'
+    في شجرة حساباتك، بالظبط زي مشكلة 'Fixed Asset' قبل كده. الأرجح إن فيه
+    حساب دائنين/موردين حقيقي موجود بس مش مُصنَّف بالنوع الصحيح — السكريبت
+    ده بيسردهم عشان تحدد الصح، بدل ما ننشئ حساب جديد ممكن يكرر حساب موجود.
+    طريقة التشغيل:
+      bench --site e-u40.hosetia.com execute asset_mgmt_custom.setup.demo_test.diagnose_payable_accounts
+    """
+    company = _get_default_company()
+    print(f"الشركة: {company}\n")
+
+    print("كل الحسابات (تجميعية وغير تجميعية) اللي اسمها فيه 'دائن' أو 'مورد' أو 'Payable':")
+    rows = frappe.db.sql(
+        """
+        SELECT name, account_type, is_group, root_type, parent_account
+        FROM `tabAccount`
+        WHERE company = %s AND (name LIKE %s OR name LIKE %s OR name LIKE %s)
+        ORDER BY name
+        """,
+        (company, "%دائن%", "%مورد%", "%Payable%"),
+        as_dict=True,
+    )
+    if not rows:
+        print("  (لا يوجد أي حساب بهذا الاسم على الإطلاق)")
+    for r in rows:
+        marker = "  <-- مُصنَّف Payable بالفعل" if r.account_type == "Payable" else ""
+        print(f"  - {r.name}  |  account_type={r.account_type or '(فارغ)'}  |  "
+              f"is_group={r.is_group}  |  root_type={r.root_type}{marker}")
+
+    print("\nكل الحسابات تحت مجموعة (Liability) غير التجميعية (أول 20 فقط، للاستئناس):")
+    rows2 = frappe.db.sql(
+        """
+        SELECT name, account_type FROM `tabAccount`
+        WHERE company = %s AND root_type = 'Liability' AND is_group = 0
+        ORDER BY name LIMIT 20
+        """,
+        company,
+        as_dict=True,
+    )
+    for r in rows2:
+        print(f"  - {r.name}  |  account_type={r.account_type or '(فارغ)'}")
+
+
 def diagnose_companies():
     """فحص أوسع: هل شجرة الحسابات (Chart of Accounts) موجودة أصلاً لأي شركة
     في النظام؟ لو مفيش أي حساب خالص لأي شركة، فده معناه شجرة الحسابات لم
