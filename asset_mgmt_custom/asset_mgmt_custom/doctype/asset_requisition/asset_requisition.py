@@ -1,12 +1,50 @@
+"""
+Asset Requisition — مصفوفة اعتماد من 3 مراحل متتالية
+-----------------------------------------------------
+لا تُستخدم آلية Frappe Workflow هنا (خلافاً لباقي مستندات التطبيق) لأن
+المرحلة الثانية تشترط موافقة "شخص محدد لكل فرع" (مدير الفرع)، وWorkflow
+الأساسي في Frappe يدعم فقط بوابات على مستوى الدور (Role) — لا يدعم
+"المستخدم المحدد في حقل مستند آخر". لذلك الحالة (status) وثلاث دوال
+اعتماد مُصرَّح بها (whitelisted) هي آلية التتبع الكاملة، بنفس النمط
+المُستخدم بالفعل في overrides/asset.py (mark_coded / set_operational).
+
+تسلسل الاعتماد:
+    Draft
+      → (تقديم/Submit) → Pending Finance Approval
+      → (approve_finance، دور Asset Finance Manager) → Pending Branch Manager Approval
+      → (approve_branch_manager، المستخدم المحدد في مدير الفرع) → Pending Asset Manager Approval
+      → (approve_asset_manager، دور Asset Manager) → Approved
+
+الرفض (reject) متاح في أي مرحلة "Pending" لصاحب الصلاحية في تلك المرحلة
+تحديداً — يضبط الحالة "Rejected" مع السبب والمُرفِض، ويبقى المستند
+submitted (بدون إلغاء تلقائي، تفادياً لتعقيد صلاحيات الإلغاء). لإعادة
+التقديم: يقوم Asset Manager أو System Manager (ولديهما صلاحية الإلغاء
+والتعديل أصلاً) بإلغاء المستند يدوياً ثم استخدام زر "Amend" القياسي في
+Frappe.
+
+System Manager مخوَّل بتجاوز أي مرحلة (دعم إداري)، بنفس صلاحياته
+الكاملة الموجودة أصلاً على هذا المستند.
+"""
+
 import frappe
 from frappe import _
+from frappe.utils import today, now_datetime
 from frappe.model.document import Document
-from frappe.utils import today
+
+
+APPROVAL_CHAIN = {
+    "Pending Finance Approval": "finance",
+    "Pending Branch Manager Approval": "branch_manager",
+    "Pending Asset Manager Approval": "asset_manager",
+}
 
 
 class AssetRequisition(Document):
     def validate(self):
         self._check_spare_availability()
+
+    def on_submit(self):
+        self.db_set("status", "Pending Finance Approval")
 
     def _check_spare_availability(self):
         if not self.asset_category:
@@ -25,6 +63,125 @@ class AssetRequisition(Document):
         else:
             self.spare_available = 0
             self.spare_asset = None
+
+    # ------------------------------------------------------------------
+    # المرحلة 1: اعتماد المالية
+    # ------------------------------------------------------------------
+
+    @frappe.whitelist()
+    def approve_finance(self):
+        self._check_stage("Pending Finance Approval", "Asset Finance Manager")
+        self.db_set({
+            "approved_by_finance": frappe.session.user,
+            "finance_approved_on": now_datetime(),
+            "status": "Pending Branch Manager Approval",
+        })
+        return self.status
+
+    # ------------------------------------------------------------------
+    # المرحلة 2: اعتماد مدير الفرع (شخص محدد، وليس دوراً عاماً)
+    # ------------------------------------------------------------------
+
+    @frappe.whitelist()
+    def approve_branch_manager(self):
+        if self.status != "Pending Branch Manager Approval":
+            frappe.throw(
+                _("This requisition is not currently at the Branch Manager approval stage."),
+                title=_("Wrong Stage"),
+            )
+        if not self._is_system_manager():
+            if not self.branch_manager:
+                frappe.throw(
+                    _(
+                        "No Branch Manager is configured for Branch {0}. "
+                        "Please set 'مدير الفرع (Branch Manager)' on the Branch record first."
+                    ).format(self.branch),
+                    title=_("Branch Manager Not Configured"),
+                )
+            if frappe.session.user != self.branch_manager:
+                frappe.throw(
+                    _("Only the designated Branch Manager ({0}) can approve this stage.").format(
+                        self.branch_manager
+                    ),
+                    title=_("Not Authorized"),
+                )
+        self.db_set({
+            "approved_by_branch_manager": frappe.session.user,
+            "branch_manager_approved_on": now_datetime(),
+            "status": "Pending Asset Manager Approval",
+        })
+        return self.status
+
+    # ------------------------------------------------------------------
+    # المرحلة 3: اعتماد إدارة الأصول (نهائي)
+    # ------------------------------------------------------------------
+
+    @frappe.whitelist()
+    def approve_asset_manager(self):
+        self._check_stage("Pending Asset Manager Approval", "Asset Manager")
+        self.db_set({
+            "approved_by_asset_manager": frappe.session.user,
+            "asset_manager_approved_on": now_datetime(),
+            "status": "Approved",
+        })
+        return self.status
+
+    # ------------------------------------------------------------------
+    # الرفض — في أي مرحلة، بواسطة صاحب الصلاحية في تلك المرحلة تحديداً
+    # ------------------------------------------------------------------
+
+    @frappe.whitelist()
+    def reject(self, reason):
+        if self.status not in APPROVAL_CHAIN:
+            frappe.throw(
+                _("This requisition is not currently pending any approval."),
+                title=_("Nothing to Reject"),
+            )
+        if not reason or not reason.strip():
+            frappe.throw(_("Please provide a rejection reason."))
+
+        stage = APPROVAL_CHAIN[self.status]
+        if stage == "finance":
+            self._check_stage(self.status, "Asset Finance Manager")
+        elif stage == "asset_manager":
+            self._check_stage(self.status, "Asset Manager")
+        elif stage == "branch_manager" and not self._is_system_manager():
+            if not self.branch_manager or frappe.session.user != self.branch_manager:
+                frappe.throw(
+                    _("Only the designated Branch Manager can reject at this stage."),
+                    title=_("Not Authorized"),
+                )
+
+        self.db_set({
+            "status": "Rejected",
+            "rejection_reason": reason,
+            "rejected_by": frappe.session.user,
+        })
+        return self.status
+
+    # ------------------------------------------------------------------
+    # مساعدات الصلاحيات
+    # ------------------------------------------------------------------
+
+    def _check_stage(self, expected_status, required_role):
+        if self.status != expected_status:
+            frappe.throw(
+                _("This requisition is not currently at the {0} stage.").format(expected_status),
+                title=_("Wrong Stage"),
+            )
+        if required_role not in frappe.get_roles() and not self._is_system_manager():
+            frappe.throw(
+                _("You need the '{0}' role to act at this stage.").format(required_role),
+                title=_("Not Authorized"),
+            )
+
+    @staticmethod
+    def _is_system_manager():
+        return "System Manager" in frappe.get_roles()
+
+    # ------------------------------------------------------------------
+    # بعد اكتمال الاعتماد: تحويل لأمر نقل أو طلب شراء
+    # ------------------------------------------------------------------
 
     @frappe.whitelist()
     def create_asset_movement(self):

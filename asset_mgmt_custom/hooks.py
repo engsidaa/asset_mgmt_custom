@@ -11,7 +11,7 @@ app_license = "MIT"
 fixtures = [
     {
         "dt": "Custom Field",
-        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Category Account", "Asset Maintenance Contract"]]],
+        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Category Account", "Asset Maintenance Contract", "Branch"]]],
     },
     {
         "dt": "Property Setter",
@@ -19,7 +19,7 @@ fixtures = [
     },
     {
         "dt": "Workflow",
-        "filters": [["document_type", "in", ["Asset Movement", "Asset Requisition", "Asset Retention Request"]]],
+        "filters": [["document_type", "in", ["Asset Movement", "Asset Retention Request"]]],
     },
     {
         "dt": "Workflow State",
@@ -136,4 +136,5 @@ scheduler_events = {
 # ---------------------------------------------------------------------------
 after_migrate = [
     "asset_mgmt_custom.setup.after_migrate.backfill_asset_coding_status",
+    "asset_mgmt_custom.setup.after_migrate.remove_old_asset_requisition_workflow",
 ]

@@ -51,7 +51,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "الحالة",
-   "options": "Draft\nPending Approval\nApproved\nRejected\nFulfilled",
+   "options": "Draft\nPending Finance Approval\nPending Branch Manager Approval\nPending Asset Manager Approval\nApproved\nRejected\nFulfilled",
    "default": "Draft",
    "read_only": 1,
    "in_list_view": 1,
@@ -98,6 +98,70 @@
    "description": "سبب الحاجة إلى هذا الأصل"
   },
   {
+   "fieldname": "section_approvals",
+   "fieldtype": "Section Break",
+   "label": "سجل الاعتمادات (مصفوفة الاعتماد)"
+  },
+  {
+   "fieldname": "branch_manager",
+   "fieldtype": "Data",
+   "label": "مدير الفرع المسؤول",
+   "read_only": 1,
+   "fetch_from": "branch.custom_branch_manager",
+   "description": "يُجلَب تلقائياً من إعداد الفرع — هو المخوّل بالموافقة في المرحلة الثانية"
+  },
+  {
+   "fieldname": "col_break_approvals_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approved_by_finance",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "اعتماد المالية بواسطة",
+   "read_only": 1
+  },
+  {
+   "fieldname": "finance_approved_on",
+   "fieldtype": "Datetime",
+   "label": "تاريخ اعتماد المالية",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_approvals_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approved_by_branch_manager",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "اعتماد مدير الفرع بواسطة",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch_manager_approved_on",
+   "fieldtype": "Datetime",
+   "label": "تاريخ اعتماد مدير الفرع",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_approvals_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approved_by_asset_manager",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "اعتماد إدارة الأصول بواسطة",
+   "read_only": 1
+  },
+  {
+   "fieldname": "asset_manager_approved_on",
+   "fieldtype": "Datetime",
+   "label": "تاريخ اعتماد إدارة الأصول",
+   "read_only": 1
+  },
+  {
    "fieldname": "section_spare",
    "fieldtype": "Section Break",
    "label": "أصل احتياطي"
@@ -124,6 +188,13 @@
    "fieldname": "rejection_reason",
    "fieldtype": "Small Text",
    "label": "سبب الرفض",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rejected_by",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "الرفض بواسطة",
    "read_only": 1
   },
   {

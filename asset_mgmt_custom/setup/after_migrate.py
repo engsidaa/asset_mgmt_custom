@@ -47,3 +47,40 @@ def backfill_asset_coding_status():
     )
 
     frappe.db.commit()
+
+
+def remove_old_asset_requisition_workflow():
+    """
+    Asset Requisition's approval used to be a single-step Frappe Workflow
+    (states: Draft/Pending Approval/Approved/Rejected/Fulfilled, one
+    'Assets Manager' gate). It's replaced by a real 3-step approval chain
+    (Finance -> Branch Manager -> Asset Manager) implemented directly on
+    the doctype's own status field + whitelisted methods — Frappe's
+    Workflow engine only supports role-based gates, not "the specific
+    person assigned to this record's branch", which the 2nd step needs.
+
+    Removing "Asset Requisition Approval" from the fixture does NOT
+    delete the existing Workflow record from the DB — fixture sync only
+    adds/updates, never deletes. Left in place, it would keep validating
+    `status` against its own old state list and conflict with the new
+    values. This deletes it explicitly, and remaps any document still
+    sitting on the old "Pending Approval" status (which no longer exists
+    as a valid option) back to the start of the new chain.
+    """
+    old_workflow = "Asset Requisition Approval"
+    if frappe.db.exists("Workflow", old_workflow):
+        frappe.db.sql("DELETE FROM `tabWorkflow Document State` WHERE parent = %s", old_workflow)
+        frappe.db.sql("DELETE FROM `tabWorkflow Transition` WHERE parent = %s", old_workflow)
+        frappe.db.sql("DELETE FROM `tabWorkflow` WHERE name = %s", old_workflow)
+        print(f"Removed obsolete Workflow: {old_workflow}")
+
+    if frappe.db.has_column("Asset Requisition", "status"):
+        frappe.db.sql(
+            """
+            UPDATE `tabAsset Requisition`
+            SET status = 'Pending Finance Approval'
+            WHERE status = 'Pending Approval'
+            """
+        )
+
+    frappe.db.commit()

@@ -646,5 +646,17 @@
   "read_only": 1,
   "reqd": 0,
   "description": "يُضبط تلقائياً عند إنشاء القيد المحاسبي لتكلفة الإصلاح (فقط عند عدم ربط فاتورة شراء)"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Branch-custom_branch_manager",
+  "dt": "Branch",
+  "fieldname": "custom_branch_manager",
+  "fieldtype": "Link",
+  "options": "User",
+  "label": "مدير الفرع (Branch Manager)",
+  "insert_after": "branch",
+  "description": "المستخدم المسؤول عن اعتماد طلبات الأصول الخاصة بهذا الفرع",
+  "reqd": 0
  }
 ]

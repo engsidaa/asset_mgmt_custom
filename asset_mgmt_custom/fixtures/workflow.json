@@ -1,115 +1,138 @@
 [
-  {
-    "doctype": "Workflow",
-    "name": "Asset Movement Approval",
-    "document_type": "Asset Movement",
-    "workflow_name": "Asset Movement Approval",
-    "workflow_state_field": "custom_approval_status",
-    "is_active": 1,
-    "override_status": 0,
-    "send_email_alert": 1,
-    "states": [
-      {
-        "state": "Draft",
-        "doc_status": "0",
-        "allow_edit": "All",
-        "is_optional_state": 0,
-        "next_action_email_template": ""
-      },
-      {
-        "state": "Pending Approval",
-        "doc_status": "0",
-        "allow_edit": "Assets Manager",
-        "is_optional_state": 0
-      },
-      {
-        "state": "Approved",
-        "doc_status": "1",
-        "allow_edit": "Assets Manager",
-        "is_optional_state": 0
-      },
-      {
-        "state": "Rejected",
-        "doc_status": "0",
-        "allow_edit": "Assets Manager",
-        "is_optional_state": 0
-      }
-    ],
-    "transitions": [
-      {
-        "state": "Draft",
-        "action": "Submit for Approval",
-        "next_state": "Pending Approval",
-        "allowed": "All",
-        "allow_self_approval": 1,
-        "condition": ""
-      },
-      {
-        "state": "Pending Approval",
-        "action": "Approve",
-        "next_state": "Approved",
-        "allowed": "Assets Manager",
-        "allow_self_approval": 1,
-        "condition": ""
-      },
-      {
-        "state": "Pending Approval",
-        "action": "Reject",
-        "next_state": "Rejected",
-        "allowed": "Assets Manager",
-        "allow_self_approval": 1,
-        "condition": ""
-      },
-      {
-        "state": "Rejected",
-        "action": "Resubmit",
-        "next_state": "Draft",
-        "allowed": "All",
-        "allow_self_approval": 1,
-        "condition": ""
-      }
-    ]
-  },
-  {
-    "doctype": "Workflow",
-    "name": "Asset Requisition Approval",
-    "document_type": "Asset Requisition",
-    "workflow_name": "Asset Requisition Approval",
-    "workflow_state_field": "status",
-    "is_active": 1,
-    "send_email_alert": 0,
-    "states": [
-      {"state": "Draft", "doc_status": "0", "allow_edit": "All", "style": ""},
-      {"state": "Pending Approval", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Warning"},
-      {"state": "Approved", "doc_status": "1", "allow_edit": "Assets Manager", "style": "Success"},
-      {"state": "Rejected", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Danger"}
-    ],
-    "transitions": [
-      {"state": "Draft", "action": "Submit for Approval", "next_state": "Pending Approval", "allowed": "All", "allow_self_approval": 1},
-      {"state": "Pending Approval", "action": "Approve", "next_state": "Approved", "allowed": "Assets Manager", "allow_self_approval": 1},
-      {"state": "Pending Approval", "action": "Reject", "next_state": "Rejected", "allowed": "Assets Manager", "allow_self_approval": 1},
-      {"state": "Rejected", "action": "Resubmit", "next_state": "Draft", "allowed": "All", "allow_self_approval": 1}
-    ]
-  },
-  {
-    "doctype": "Workflow",
-    "name": "Asset Retention Approval",
-    "document_type": "Asset Retention Request",
-    "workflow_name": "Asset Retention Approval",
-    "workflow_state_field": "status",
-    "is_active": 1,
-    "send_email_alert": 0,
-    "states": [
-      {"state": "Draft", "doc_status": "0", "allow_edit": "All", "style": ""},
-      {"state": "Pending Approval", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Warning"},
-      {"state": "Approved", "doc_status": "1", "allow_edit": "Assets Manager", "style": "Success"},
-      {"state": "Rejected", "doc_status": "0", "allow_edit": "Assets Manager", "style": "Danger"}
-    ],
-    "transitions": [
-      {"state": "Draft", "action": "Submit for Approval", "next_state": "Pending Approval", "allowed": "All", "allow_self_approval": 1},
-      {"state": "Pending Approval", "action": "Approve", "next_state": "Approved", "allowed": "Assets Manager", "allow_self_approval": 1},
-      {"state": "Pending Approval", "action": "Reject", "next_state": "Rejected", "allowed": "Assets Manager", "allow_self_approval": 1},
-      {"state": "Rejected", "action": "Resubmit", "next_state": "Draft", "allowed": "All", "allow_self_approval": 1}
-    ]
-  }
+ {
+  "doctype": "Workflow",
+  "name": "Asset Movement Approval",
+  "document_type": "Asset Movement",
+  "workflow_name": "Asset Movement Approval",
+  "workflow_state_field": "custom_approval_status",
+  "is_active": 1,
+  "override_status": 0,
+  "send_email_alert": 1,
+  "states": [
+   {
+    "state": "Draft",
+    "doc_status": "0",
+    "allow_edit": "All",
+    "is_optional_state": 0,
+    "next_action_email_template": ""
+   },
+   {
+    "state": "Pending Approval",
+    "doc_status": "0",
+    "allow_edit": "Assets Manager",
+    "is_optional_state": 0
+   },
+   {
+    "state": "Approved",
+    "doc_status": "1",
+    "allow_edit": "Assets Manager",
+    "is_optional_state": 0
+   },
+   {
+    "state": "Rejected",
+    "doc_status": "0",
+    "allow_edit": "Assets Manager",
+    "is_optional_state": 0
+   }
+  ],
+  "transitions": [
+   {
+    "state": "Draft",
+    "action": "Submit for Approval",
+    "next_state": "Pending Approval",
+    "allowed": "All",
+    "allow_self_approval": 1,
+    "condition": ""
+   },
+   {
+    "state": "Pending Approval",
+    "action": "Approve",
+    "next_state": "Approved",
+    "allowed": "Assets Manager",
+    "allow_self_approval": 1,
+    "condition": ""
+   },
+   {
+    "state": "Pending Approval",
+    "action": "Reject",
+    "next_state": "Rejected",
+    "allowed": "Assets Manager",
+    "allow_self_approval": 1,
+    "condition": ""
+   },
+   {
+    "state": "Rejected",
+    "action": "Resubmit",
+    "next_state": "Draft",
+    "allowed": "All",
+    "allow_self_approval": 1,
+    "condition": ""
+   }
+  ]
+ },
+ {
+  "doctype": "Workflow",
+  "name": "Asset Retention Approval",
+  "document_type": "Asset Retention Request",
+  "workflow_name": "Asset Retention Approval",
+  "workflow_state_field": "status",
+  "is_active": 1,
+  "send_email_alert": 0,
+  "states": [
+   {
+    "state": "Draft",
+    "doc_status": "0",
+    "allow_edit": "All",
+    "style": ""
+   },
+   {
+    "state": "Pending Approval",
+    "doc_status": "0",
+    "allow_edit": "Assets Manager",
+    "style": "Warning"
+   },
+   {
+    "state": "Approved",
+    "doc_status": "1",
+    "allow_edit": "Assets Manager",
+    "style": "Success"
+   },
+   {
+    "state": "Rejected",
+    "doc_status": "0",
+    "allow_edit": "Assets Manager",
+    "style": "Danger"
+   }
+  ],
+  "transitions": [
+   {
+    "state": "Draft",
+    "action": "Submit for Approval",
+    "next_state": "Pending Approval",
+    "allowed": "All",
+    "allow_self_approval": 1
+   },
+   {
+    "state": "Pending Approval",
+    "action": "Approve",
+    "next_state": "Approved",
+    "allowed": "Assets Manager",
+    "allow_self_approval": 1
+   },
+   {
+    "state": "Pending Approval",
+    "action": "Reject",
+    "next_state": "Rejected",
+    "allowed": "Assets Manager",
+    "allow_self_approval": 1
+   },
+   {
+    "state": "Rejected",
+    "action": "Resubmit",
+    "next_state": "Draft",
+    "allowed": "All",
+    "allow_self_approval": 1
+   }
+  ]
+ }
 ]
