@@ -10,7 +10,10 @@
 الحقيقية من الواجهة (UI) عادي.
 
 آمن للتشغيل أكثر من مرة: كل خطوة تتأكد أولاً هل الحساب/الفئة موجودة قبل
-ما تنشئ حاجة جديدة — التشغيل الثاني مايكررش أي شيء.
+ما تنشئ حاجة جديدة، وبتصحح أي ربط خاطئ حصل في تشغيل سابق (انظر تعليق
+_find_or_create_leaf_account أدناه لتفاصيل خطأين تم اكتشافهما وتصحيحهما:
+حساب أُنشئ تحت مجموعة "مجمع إهلاك" بالغلط، وحساب آخر أُعيد استخدامه فقط
+لأن رقمه (110902) تصادف مع حساب حقيقي غير مرتبط إطلاقاً بالغرض المطلوب).
 
 طريقة التشغيل من السيرفر:
     cd ~/frappe-bench
@@ -92,12 +95,12 @@ def run():
         row = cat.append("accounts", {})
         row.company_name = company
 
-    if fixed_asset_account:
-        row.fixed_asset_account = fixed_asset_account
-    if wip_account:
-        row.custom_capital_maintenance_wip_account = wip_account
-    if maintenance_expense_account:
-        row.custom_maintenance_expense_account = maintenance_expense_account
+    # مهم: نضبط القيمة صراحة دايماً (حتى لو None) بدل الشرط الجزئي القديم
+    # (if x: row.field = x) — عشان لو تشغيل سابق ربط حساب غلط، التشغيل ده
+    # يصححه/يمسحه بدل ما يسيبه زي ما هو.
+    row.fixed_asset_account = fixed_asset_account
+    row.custom_capital_maintenance_wip_account = wip_account
+    row.custom_maintenance_expense_account = maintenance_expense_account
 
     if cat.is_new():
         cat.insert(ignore_permissions=True)
@@ -110,8 +113,8 @@ def run():
     print("# تم — ملخص ما تم إنشاؤه/التأكد منه:")
     print("#" * 70)
     print(f"  فئة الأصل: {cat.name}")
-    print(f"  حساب الأصل الثابت (Fixed Asset): {fixed_asset_account or '(لم يُنشأ)'}")
-    print(f"  حساب الوساطة 110902 (Capital Work in Progress): {wip_account or '(لم يُنشأ)'}")
+    print(f"  حساب الأصل الثابت (Fixed Asset): {fixed_asset_account or '(لم يُنشأ — راجع التحذيرات أعلاه)'}")
+    print(f"  حساب الوساطة (Capital Work in Progress): {wip_account or '(لم يُنشأ — راجع التحذيرات أعلاه)'}")
     print(f"  حساب مصروف الصيانة (Indirect Expense): {maintenance_expense_account or '(لم يُنشأ)'}")
     print("\nراجع هذه الحسابات في شجرة الحسابات (Chart of Accounts) وعدّل الأسماء/الأرقام")
     print("لو حابب تناسب ترقيمك المحاسبي الفعلي — دي بداية جاهزة للعمل، مش نهائية بالضرورة.")
@@ -135,17 +138,27 @@ def _get_asset_root(company):
 
 
 def _find_or_create_fixed_assets_group(company):
+    """يدوّر على مجموعة تمثل 'الأصول الثابتة نفسها' (تكلفة الاقتناء) —
+    وليس 'مجمع إهلاك الأصول الثابتة' (Accumulated Depreciation)، وهي
+    مجموعة مقابلة (contra-asset) مختلفة تماماً رغم إن اسمها بيحتوي نفس
+    الكلمات. أول تشغيل وقع في هذا الخطأ بالظبط: لاقى '120108 - مجمع اهلاك
+    الاصول الثابتة' عن طريق تطابق '%ثابتة%' وحطّ الحساب الجديد تحتها،
+    وهو غلط محاسبياً (حساب أصل تحت مجموعة مقابلة/دائنة)."""
     _step("البحث عن مجموعة 'الأصول الثابتة' (Fixed Assets) في شجرة الحسابات")
 
+    exclude_keywords = ["اهلاك", "إهلاك", "مجمع", "Depreciation", "Accumulated"]
+
     for pattern in ["%Fixed Asset%", "%ثابتة%"]:
-        group = frappe.db.get_value(
+        candidates = frappe.db.get_all(
             "Account",
-            {"company": company, "is_group": 1, "root_type": "Asset", "account_name": ["like", pattern]},
-            "name",
+            filters={"company": company, "is_group": 1, "root_type": "Asset", "account_name": ["like", pattern]},
+            fields=["name", "account_name"],
         )
-        if group:
-            _ok(f"موجودة بالفعل: {group}")
-            return group
+        for c in candidates:
+            if any(k in c.account_name for k in exclude_keywords):
+                continue
+            _ok(f"موجودة بالفعل: {c.name}")
+            return c.name
 
     asset_root = _get_asset_root(company)
     if not asset_root:
@@ -161,8 +174,8 @@ def _find_or_create_fixed_assets_group(company):
         (company, asset_root),
         as_dict=True,
     )
-    _warn(f"لم يتم العثور على مجموعة اسمها يحتوي 'Fixed Asset' أو 'ثابتة' تلقائياً تحت الجذر "
-          f"'{asset_root}'. هذه شجرة حسابات حقيقية بها 760 حساباً بالفعل — لن يتم إنشاء مجموعة "
+    _warn(f"لم يتم العثور على مجموعة 'أصول ثابتة' حقيقية (غير مجمع الإهلاك) تلقائياً تحت الجذر "
+          f"'{asset_root}'. هذه شجرة حسابات حقيقية بها مئات الحسابات بالفعل — لن يتم إنشاء مجموعة "
           f"جديدة تلقائياً تفادياً لتكرار مجموعة موجودة باسم مختلف. الحسابات/المجموعات الموجودة "
           f"مباشرة تحت جذر الأصول هي:")
     for c in children:
@@ -194,19 +207,49 @@ def _find_expense_group(company):
 
 
 def _find_or_create_leaf_account(company, parent, account_name, account_type, account_number=None):
+    """
+    ملاحظتان مهمتان اتصلّحوا هنا بعد أول تشغيل:
+
+    1. لو لقينا حساب من نفس النوع (account_type) موجود بالفعل، بنستخدمه —
+       لكن لو والده (parent_account) مش نفس المجموعة الصحيحة اللي حددناها
+       (fixed_assets_group)، بننقله لها بدل ما نسيبه في مكانه الغلط.
+
+    2. رقم الحساب (account_number) وحده مش كافي لاعتبار حساب "موجود
+       بالفعل ومناسب" — أول تشغيل لقى حساب حقيقي غير مرتبط تماماً
+       ('اصول متداولة متنوعة اخرى') بس رقمه اتصادف 110902، واستخدمه غلط.
+       دلوقتي: لو الرقم مستخدم لحساب من نوع مختلف تماماً، نعتبرها تعارض
+       حقيقي ونتوقف — مش نستخدمه ومش ننشئ حساب جديد بنفس الرقم (هيفشل
+       أصلاً لأن رقم الحساب لازم يكون فريد).
+    """
     _step(f"التأكد من حساب '{account_name}' (نوع: {account_type})")
 
     existing = frappe.db.get_value(
-        "Account", {"company": company, "account_type": account_type, "is_group": 0}, "name"
+        "Account", {"company": company, "account_type": account_type, "is_group": 0},
+        ["name", "parent_account"], as_dict=True,
     )
     if existing:
-        _ok(f"موجود بالفعل حساب من نفس النوع: {existing} — تم استخدامه بدل إنشاء واحد جديد")
-        return existing
+        if existing.parent_account != parent:
+            _warn(f"حساب '{existing.name}' من نفس النوع موجود، لكنه تحت مجموعة غير صحيحة "
+                  f"('{existing.parent_account}') — سيتم نقله إلى '{parent}'")
+            doc = frappe.get_doc("Account", existing.name)
+            doc.parent_account = parent
+            doc.save(ignore_permissions=True)
+            frappe.db.commit()
+            _ok(f"تم نقل الحساب إلى المجموعة الصحيحة: {doc.name}")
+        else:
+            _ok(f"موجود بالفعل حساب من نفس النوع وتحت المجموعة الصحيحة: {existing.name}")
+        return existing.name
 
-    if account_number and frappe.db.exists("Account", {"company": company, "account_number": account_number}):
-        existing = frappe.db.get_value("Account", {"company": company, "account_number": account_number}, "name")
-        _ok(f"موجود بالفعل حساب برقم {account_number}: {existing}")
-        return existing
+    if account_number:
+        conflict = frappe.db.get_value(
+            "Account", {"company": company, "account_number": account_number},
+            ["name", "account_type"], as_dict=True,
+        )
+        if conflict:
+            _warn(f"رقم الحساب {account_number} مستخدم بالفعل لحساب مختلف تمامًا عن الغرض المطلوب: "
+                  f"'{conflict.name}' (نوعه: {conflict.account_type or 'غير محدد'}, "
+                  f"والمطلوب: {account_type}) — لن يُستخدم هذا الحساب. اختر رقم حساب آخر غير مستخدم.")
+            return None
 
     doc = frappe.get_doc({
         "doctype": "Account",
