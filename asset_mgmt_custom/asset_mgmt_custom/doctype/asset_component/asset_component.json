@@ -5,12 +5,36 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "naming_series","asset","component_name","col_break_1","component_type","status",
-  "sec_break_hierarchy","parent_component","level","part_number",
-  "sec_break_specs","manufacturer","model_number","col_break_specs","serial_number","installation_date",
-  "sec_break_maint","asset_maintenance","maintenance_schedule_note","col_break_maint","last_service_date","next_service_date",
-  "sec_break_condition","condition","condition_score","col_break_condition","replacement_due_date","estimated_replacement_cost",
-  "sec_break_notes","notes"
+  "naming_series",
+  "asset",
+  "component_name",
+  "col_break_1",
+  "component_type",
+  "status",
+  "sec_break_hierarchy",
+  "parent_component",
+  "level",
+  "part_number",
+  "sec_break_specs",
+  "manufacturer",
+  "model_number",
+  "col_break_specs",
+  "serial_number",
+  "installation_date",
+  "sec_break_maint",
+  "asset_maintenance",
+  "maintenance_schedule_note",
+  "col_break_maint",
+  "last_service_date",
+  "next_service_date",
+  "sec_break_condition",
+  "condition",
+  "condition_score",
+  "col_break_condition",
+  "replacement_due_date",
+  "estimated_replacement_cost",
+  "sec_break_notes",
+  "notes"
  ],
  "fields": [
   {
@@ -205,12 +229,42 @@
  "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
-  {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 0, "report": 1, "export": 1},
-  {"role": "Assets Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "report": 1, "export": 1},
-  {"role": "Asset Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "report": 1, "export": 1},
-  {"role": "Asset Finance Manager", "read": 1, "report": 1, "export": 1},
-  {"role": "Asset Technician", "read": 1, "write": 1, "create": 1, "report": 1},
-  {"role": "Asset User", "read": 1}
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 0,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1
+  }
  ],
  "sort_field": "modified",
  "sort_order": "DESC",

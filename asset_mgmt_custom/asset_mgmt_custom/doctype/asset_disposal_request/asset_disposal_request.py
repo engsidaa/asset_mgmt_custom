@@ -19,7 +19,7 @@ class AssetDisposalRequest(Document):
             SELECT u.name
             FROM `tabUser` u
             JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
-            WHERE hr.role = 'Assets Manager' AND u.enabled = 1
+            WHERE hr.role = 'Asset Manager' AND u.enabled = 1
         """)]
         if not recipients:
             return

@@ -1,15 +1,19 @@
 {
-  "add_total_row": 1,
-  "disabled": 0,
-  "doctype": "Report",
-  "is_standard": "Yes",
-  "module": "Asset Mgmt Custom",
-  "name": "Asset Downtime Analysis",
-  "ref_doctype": "Asset Repair",
-  "report_name": "Asset Downtime Analysis",
-  "report_type": "Script Report",
-  "roles": [
-    {"role": "Assets Manager"},
-    {"role": "System Manager"}
-  ]
+ "add_total_row": 1,
+ "disabled": 0,
+ "doctype": "Report",
+ "is_standard": "Yes",
+ "module": "Asset Mgmt Custom",
+ "name": "Asset Downtime Analysis",
+ "ref_doctype": "Asset Repair",
+ "report_name": "Asset Downtime Analysis",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Asset Manager"
+  },
+  {
+   "role": "System Manager"
+  }
+ ]
 }

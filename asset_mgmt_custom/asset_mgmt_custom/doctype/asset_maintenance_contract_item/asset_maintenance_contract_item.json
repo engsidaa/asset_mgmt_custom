@@ -65,7 +65,7 @@
    "email": 1
   },
   {
-   "role": "Assets Manager",
+   "role": "Asset Manager",
    "read": 1,
    "write": 1,
    "create": 1,
@@ -77,13 +77,6 @@
    "export": 1,
    "print": 1,
    "email": 1
-  },
-  {
-   "role": "Asset Manager",
-   "read": 1,
-   "write": 1,
-   "create": 1,
-   "delete": 1
   },
   {
    "role": "Asset Technician",

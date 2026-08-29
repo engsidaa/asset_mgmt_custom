@@ -1,7 +1,7 @@
 frappe.ui.form.on("Asset Disposal Request", {
 	refresh(frm) {
 		if (frm.doc.docstatus === 1 && frm.doc.status === "Pending Approval") {
-			if (frappe.user.has_role(["Assets Manager", "System Manager"])) {
+			if (frappe.user.has_role(["Asset Manager", "System Manager"])) {
 				frm.add_custom_button(__("Approve"), () => {
 					frappe.confirm(
 						__("Approve this disposal request for {0}?", [frm.doc.asset_name || frm.doc.asset]),

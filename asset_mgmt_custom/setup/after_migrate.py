@@ -6,6 +6,46 @@ by a Custom Field fixture in the same deploy.
 import frappe
 
 
+def unify_asset_manager_role():
+    """
+    The app had two roles doing the same job: 'Asset Manager' (singular —
+    matches the deliberate 5-role naming convention: Asset User, Asset
+    Technician, Asset Manager, Asset Finance Manager, System Manager) and
+    'Assets Manager' (plural). Both were granted permissions in parallel
+    across all 59+ doctypes, and in some doctypes 'Assets Manager' actually
+    had BROADER permissions (submit/cancel/amend/report/export/print/email)
+    that 'Asset Manager' lacked — a real, verified mismatch, not just a
+    naming typo. All fixtures (DocType permissions, Report roles, Workflow
+    allowed/state-edit roles) and code (notification queries, JS role
+    checks) have been updated to the union of both roles' permissions,
+    consolidated under 'Asset Manager' only.
+
+    That fixture cleanup does not touch the live `tabRole` record or any
+    user's actual role assignment. This does: frappe.rename_doc with
+    merge=True updates every Link field across the system that points to
+    the old Role — including Has Role (so any user who had 'Assets
+    Manager' keeps their access, now under 'Asset Manager') — then removes
+    the now-empty duplicate. Whichever of the two roles real users
+    actually held before this deploy, they lose nothing.
+    """
+    old_role = "Assets Manager"
+    new_role = "Asset Manager"
+
+    if not frappe.db.exists("Role", old_role):
+        return
+
+    try:
+        if frappe.db.exists("Role", new_role):
+            frappe.rename_doc("Role", old_role, new_role, merge=True, force=True)
+        else:
+            frappe.rename_doc("Role", old_role, new_role, force=True)
+        frappe.db.commit()
+        print(f"Unified role: '{old_role}' -> '{new_role}'")
+    except Exception:
+        frappe.db.rollback()
+        frappe.log_error(title="unify_asset_manager_role failed")
+
+
 def backfill_asset_coding_status():
     """
     custom_coding_status (added alongside the before/after tagging photos)

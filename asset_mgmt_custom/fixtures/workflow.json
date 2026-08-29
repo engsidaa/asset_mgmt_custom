@@ -19,19 +19,19 @@
    {
     "state": "Pending Approval",
     "doc_status": "0",
-    "allow_edit": "Assets Manager",
+    "allow_edit": "Asset Manager",
     "is_optional_state": 0
    },
    {
     "state": "Approved",
     "doc_status": "1",
-    "allow_edit": "Assets Manager",
+    "allow_edit": "Asset Manager",
     "is_optional_state": 0
    },
    {
     "state": "Rejected",
     "doc_status": "0",
-    "allow_edit": "Assets Manager",
+    "allow_edit": "Asset Manager",
     "is_optional_state": 0
    }
   ],
@@ -48,7 +48,7 @@
     "state": "Pending Approval",
     "action": "Approve",
     "next_state": "Approved",
-    "allowed": "Assets Manager",
+    "allowed": "Asset Manager",
     "allow_self_approval": 1,
     "condition": ""
    },
@@ -56,7 +56,7 @@
     "state": "Pending Approval",
     "action": "Reject",
     "next_state": "Rejected",
-    "allowed": "Assets Manager",
+    "allowed": "Asset Manager",
     "allow_self_approval": 1,
     "condition": ""
    },
@@ -88,19 +88,19 @@
    {
     "state": "Pending Approval",
     "doc_status": "0",
-    "allow_edit": "Assets Manager",
+    "allow_edit": "Asset Manager",
     "style": "Warning"
    },
    {
     "state": "Approved",
     "doc_status": "1",
-    "allow_edit": "Assets Manager",
+    "allow_edit": "Asset Manager",
     "style": "Success"
    },
    {
     "state": "Rejected",
     "doc_status": "0",
-    "allow_edit": "Assets Manager",
+    "allow_edit": "Asset Manager",
     "style": "Danger"
    }
   ],
@@ -116,14 +116,14 @@
     "state": "Pending Approval",
     "action": "Approve",
     "next_state": "Approved",
-    "allowed": "Assets Manager",
+    "allowed": "Asset Manager",
     "allow_self_approval": 1
    },
    {
     "state": "Pending Approval",
     "action": "Reject",
     "next_state": "Rejected",
-    "allowed": "Assets Manager",
+    "allowed": "Asset Manager",
     "allow_self_approval": 1
    },
    {

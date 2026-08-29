@@ -104,12 +104,12 @@ def _clear_transit(item):
 
 
 def _get_assets_manager_emails():
-    """Return email list of all enabled users holding the 'Assets Manager' role."""
+    """Return email list of all enabled users holding the 'Asset Manager' role."""
     return [r[0] for r in frappe.db.sql("""
         SELECT u.email
         FROM `tabUser` u
         JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
-        WHERE hr.role = 'Assets Manager'
+        WHERE hr.role = 'Asset Manager'
           AND u.enabled = 1
           AND u.name NOT IN ('Administrator', 'All', 'Guest')
           AND u.email IS NOT NULL AND u.email != ''
@@ -117,7 +117,7 @@ def _get_assets_manager_emails():
 
 
 def _notify_target_location(doc, item):
-    """Notify ALL users with 'Assets Manager' role when an asset enters transit."""
+    """Notify ALL users with 'Asset Manager' role when an asset enters transit."""
     try:
         target = item.target_location
         if not target:

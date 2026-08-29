@@ -13,7 +13,7 @@ def _get_manager_users():
         SELECT u.name
         FROM `tabUser` u
         JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
-        WHERE hr.role = 'Assets Manager' AND u.enabled = 1
+        WHERE hr.role = 'Asset Manager' AND u.enabled = 1
     """)]
 
 
@@ -22,7 +22,7 @@ def _get_manager_emails():
         SELECT u.email
         FROM `tabUser` u
         JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
-        WHERE hr.role = 'Assets Manager'
+        WHERE hr.role = 'Asset Manager'
           AND u.enabled = 1
           AND u.name NOT IN ('Administrator', 'All', 'Guest')
           AND u.email IS NOT NULL AND u.email != ''
@@ -53,7 +53,7 @@ def _create_notification(subject, content, doc_type, doc_name, users):
 def send_incomplete_asset_alerts():
     """
     Daily job: find assets that have been in 'Incomplete' status for > 3 days
-    and send an in-app notification to users with the 'Assets Manager' role.
+    and send an in-app notification to users with the 'Asset Manager' role.
     """
     incomplete = frappe.db.sql("""
         SELECT name, asset_name, creation, company
@@ -96,7 +96,7 @@ def send_incomplete_asset_alerts():
 
 def send_maintenance_due_alerts():
     """
-    Daily: notify Assets Managers of maintenance tasks due in <= 7 days or overdue.
+    Daily: notify Asset Managers of maintenance tasks due in <= 7 days or overdue.
     """
     cutoff = add_days(today(), 7)
 

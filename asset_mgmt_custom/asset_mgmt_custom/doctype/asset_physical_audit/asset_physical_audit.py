@@ -42,7 +42,7 @@ class AssetPhysicalAudit(frappe.model.document.Document):
         managers = [r[0] for r in frappe.db.sql("""
             SELECT u.name FROM `tabUser` u
             JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
-            WHERE hr.role = 'Assets Manager' AND u.enabled = 1
+            WHERE hr.role = 'Asset Manager' AND u.enabled = 1
         """)]
         if not managers:
             return

@@ -135,6 +135,7 @@ scheduler_events = {
 # Migration Hooks — run AFTER sync_fixtures(), unlike patches.txt entries
 # ---------------------------------------------------------------------------
 after_migrate = [
+    "asset_mgmt_custom.setup.after_migrate.unify_asset_manager_role",
     "asset_mgmt_custom.setup.after_migrate.backfill_asset_coding_status",
     "asset_mgmt_custom.setup.after_migrate.remove_old_asset_requisition_workflow",
 ]

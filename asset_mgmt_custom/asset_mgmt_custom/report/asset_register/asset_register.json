@@ -1,17 +1,25 @@
 {
-  "add_total_row": 1,
-  "disabled": 0,
-  "doctype": "Report",
-  "is_standard": "Yes",
-  "module": "Asset Mgmt Custom",
-  "name": "Asset Register",
-  "ref_doctype": "Asset",
-  "report_name": "Asset Register",
-  "report_type": "Script Report",
-  "roles": [
-    {"role": "Assets Manager"},
-    {"role": "System Manager"},
-    {"role": "Accounts Manager"},
-    {"role": "Accounts User"}
-  ]
+ "add_total_row": 1,
+ "disabled": 0,
+ "doctype": "Report",
+ "is_standard": "Yes",
+ "module": "Asset Mgmt Custom",
+ "name": "Asset Register",
+ "ref_doctype": "Asset",
+ "report_name": "Asset Register",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Asset Manager"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Accounts User"
+  }
+ ]
 }

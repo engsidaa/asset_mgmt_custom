@@ -20,7 +20,7 @@ assets_allocated):
     touching HRMS's code.
 
 on_submit:
-  - notify Assets Managers about any 'Recover Cost' assets — HRMS's own
+  - notify Asset Managers about any 'Recover Cost' assets — HRMS's own
     before_submit gate guarantees no 'Return'-pending rows survive to this
     point, but a recovered-cost row means the asset is effectively lost or
     damaged and still needs real follow-up (write-off, status update) in
@@ -96,7 +96,7 @@ def _asset_for_row(row, employee):
 
 
 def _notify_assets_managers(doc):
-    """On Full & Final submission: notify Assets Managers about any
+    """On Full & Final submission: notify Asset Managers about any
     'Recover Cost' rows — the asset is effectively written off from the
     employee's custody, but its status/write-off in the Asset module
     itself needs a human to actually action it."""
@@ -113,7 +113,7 @@ def _notify_assets_managers(doc):
         SELECT u.name
         FROM `tabUser` u
         JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
-        WHERE hr.role = 'Assets Manager' AND u.enabled = 1
+        WHERE hr.role = 'Asset Manager' AND u.enabled = 1
     """)]
     if not managers:
         return

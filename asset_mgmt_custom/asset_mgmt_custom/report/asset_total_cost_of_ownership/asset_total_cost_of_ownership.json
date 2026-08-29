@@ -1,39 +1,45 @@
 {
-  "doctype": "Report",
-  "name": "Asset Total Cost of Ownership",
-  "report_name": "Asset Total Cost of Ownership",
-  "ref_doctype": "Asset",
-  "report_type": "Script Report",
-  "is_standard": "Yes",
-  "module": "Asset Mgmt Custom",
-  "disabled": 0,
-  "filters": [
-    {
-      "fieldname": "company",
-      "label": "Company",
-      "fieldtype": "Link",
-      "options": "Company"
-    },
-    {
-      "fieldname": "asset_category",
-      "label": "Asset Category",
-      "fieldtype": "Link",
-      "options": "Asset Category"
-    },
-    {
-      "fieldname": "from_date",
-      "label": "From Date",
-      "fieldtype": "Date"
-    },
-    {
-      "fieldname": "to_date",
-      "label": "To Date",
-      "fieldtype": "Date"
-    }
-  ],
-  "roles": [
-    {"role": "Assets Manager"},
-    {"role": "System Manager"},
-    {"role": "Accounts Manager"}
-  ]
+ "doctype": "Report",
+ "name": "Asset Total Cost of Ownership",
+ "report_name": "Asset Total Cost of Ownership",
+ "ref_doctype": "Asset",
+ "report_type": "Script Report",
+ "is_standard": "Yes",
+ "module": "Asset Mgmt Custom",
+ "disabled": 0,
+ "filters": [
+  {
+   "fieldname": "company",
+   "label": "Company",
+   "fieldtype": "Link",
+   "options": "Company"
+  },
+  {
+   "fieldname": "asset_category",
+   "label": "Asset Category",
+   "fieldtype": "Link",
+   "options": "Asset Category"
+  },
+  {
+   "fieldname": "from_date",
+   "label": "From Date",
+   "fieldtype": "Date"
+  },
+  {
+   "fieldname": "to_date",
+   "label": "To Date",
+   "fieldtype": "Date"
+  }
+ ],
+ "roles": [
+  {
+   "role": "Asset Manager"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Accounts Manager"
+  }
+ ]
 }

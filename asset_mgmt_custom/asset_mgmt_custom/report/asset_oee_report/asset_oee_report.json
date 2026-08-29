@@ -17,10 +17,17 @@
  "report_name": "Asset OEE Report",
  "report_type": "Script Report",
  "roles": [
-  {"role": "System Manager"},
-  {"role": "Assets Manager"},
-  {"role": "Asset Manager"},
-  {"role": "Asset Finance Manager"},
-  {"role": "Asset Technician"}
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Asset Manager"
+  },
+  {
+   "role": "Asset Finance Manager"
+  },
+  {
+   "role": "Asset Technician"
+  }
  ]
 }
