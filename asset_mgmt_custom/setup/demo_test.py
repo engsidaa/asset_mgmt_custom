@@ -584,3 +584,37 @@ def diagnose_accounts():
     for r in rows2:
         print(f"  - {r.name}  |  account_type={r.account_type or '(فارغ)'}  |  "
               f"is_group={r.is_group}  |  root_type={r.root_type}")
+
+
+def diagnose_companies():
+    """فحص أوسع: هل شجرة الحسابات (Chart of Accounts) موجودة أصلاً لأي شركة
+    في النظام؟ لو مفيش أي حساب خالص لأي شركة، فده معناه شجرة الحسابات لم
+    تُنشأ من الأساس (وده أكبر من مجرد حساب واحد ناقص).
+    طريقة التشغيل:
+      bench --site e-u40.hosetia.com execute asset_mgmt_custom.setup.demo_test.diagnose_companies
+    """
+    companies = frappe.get_all("Company", fields=["name", "default_currency", "country"])
+    print(f"عدد الشركات في النظام: {len(companies)}\n")
+
+    for c in companies:
+        total = frappe.db.count("Account", {"company": c.name})
+        roots = frappe.db.sql(
+            """
+            SELECT name, root_type FROM `tabAccount`
+            WHERE company = %s AND is_group = 1 AND (parent_account IS NULL OR parent_account = '')
+            """,
+            c.name,
+            as_dict=True,
+        )
+        print(f"- {c.name}  (currency={c.default_currency}, country={c.country})")
+        print(f"    إجمالي عدد الحسابات: {total}")
+        if roots:
+            print(f"    الحسابات الجذرية (Root): {[f'{r.name} ({r.root_type})' for r in roots]}")
+        else:
+            print("    لا توجد أي حسابات جذرية — شجرة الحسابات غير موجودة إطلاقاً لهذه الشركة")
+
+    total_accounts_system_wide = frappe.db.count("Account")
+    print(f"\nإجمالي عدد الحسابات في كل النظام (كل الشركات): {total_accounts_system_wide}")
+
+    default_company = frappe.defaults.get_global_default("company")
+    print(f"الشركة الافتراضية (Global Default Company): {default_company}")
