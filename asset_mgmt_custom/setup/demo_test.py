@@ -539,3 +539,48 @@ def _asset_for_row_matches(row, employee, asset):
         "Asset Movement Item", {"parent": row.reference, "to_employee": employee}, "asset"
     )
     return linked_asset == asset
+
+
+# ---------------------------------------------------------------------------
+# تشخيص فقط (قراءة، بدون أي تعديل) — لمعرفة سبب عدم وجود حساب Fixed Asset
+# طريقة التشغيل:
+#   bench --site e-u40.hosetia.com execute asset_mgmt_custom.setup.demo_test.diagnose_accounts
+# ---------------------------------------------------------------------------
+
+def diagnose_accounts():
+    company = _get_default_company()
+    print(f"الشركة: {company}\n")
+
+    print("كل حسابات نوع الأصول (root_type = Asset) غير التجميعية (is_group=0):")
+    rows = frappe.db.sql(
+        """
+        SELECT name, account_type, parent_account
+        FROM `tabAccount`
+        WHERE company = %s AND root_type = 'Asset' AND is_group = 0
+        ORDER BY parent_account, name
+        """,
+        company,
+        as_dict=True,
+    )
+    if not rows:
+        print("  (لا يوجد أي حساب أصول غير تجميعي على الإطلاق لهذه الشركة)")
+    for r in rows:
+        marker = "  <-- هذا مُصنَّف كـ Fixed Asset" if r.account_type == "Fixed Asset" else ""
+        print(f"  - {r.name}  |  account_type={r.account_type or '(فارغ)'}  |  parent={r.parent_account}{marker}")
+
+    print("\nكل الحسابات (تجميعية وغير تجميعية) اللي اسمها يحتوي 'Fixed' أو 'أصول':")
+    rows2 = frappe.db.sql(
+        """
+        SELECT name, account_type, is_group, root_type
+        FROM `tabAccount`
+        WHERE company = %s AND (name LIKE %s OR name LIKE %s)
+        ORDER BY name
+        """,
+        (company, "%Fixed%", "%أصول%"),
+        as_dict=True,
+    )
+    if not rows2:
+        print("  (لا يوجد)")
+    for r in rows2:
+        print(f"  - {r.name}  |  account_type={r.account_type or '(فارغ)'}  |  "
+              f"is_group={r.is_group}  |  root_type={r.root_type}")
