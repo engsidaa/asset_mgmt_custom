@@ -208,6 +208,22 @@ def _ensure_default_payable_account(company):
     payable = frappe.db.get_value(
         "Account", {"company": company, "account_type": "Payable", "is_group": 0}, "name"
     )
+
+    if not payable:
+        # نفس نمط مشكلة "Fixed Asset": حساب حقيقي موجود ("حساب الموردين")
+        # لكنه مش مُصنَّف بنوع Payable. تم تأكيد هذا الحساب تحديداً مع
+        # المستخدم عبر diagnose_payable_accounts() قبل تصنيفه هنا.
+        known_account = frappe.db.get_value(
+            "Account", {"company": company, "account_name": "حساب الموردين", "is_group": 0}, "name"
+        )
+        if known_account:
+            doc = frappe.get_doc("Account", known_account)
+            doc.account_type = "Payable"
+            doc.save(ignore_permissions=True)
+            frappe.db.commit()
+            payable = known_account
+            _ok(f"تم تصنيف الحساب الموجود '{known_account}' كنوع Payable (بتأكيد المستخدم)")
+
     if not payable:
         _warn("لا يوجد أي حساب من نوع 'Payable' في شجرة الحسابات — لن يتم ضبط شيء. "
               "إصلاحات OpEx بدون فاتورة شراء ستفشل حتى يُعرَّف هذا الحساب يدوياً.")
