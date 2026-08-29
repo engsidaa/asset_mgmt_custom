@@ -459,7 +459,7 @@
   "fieldname": "custom_vehicle_number",
   "fieldtype": "Data",
   "label": "Vehicle Number (رقم السيارة)",
-  "insert_after": "custom_transit_col",
+  "insert_after": "custom_driver",
   "reqd": 0
  },
  {
@@ -657,6 +657,30 @@
   "label": "مدير الفرع (Branch Manager)",
   "insert_after": "branch",
   "description": "المستخدم المسؤول عن اعتماد طلبات الأصول الخاصة بهذا الفرع",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Branch-custom_default_warehouse",
+  "dt": "Branch",
+  "fieldname": "custom_default_warehouse",
+  "fieldtype": "Link",
+  "options": "Warehouse",
+  "label": "المخزن الافتراضي للفرع (Default Warehouse)",
+  "insert_after": "custom_branch_manager",
+  "description": "يُستخدم للتحقق الفعلي من توفر الأصناف بالمخزون عند تقديم طلب أصل من هذا الفرع",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_driver",
+  "dt": "Asset Movement",
+  "fieldname": "custom_driver",
+  "fieldtype": "Link",
+  "options": "Driver",
+  "label": "السائق (من سجل السائقين)",
+  "insert_after": "custom_transit_section",
+  "description": "اختياري — لو السائق مسجَّل في سجل السائقين (Driver) بدل إدخال الاسم يدوياً",
   "reqd": 0
  }
 ]

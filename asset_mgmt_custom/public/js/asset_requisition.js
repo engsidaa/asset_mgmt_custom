@@ -94,7 +94,7 @@ frappe.ui.form.on("Asset Requisition", {
 			}, __("Actions"));
 		}
 
-		if (frm.doc.docstatus === 1 && frm.doc.status === "Approved" && !frm.doc.spare_available) {
+		if (frm.doc.docstatus === 1 && frm.doc.status === "Approved" && !frm.doc.spare_available && !frm.doc.stock_available) {
 			frm.add_custom_button(__("Create Purchase Request"), function () {
 				frappe.call({
 					method: "create_purchase_requisition",
@@ -114,9 +114,14 @@ frappe.ui.form.on("Asset Requisition", {
 				__("Spare asset available: {0}", [frm.doc.spare_asset]),
 				"green"
 			);
+		} else if (frm.doc.stock_available) {
+			frm.dashboard.add_comment(
+				__("Item available in warehouse {0} (qty: {1}). No purchase needed.", [frm.doc.check_warehouse, frm.doc.available_qty]),
+				"green"
+			);
 		} else if (frm.doc.docstatus === 0) {
 			frm.dashboard.add_comment(
-				__("No spare asset found for this category. A purchase requisition may be needed."),
+				__("No spare asset or warehouse stock found. A purchase requisition may be needed."),
 				"orange"
 			);
 		}

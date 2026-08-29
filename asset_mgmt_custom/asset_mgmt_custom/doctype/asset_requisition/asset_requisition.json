@@ -164,7 +164,7 @@
   {
    "fieldname": "section_spare",
    "fieldtype": "Section Break",
-   "label": "أصل احتياطي"
+   "label": "التحقق من التوفر (أصل احتياطي أو مخزون)"
   },
   {
    "fieldname": "spare_available",
@@ -177,6 +177,30 @@
    "fieldtype": "Link",
    "label": "الأصل الاحتياطي",
    "options": "Asset",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_spare",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stock_available",
+   "fieldtype": "Check",
+   "label": "متوفر بالمخزون",
+   "read_only": 1,
+   "description": "تحقق فعلي من كمية الصنف في المخزن الافتراضي للفرع (Bin.actual_qty)"
+  },
+  {
+   "fieldname": "available_qty",
+   "fieldtype": "Float",
+   "label": "الكمية المتاحة بالمخزن",
+   "read_only": 1
+  },
+  {
+   "fieldname": "check_warehouse",
+   "fieldtype": "Link",
+   "options": "Warehouse",
+   "label": "المخزن الذي تم التحقق منه",
    "read_only": 1
   },
   {

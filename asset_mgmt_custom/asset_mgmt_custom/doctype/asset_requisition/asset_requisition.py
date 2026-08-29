@@ -42,11 +42,13 @@ APPROVAL_CHAIN = {
 class AssetRequisition(Document):
     def validate(self):
         self._check_spare_availability()
+        self._check_warehouse_stock()
 
     def on_submit(self):
         self.db_set("status", "Pending Finance Approval")
 
     def _check_spare_availability(self):
+        """أعلى أولوية: أصل جاهز فعلاً (مُرمَّز، جزء من سجل الأصول) في نفس الفئة."""
         if not self.asset_category:
             return
         filters = {
@@ -63,6 +65,37 @@ class AssetRequisition(Document):
         else:
             self.spare_available = 0
             self.spare_asset = None
+
+    def _check_warehouse_stock(self):
+        """
+        تحقق فعلي من المخزون (Bin.actual_qty) — يعمل فقط لو مفيش أصل احتياطي
+        جاهز أصلاً، وفيه صنف (item_code) ومخزن افتراضي مُعرَّف للفرع.
+        هذا تحقق/عرض معلومات فقط لدعم قرار المعتمدين — تحويل الصنف من
+        المخزون إلى أصل مُسجَّل فعلياً يبقى إجراء منفصل يقوم به أمين
+        المخزن/إدارة الأصول يدوياً بعد الاعتماد، بنفس الآلية المحاسبية
+        القياسية في ERPNext (Purchase Receipt → Create Asset)، بدل ما
+        نخترع مسار محاسبي جديد.
+        """
+        self.stock_available = 0
+        self.available_qty = 0
+        self.check_warehouse = None
+
+        if self.spare_available or not self.item_code or not self.branch:
+            return
+
+        warehouse = frappe.db.get_value("Branch", self.branch, "custom_default_warehouse")
+        if not warehouse:
+            return
+
+        self.check_warehouse = warehouse
+        actual_qty = frappe.db.get_value(
+            "Bin", {"item_code": self.item_code, "warehouse": warehouse}, "actual_qty"
+        ) or 0
+        self.available_qty = actual_qty
+
+        required_qty = self.quantity or 1
+        if actual_qty >= required_qty:
+            self.stock_available = 1
 
     # ------------------------------------------------------------------
     # المرحلة 1: اعتماد المالية
@@ -201,9 +234,16 @@ class AssetRequisition(Document):
 
     @frappe.whitelist()
     def create_purchase_requisition(self):
-        """Create a Material Request (Purchase) from this requisition when no spare is available."""
+        """Create a Material Request (Purchase) — only when neither a spare
+        asset nor real warehouse stock is available."""
         if self.spare_available:
             frappe.throw(_("A spare asset is available. Use 'Create Asset Movement' instead."))
+        if self.stock_available:
+            frappe.throw(
+                _("Item is available in warehouse {0} (qty: {1}). No need to purchase.").format(
+                    self.check_warehouse, self.available_qty
+                )
+            )
         if self.status != "Approved":
             frappe.throw(_("Requisition must be Approved before creating a purchase request."))
 

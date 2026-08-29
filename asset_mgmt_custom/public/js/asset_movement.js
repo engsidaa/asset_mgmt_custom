@@ -49,6 +49,18 @@ frappe.ui.form.on("Asset Movement", {
 		_render_movement_summary(frm);
 		_toggle_transit_section(frm);
 	},
+
+	// -----------------------------------------------------------------------
+	// اختيار سائق من سجل السائقين — يملأ اسمه تلقائياً (اختياري)
+	// -----------------------------------------------------------------------
+	custom_driver(frm) {
+		if (!frm.doc.custom_driver) return;
+		frappe.db.get_value("Driver", frm.doc.custom_driver, "full_name").then(({ message }) => {
+			if (message && message.full_name) {
+				frm.set_value("custom_driver_name", message.full_name);
+			}
+		});
+	},
 });
 
 frappe.ui.form.on("Asset Movement Item", {
@@ -182,6 +194,7 @@ function _show_transit_badge(frm) {
 function _toggle_transit_section(frm) {
 	const show = frm.doc.purpose === "Transfer";
 	frm.toggle_display("custom_transit_section", show);
+	frm.toggle_display("custom_driver", show);
 	frm.toggle_display("custom_driver_name", show);
 	frm.toggle_display("custom_transit_col", show);
 	frm.toggle_display("custom_vehicle_number", show);
