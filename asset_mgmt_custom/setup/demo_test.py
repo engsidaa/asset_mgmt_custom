@@ -504,9 +504,16 @@ def _test_retention_and_ff_exemption():
         retention.db_set("status", "Approved")
         _ok(f"تم إنشاء طلب احتفاظ {retention.name} وتعيينه كـ 'Approved' مباشرة (تجاوز الـ Workflow للاختبار)")
 
+        # relieving_date على المستند مربوط (fetch_from) بحقل الموظف نفسه
+        # ومقروء فقط (read_only) — Frappe بيعيد جلبه من سجل الموظف وقت
+        # الحفظ بغض النظر عمّا نضبطه هنا مباشرة، فلازم نضبطه على سجل
+        # الموظف الحقيقي أولاً (مؤقتاً، هيترجع بالـ rollback زي كل حاجة تانية)
+        if not frappe.db.get_value("Employee", employee, "relieving_date"):
+            frappe.db.set_value("Employee", employee, "relieving_date", today())
+            _info(f"تم ضبط تاريخ إخلاء طرف مؤقت على الموظف {employee} (لازم لاختبار Full & Final)")
+
         ff = frappe.new_doc("Full and Final Statement")
         ff.employee = employee
-        ff.relieving_date = today()
         ff.insert(ignore_permissions=True)
         _ok(f"تم إنشاء Full and Final Statement {ff.name} (بدون submit)")
 

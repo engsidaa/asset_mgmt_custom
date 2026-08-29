@@ -28,7 +28,7 @@ def execute(filters=None):
         values["asset"] = filters["asset"]
 
     if filters.get("asset_category"):
-        conditions.append("ar.asset_category = %(asset_category)s")
+        conditions.append("a.asset_category = %(asset_category)s")
         values["asset_category"] = filters["asset_category"]
 
     if filters.get("from_date"):
@@ -45,7 +45,7 @@ def execute(filters=None):
             ar.name                                                     AS repair_name,
             ar.asset,
             a.asset_name,
-            ar.asset_category,
+            a.asset_category,
             ar.completion_date,
             ar.repair_cost,
             IFNULL(ar.custom_labor_cost, 0)                             AS labor_cost,
@@ -56,7 +56,7 @@ def execute(filters=None):
             ar.custom_is_warranty_repair                                AS is_warranty_repair
         FROM `tabAsset Repair` ar
         LEFT JOIN `tabAsset` a  ON a.name  = ar.asset
-        LEFT JOIN `tabAsset Category` ac ON ac.name = ar.asset_category
+        LEFT JOIN `tabAsset Category` ac ON ac.name = a.asset_category
         WHERE
             ar.docstatus = 1
             AND ar.capitalize_repair_cost = 1

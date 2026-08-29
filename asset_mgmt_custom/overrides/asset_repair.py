@@ -74,18 +74,24 @@ def _validate_completion_requirements(doc):
 
 
 def _auto_classify_capex(doc):
-    """If warranty repair, zero out costs. If cost > threshold, auto-set capitalize."""
+    """If warranty repair, zero out costs. If cost > threshold, auto-set capitalize.
+
+    Asset Repair has no 'asset_category' field of its own (unlike Asset) —
+    it must always be looked up via the linked Asset. A previous version of
+    this function read/wrote doc.asset_category directly, which crashed with
+    AttributeError on every single Asset Repair the first time this ran,
+    since Python raises on reading an attribute that was never set for a
+    field the doctype doesn't declare."""
     if doc.get("custom_is_warranty_repair"):
         doc.capitalize_repair_cost = 0
         return
 
-    if not doc.asset_category:
-        doc.asset_category = frappe.db.get_value("Asset", doc.asset, "asset_category")
+    asset_category = frappe.db.get_value("Asset", doc.asset, "asset_category")
 
     threshold = 0
-    if doc.asset_category:
+    if asset_category:
         threshold = frappe.db.get_value(
-            "Asset Category", doc.asset_category, "custom_capitalization_threshold"
+            "Asset Category", asset_category, "custom_capitalization_threshold"
         ) or 0
 
     total = flt(doc.repair_cost) + flt(doc.get("custom_labor_cost"))
