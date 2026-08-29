@@ -20,7 +20,10 @@ On Submit:
         الصيانة الرأسمالية" (custom_capital_maintenance_wip_account على فئة
         الأصل) — بدل الترحيل المباشر لحساب الأصل.
       * OpEx: من حـ/ مصروف الصيانة (custom_maintenance_expense_account) ←
-        إلى حساب الدائنين الافتراضي للشركة (default_payable_account).
+        إلى حـ/ التزامات صيانة مستحقة (custom_maintenance_accrued_liability_account
+        على فئة الأصل) — وليس حساب موردين الشركة العام، لأن ERPNext يشترط
+        تحديد طرف (Party) لأي قيد على حساب Payable، وإصلاح بدون فاتورة
+        شراء ليس له مورد محدد أصلاً.
 
 On Cancel:
   - يُعيد حساب إجمالي التكلفة وتاريخ آخر صيانة بعد حذف هذا السند
@@ -191,7 +194,12 @@ def _post_repair_cost_gl_entry(doc):
     category_account = frappe.db.get_value(
         "Asset Category Account",
         {"parent": asset.asset_category, "company_name": company},
-        ["fixed_asset_account", "custom_capital_maintenance_wip_account", "custom_maintenance_expense_account"],
+        [
+            "fixed_asset_account",
+            "custom_capital_maintenance_wip_account",
+            "custom_maintenance_expense_account",
+            "custom_maintenance_accrued_liability_account",
+        ],
         as_dict=True,
     )
     if not category_account:
@@ -247,11 +255,21 @@ def _post_repair_cost_gl_entry(doc):
                 ).format(asset.asset_category, company),
                 title=_("Missing Maintenance Expense Account"),
             )
-        payable_account = frappe.db.get_value("Company", company, "default_payable_account")
-        if not payable_account:
+        # لا نستخدم حساب موردين الشركة العام هنا: ERPNext يشترط تحديد طرف
+        # (Party Type / Party) لأي قيد على حساب من نوع Payable/Receivable،
+        # وإصلاح بدون فاتورة شراء ليس له مورد محدد أصلاً (لو كان له مورد،
+        # كان المفروض يُفوتَر أصلاً بدل ما يمر من هنا). لذلك نستخدم حساب
+        # التزامات مستحقة مخصص (Current Liability، وليس Payable) لا يحتاج
+        # طرفاً — قرار تأكد من المستخدم صراحة.
+        accrued_account = category_account.custom_maintenance_accrued_liability_account
+        if not accrued_account:
             frappe.throw(
-                _("Please set 'Default Payable Account' in Company {0}.").format(company),
-                title=_("Missing Payable Account"),
+                _(
+                    "Please set 'Maintenance Accrued Liability Account' on the Asset Category "
+                    "Account for {0} / {1} before completing a non-capitalized repair without "
+                    "a linked Purchase Invoice."
+                ).format(asset.asset_category, company),
+                title=_("Missing Accrued Liability Account"),
             )
         je.user_remark = _("Maintenance expense for Asset {0} via {1}").format(
             asset.asset_name, doc.name
@@ -264,7 +282,7 @@ def _post_repair_cost_gl_entry(doc):
             "reference_name": doc.asset,
         })
         je.append("accounts", {
-            "account": payable_account,
+            "account": accrued_account,
             "credit_in_account_currency": total_cost,
             "cost_center": doc.cost_center or None,
             "reference_type": "Asset",

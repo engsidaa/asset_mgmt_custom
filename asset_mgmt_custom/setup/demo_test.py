@@ -349,7 +349,7 @@ def _test_asset_repair_gl():
             "Asset Category Account",
             {"parent": asset_doc.asset_category, "company_name": asset_doc.company},
             ["fixed_asset_account", "custom_capital_maintenance_wip_account",
-             "custom_maintenance_expense_account"],
+             "custom_maintenance_expense_account", "custom_maintenance_accrued_liability_account"],
             as_dict=True,
         )
         if not category_account:
@@ -358,11 +358,11 @@ def _test_asset_repair_gl():
                   f"لازم يُضاف قبل ما نقدر نختبر القيد المحاسبي")
             return
 
-        if not category_account.custom_maintenance_expense_account:
-            _info("ملاحظة: 'Maintenance Expense Account' غير مُعرَّف على هذه الفئة "
-                  "— اختبار OpEx هيُتخطى تلقائياً لو حصل")
+        if not category_account.custom_maintenance_expense_account or not category_account.custom_maintenance_accrued_liability_account:
+            _info("ملاحظة: 'Maintenance Expense Account' أو 'Maintenance Accrued Liability Account' "
+                  "غير مُعرَّفين على هذه الفئة — اختبار OpEx هيُتخطى تلقائياً لو حصل")
         if not category_account.custom_capital_maintenance_wip_account:
-            _info("ملاحظة: 'Capital Maintenance WIP Account' (حساب الوساطة 110902) غير "
+            _info("ملاحظة: 'Capital Maintenance WIP Account' (حساب الوساطة) غير "
                   "مُعرَّف على هذه الفئة — اختبار CapEx هيُتخطى تلقائياً لو حصل")
 
         # --- OpEx: إصلاح عادي بدون رسملة (سيناريو مستقل — فشله لا يوقف باقي السيناريوهات) ---
@@ -392,7 +392,7 @@ def _test_asset_repair_gl():
                     _fail("OpEx: المبالغ غير متزنة أو غير مطابقة (متوقع 500)")
             else:
                 _skip("OpEx: لم يُنشأ قيد يومية — على الأغلب معندهاش custom_maintenance_expense_account "
-                      "أو default_payable_account مُعرَّفين")
+                      "أو custom_maintenance_accrued_liability_account مُعرَّفين")
         except Exception as e:
             _fail("OpEx: فشل السيناريو", e)
 

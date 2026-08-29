@@ -82,6 +82,21 @@ def run():
 
     _ensure_default_payable_account(company)
 
+    # قرار مؤكد من المستخدم: تكلفة إصلاح غير مُرسملة (OpEx) بدون فاتورة
+    # شراء لا تُقفَل على حساب موردين الشركة (يتطلب طرفاً/Party لا نعرفه) —
+    # بل على حساب التزامات مستحقة مخصص (Current Liability عادي).
+    liability_group = _find_liability_group(company)
+    accrued_liability_account = None
+    if liability_group:
+        accrued_liability_account = _find_or_create_leaf_account(
+            company,
+            parent=liability_group,
+            account_name="التزامات صيانة مستحقة",
+            account_type="Current Liability",
+        )
+    else:
+        _warn("لم يتم العثور على مجموعة التزامات (Liability) — تم تخطي حساب الالتزامات المستحقة")
+
     _step("إنشاء/تحديث فئة أصل واحدة تربط الحسابات السابقة")
     category_name = "أصول عامة"
     if frappe.db.exists("Asset Category", category_name):
@@ -106,6 +121,7 @@ def run():
     row.fixed_asset_account = fixed_asset_account
     row.custom_capital_maintenance_wip_account = wip_account
     row.custom_maintenance_expense_account = maintenance_expense_account
+    row.custom_maintenance_accrued_liability_account = accrued_liability_account
 
     if cat.is_new():
         cat.insert(ignore_permissions=True)
@@ -121,6 +137,7 @@ def run():
     print(f"  حساب الأصل الثابت (Fixed Asset): {fixed_asset_account or '(لم يُنشأ — راجع التحذيرات أعلاه)'}")
     print(f"  حساب الوساطة (Capital Work in Progress): {wip_account or '(لم يُنشأ — راجع التحذيرات أعلاه)'}")
     print(f"  حساب مصروف الصيانة (Indirect Expense): {maintenance_expense_account or '(لم يُنشأ)'}")
+    print(f"  حساب التزامات الصيانة المستحقة (Current Liability): {accrued_liability_account or '(لم يُنشأ)'}")
     print("\nراجع هذه الحسابات في شجرة الحسابات (Chart of Accounts) وعدّل الأسماء/الأرقام")
     print("لو حابب تناسب ترقيمك المحاسبي الفعلي — دي بداية جاهزة للعمل، مش نهائية بالضرورة.")
     print("\nبعد كده تقدر تشغّل demo_test.run_demo_test تاني وهيكمل الاختبارات الفعلية بدل التخطي.")
@@ -232,6 +249,30 @@ def _ensure_default_payable_account(company):
     frappe.db.set_value("Company", company, "default_payable_account", payable)
     frappe.db.commit()
     _ok(f"تم ضبط 'Default Payable Account' = {payable}")
+
+
+def _find_liability_group(company):
+    """يدوّر على مجموعة التزامات مناسبة (مفضّل 'دائنون' نفسها بما إنها
+    فعلاً مجموعة موردين حقيقية موجودة) لوضع حساب الالتزامات المستحقة
+    الجديد تحتها كأخ لحساب الموردين، بدل جذر الالتزامات مباشرة."""
+    for pattern in ["%دائنون%", "%Payable%", "%التزامات%", "%Liabilit%"]:
+        group = frappe.db.get_value(
+            "Account",
+            {"company": company, "is_group": 1, "root_type": "Liability", "account_name": ["like", pattern]},
+            "name",
+        )
+        if group:
+            return group
+    row = frappe.db.sql(
+        """
+        SELECT name FROM `tabAccount`
+        WHERE company = %s AND is_group = 1 AND root_type = 'Liability'
+          AND (parent_account IS NULL OR parent_account = '')
+        LIMIT 1
+        """,
+        company,
+    )
+    return row[0][0] if row else None
 
 
 def _find_expense_group(company):

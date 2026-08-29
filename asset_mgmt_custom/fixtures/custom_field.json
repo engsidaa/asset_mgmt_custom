@@ -636,6 +636,18 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset Category Account-custom_maintenance_accrued_liability_account",
+  "dt": "Asset Category Account",
+  "fieldname": "custom_maintenance_accrued_liability_account",
+  "fieldtype": "Link",
+  "options": "Account",
+  "label": "Maintenance Accrued Liability Account (التزامات صيانة مستحقة)",
+  "insert_after": "custom_maintenance_expense_account",
+  "description": "حساب التزامات مستحقة (وليس حساب موردين) يُقفَل عليه الطرف الدائن لمصروف صيانة (OpEx) بدون فاتورة شراء أو مورد محدد — حسابات الموردين تتطلب طرفاً (Party) محدداً ولا تصلح هنا",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Repair-custom_journal_entry",
   "dt": "Asset Repair",
   "fieldname": "custom_journal_entry",
