@@ -365,78 +365,87 @@ def _test_asset_repair_gl():
             _info("ملاحظة: 'Capital Maintenance WIP Account' (حساب الوساطة 110902) غير "
                   "مُعرَّف على هذه الفئة — اختبار CapEx هيُتخطى تلقائياً لو حصل")
 
-        # --- OpEx: إصلاح عادي بدون رسملة ---
-        repair = frappe.new_doc("Asset Repair")
-        repair.asset = asset
-        repair.failure_date = today()
-        repair.completion_date = today()
-        repair.repair_status = "Completed"
-        repair.repair_cost = 500
-        repair.capitalize_repair_cost = 0
-        repair.custom_technician_name = "فني تجريبي"
-        repair.custom_repair_notes = "اختبار توضيحي تلقائي (Demo Test)"
-        repair.insert(ignore_permissions=True)
-        repair.submit()
-        repair.reload()
-
-        if repair.custom_journal_entry:
-            je = frappe.get_doc("Journal Entry", repair.custom_journal_entry)
-            total_debit = sum(row.debit_in_account_currency for row in je.accounts)
-            total_credit = sum(row.credit_in_account_currency for row in je.accounts)
-            _ok(f"OpEx: تم إنشاء قيد يومية {je.name} بحالة {je.docstatus} "
-                f"— إجمالي مدين={total_debit}, دائن={total_credit}")
-            if total_debit == total_credit == 500:
-                _ok("OpEx: المبالغ متزنة ومطابقة لتكلفة الإصلاح (500)")
-            else:
-                _fail("OpEx: المبالغ غير متزنة أو غير مطابقة (متوقع 500)")
-        else:
-            _skip("OpEx: لم يُنشأ قيد يومية — على الأغلب معندهاش custom_maintenance_expense_account "
-                  "أو default_payable_account مُعرَّفين")
-
-        # --- اختبار سلبي: رسملة بدون تمديد العمر يجب أن تُرفض ---
-        repair2 = frappe.new_doc("Asset Repair")
-        repair2.asset = asset
-        repair2.failure_date = today()
-        repair2.completion_date = today()
-        repair2.repair_status = "Completed"
-        repair2.repair_cost = 1000
-        repair2.capitalize_repair_cost = 1
-        repair2.custom_technician_name = "فني تجريبي"
-        repair2.custom_repair_notes = "اختبار رسملة بدون تمديد عمر (يجب أن يُرفض)"
-        blocked_correctly = False
+        # --- OpEx: إصلاح عادي بدون رسملة (سيناريو مستقل — فشله لا يوقف باقي السيناريوهات) ---
         try:
-            repair2.insert(ignore_permissions=True)
-        except frappe.ValidationError:
-            blocked_correctly = True
+            repair = frappe.new_doc("Asset Repair")
+            repair.asset = asset
+            repair.failure_date = today()
+            repair.completion_date = today()
+            repair.repair_status = "Completed"
+            repair.repair_cost = 500
+            repair.capitalize_repair_cost = 0
+            repair.custom_technician_name = "فني تجريبي"
+            repair.custom_repair_notes = "اختبار توضيحي تلقائي (Demo Test)"
+            repair.insert(ignore_permissions=True)
+            repair.submit()
+            repair.reload()
 
-        if blocked_correctly:
-            _ok("CapEx بدون 'زيادة العمر الإنتاجي': تم الرفض بشكل صحيح كما هو متوقع")
-        else:
-            _fail("CapEx بدون 'زيادة العمر الإنتاجي': لم يُرفض — المفروض يمنع الحفظ!")
+            if repair.custom_journal_entry:
+                je = frappe.get_doc("Journal Entry", repair.custom_journal_entry)
+                total_debit = sum(row.debit_in_account_currency for row in je.accounts)
+                total_credit = sum(row.credit_in_account_currency for row in je.accounts)
+                _ok(f"OpEx: تم إنشاء قيد يومية {je.name} بحالة {je.docstatus} "
+                    f"— إجمالي مدين={total_debit}, دائن={total_credit}")
+                if total_debit == total_credit == 500:
+                    _ok("OpEx: المبالغ متزنة ومطابقة لتكلفة الإصلاح (500)")
+                else:
+                    _fail("OpEx: المبالغ غير متزنة أو غير مطابقة (متوقع 500)")
+            else:
+                _skip("OpEx: لم يُنشأ قيد يومية — على الأغلب معندهاش custom_maintenance_expense_account "
+                      "أو default_payable_account مُعرَّفين")
+        except Exception as e:
+            _fail("OpEx: فشل السيناريو", e)
 
-        # --- CapEx: رسملة صحيحة مع تمديد العمر ---
-        repair3 = frappe.new_doc("Asset Repair")
-        repair3.asset = asset
-        repair3.failure_date = today()
-        repair3.completion_date = today()
-        repair3.repair_status = "Completed"
-        repair3.repair_cost = 1000
-        repair3.capitalize_repair_cost = 1
-        repair3.increase_in_asset_life = 6
-        repair3.custom_technician_name = "فني تجريبي"
-        repair3.custom_repair_notes = "اختبار رسملة صحيحة (Demo Test)"
-        repair3.insert(ignore_permissions=True)
-        repair3.submit()
-        repair3.reload()
+        # --- اختبار سلبي: رسملة بدون تمديد العمر يجب أن تُرفض (سيناريو مستقل) ---
+        try:
+            repair2 = frappe.new_doc("Asset Repair")
+            repair2.asset = asset
+            repair2.failure_date = today()
+            repair2.completion_date = today()
+            repair2.repair_status = "Completed"
+            repair2.repair_cost = 1000
+            repair2.capitalize_repair_cost = 1
+            repair2.custom_technician_name = "فني تجريبي"
+            repair2.custom_repair_notes = "اختبار رسملة بدون تمديد عمر (يجب أن يُرفض)"
+            blocked_correctly = False
+            try:
+                repair2.insert(ignore_permissions=True)
+            except frappe.ValidationError:
+                blocked_correctly = True
 
-        if repair3.custom_journal_entry:
-            je3 = frappe.get_doc("Journal Entry", repair3.custom_journal_entry)
-            total_debit3 = sum(row.debit_in_account_currency for row in je3.accounts)
-            _ok(f"CapEx: تم إنشاء قيد يومية {je3.name} — إجمالي مدين={total_debit3} "
-                f"(على حساب الأصل مقابل حساب الوساطة WIP)")
-        else:
-            _skip("CapEx: لم يُنشأ قيد يومية — على الأغلب معندهاش "
-                  "custom_capital_maintenance_wip_account مُعرَّف")
+            if blocked_correctly:
+                _ok("CapEx بدون 'زيادة العمر الإنتاجي': تم الرفض بشكل صحيح كما هو متوقع")
+            else:
+                _fail("CapEx بدون 'زيادة العمر الإنتاجي': لم يُرفض — المفروض يمنع الحفظ!")
+        except Exception as e:
+            _fail("اختبار الرفض السلبي (CapEx بدون تمديد عمر): فشل غير متوقع", e)
+
+        # --- CapEx: رسملة صحيحة مع تمديد العمر (سيناريو مستقل) ---
+        try:
+            repair3 = frappe.new_doc("Asset Repair")
+            repair3.asset = asset
+            repair3.failure_date = today()
+            repair3.completion_date = today()
+            repair3.repair_status = "Completed"
+            repair3.repair_cost = 1000
+            repair3.capitalize_repair_cost = 1
+            repair3.increase_in_asset_life = 6
+            repair3.custom_technician_name = "فني تجريبي"
+            repair3.custom_repair_notes = "اختبار رسملة صحيحة (Demo Test)"
+            repair3.insert(ignore_permissions=True)
+            repair3.submit()
+            repair3.reload()
+
+            if repair3.custom_journal_entry:
+                je3 = frappe.get_doc("Journal Entry", repair3.custom_journal_entry)
+                total_debit3 = sum(row.debit_in_account_currency for row in je3.accounts)
+                _ok(f"CapEx: تم إنشاء قيد يومية {je3.name} — إجمالي مدين={total_debit3} "
+                    f"(على حساب الأصل مقابل حساب الوساطة WIP)")
+            else:
+                _skip("CapEx: لم يُنشأ قيد يومية — على الأغلب معندهاش "
+                      "custom_capital_maintenance_wip_account مُعرَّف")
+        except Exception as e:
+            _fail("CapEx: فشل السيناريو", e)
 
     except Exception as e:
         _fail("فشل اختبار القيد المحاسبي لإصلاح الأصل", e)
@@ -514,6 +523,7 @@ def _test_retention_and_ff_exemption():
 
         ff = frappe.new_doc("Full and Final Statement")
         ff.employee = employee
+        ff.transaction_date = today()
         ff.insert(ignore_permissions=True)
         _ok(f"تم إنشاء Full and Final Statement {ff.name} (بدون submit)")
 

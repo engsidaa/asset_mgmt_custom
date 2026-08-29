@@ -80,6 +80,8 @@ def run():
     else:
         _warn("لم يتم العثور على مجموعة مصروفات (Expense) — تم تخطي حساب مصروف الصيانة")
 
+    _ensure_default_payable_account(company)
+
     _step("إنشاء/تحديث فئة أصل واحدة تربط الحسابات السابقة")
     category_name = "أصول عامة"
     if frappe.db.exists("Asset Category", category_name):
@@ -186,6 +188,34 @@ def _find_or_create_fixed_assets_group(company):
     print("\n  راجع القائمة دي وقولّي أنهي حساب/مجموعة هو المقصود بـ 'الأصول الثابتة' فعلياً،")
     print("  أو لو مفيش أي حاجة مناسبة، قولّي أنشئ مجموعة جديدة باسم محدد منك.")
     return None
+
+
+def _ensure_default_payable_account(company):
+    """
+    الإصلاح غير الرأسمالي (OpEx) بدون فاتورة شراء مرتبطة بيترحّل لحساب
+    الدائنين الافتراضي للشركة (Company.default_payable_account) — لو مش
+    معرَّف، القيد المحاسبي هيفشل مهما كانت باقي الإعدادات صحيحة. هذا
+    إعداد على مستوى الشركة نفسها (مش على فئة الأصل) فبنتأكد منه مرة واحدة
+    هنا. لا نغيّر القيمة أبداً لو كانت معرَّفة بالفعل — فقط نملأ الفراغ.
+    """
+    _step("التأكد من 'Default Payable Account' على مستوى الشركة")
+
+    current = frappe.db.get_value("Company", company, "default_payable_account")
+    if current:
+        _ok(f"مُعرَّف بالفعل: {current}")
+        return
+
+    payable = frappe.db.get_value(
+        "Account", {"company": company, "account_type": "Payable", "is_group": 0}, "name"
+    )
+    if not payable:
+        _warn("لا يوجد أي حساب من نوع 'Payable' في شجرة الحسابات — لن يتم ضبط شيء. "
+              "إصلاحات OpEx بدون فاتورة شراء ستفشل حتى يُعرَّف هذا الحساب يدوياً.")
+        return
+
+    frappe.db.set_value("Company", company, "default_payable_account", payable)
+    frappe.db.commit()
+    _ok(f"تم ضبط 'Default Payable Account' = {payable}")
 
 
 def _find_expense_group(company):
