@@ -650,6 +650,47 @@ def diagnose_payable_accounts():
         print(f"  - {r.name}  |  account_type={r.account_type or '(فارغ)'}")
 
 
+def diagnose_cwip_accounts():
+    """
+    قراءة فقط — تحقق هل فيه حساب 'رأس المال قيد التنفيذ' (Capital Work in
+    Progress) موجود بالفعل تحت مجموعة الأصول في شجرة حساباتك الحقيقية،
+    منفصل عن الحساب اللي أنشأه bootstrap ("أصول تحت الصيانة الرأسمالية").
+    لو موجود، ممكن يكون نفس الحساب المطلوب أصلاً بدل ما ننشئ واحد جديد.
+    طريقة التشغيل:
+      bench --site e-u40.hosetia.com execute asset_mgmt_custom.setup.demo_test.diagnose_cwip_accounts
+    """
+    company = _get_default_company()
+    print(f"الشركة: {company}\n")
+
+    print("كل الحسابات تحت مجموعة الأصول (root_type=Asset) اللي اسمها فيه "
+          "'رأس المال' أو 'قيد التنفيذ' أو 'تحت التنفيذ' أو 'CWIP' أو 'Work in Progress':")
+    rows = frappe.db.sql(
+        """
+        SELECT name, account_type, is_group, parent_account, account_number
+        FROM `tabAccount`
+        WHERE company = %s AND root_type = 'Asset'
+          AND (name LIKE %s OR name LIKE %s OR name LIKE %s OR name LIKE %s OR name LIKE %s)
+        ORDER BY name
+        """,
+        (company, "%رأس المال%", "%قيد التنفيذ%", "%تحت التنفيذ%", "%CWIP%", "%Work in Progress%"),
+        as_dict=True,
+    )
+    if not rows:
+        print("  (لا يوجد أي حساب بهذا الاسم تحت الأصول)")
+    for r in rows:
+        marker = "  <-- مُصنَّف Capital Work in Progress بالفعل" if r.account_type == "Capital Work in Progress" else ""
+        print(f"  - {r.name}  |  رقم={r.account_number or '(بدون)'}  |  account_type={r.account_type or '(فارغ)'}  |  "
+              f"is_group={r.is_group}  |  parent={r.parent_account}{marker}")
+
+    print("\nالحساب اللي أنشأه bootstrap (لو موجود):")
+    wired = frappe.db.get_value(
+        "Asset Category Account",
+        {"parent": "أصول عامة", "company_name": company},
+        "custom_capital_maintenance_wip_account",
+    )
+    print(f"  {wired or '(غير مربوط)'}")
+
+
 def diagnose_companies():
     """فحص أوسع: هل شجرة الحسابات (Chart of Accounts) موجودة أصلاً لأي شركة
     في النظام؟ لو مفيش أي حساب خالص لأي شركة، فده معناه شجرة الحسابات لم
