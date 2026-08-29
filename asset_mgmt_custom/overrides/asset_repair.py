@@ -13,14 +13,23 @@ On Submit:
   - يُحدِّث إجمالي تكلفة الصيانة (custom_total_maintenance_cost) على الأصل
   - يُحدِّث تاريخ آخر صيانة (custom_last_maintenance_date) على الأصل
   - يُسجِّل ملخص الإصلاح في Asset Activity
+  - قيد محاسبي تلقائي لتكلفة الإصلاح (فقط عند عدم ربط فاتورة شراء — لو فيه فاتورة،
+    ERPNext الأساسي أو محاسبة الفاتورة نفسها بيتكفلوا بالقيد فعلاً، وأي قيد إضافي
+    هنا هيكرر المبلغ):
+      * CapEx (capitalize_repair_cost): من حـ/ الأصل ← إلى حـ/ وساطة "أصول تحت
+        الصيانة الرأسمالية" (custom_capital_maintenance_wip_account على فئة
+        الأصل) — بدل الترحيل المباشر لحساب الأصل.
+      * OpEx: من حـ/ مصروف الصيانة (custom_maintenance_expense_account) ←
+        إلى حساب الدائنين الافتراضي للشركة (default_payable_account).
 
 On Cancel:
   - يُعيد حساب إجمالي التكلفة وتاريخ آخر صيانة بعد حذف هذا السند
+  - يُلغي قيد اليومية المُنشأ (لو موجود)
 """
 
 import frappe
 from frappe import _
-from frappe.utils import flt, getdate, now_datetime, time_diff_in_hours
+from frappe.utils import flt, getdate, now_datetime, time_diff_in_hours, today
 
 
 # ---------------------------------------------------------------------------
@@ -110,6 +119,7 @@ def _require_life_extension_when_capitalized(doc):
 def on_submit(doc, method=None):
     _update_asset_maintenance_summary(doc.asset)
     _log_repair_activity(doc)
+    _post_repair_cost_gl_entry(doc)
 
 
 def _update_asset_maintenance_summary(asset_name):
@@ -147,6 +157,129 @@ def _update_asset_maintenance_summary(asset_name):
     )
 
 
+def _post_repair_cost_gl_entry(doc):
+    """
+    ERPNext's own GL posting for repair cost only fires for capitalized
+    (CapEx) repairs, and only when a Purchase Invoice is linked (it reads
+    the PI's own expense account). Plain OpEx repairs get NO automatic GL
+    entry at all — even with a PI linked, since the PI's own accounting
+    already books the expense on its own submission.
+
+    We only need to step in when there's no PI: with one linked, either
+    ERPNext's native path (CapEx) or the PI's own posting (OpEx) already
+    handles it correctly, and adding our own entry here would double-book
+    the cost.
+    """
+    if doc.get("purchase_invoice"):
+        return
+    if doc.get("custom_journal_entry"):
+        return
+
+    total_cost = flt(doc.repair_cost) + flt(doc.get("custom_labor_cost"))
+    if not total_cost:
+        return
+
+    asset = frappe.get_doc("Asset", doc.asset)
+    company = asset.company or frappe.defaults.get_user_default("Company")
+
+    category_account = frappe.db.get_value(
+        "Asset Category Account",
+        {"parent": asset.asset_category, "company_name": company},
+        ["fixed_asset_account", "custom_capital_maintenance_wip_account", "custom_maintenance_expense_account"],
+        as_dict=True,
+    )
+    if not category_account:
+        frappe.throw(
+            _("No Asset Category Account is set up for category {0} / company {1}.").format(
+                asset.asset_category, company
+            ),
+            title=_("Missing Account Setup"),
+        )
+
+    je = frappe.new_doc("Journal Entry")
+    je.voucher_type = "Journal Entry"
+    je.posting_date = doc.completion_date or today()
+    je.company = company
+    if doc.cost_center:
+        je.cost_center = doc.cost_center
+
+    if doc.get("capitalize_repair_cost"):
+        wip_account = category_account.custom_capital_maintenance_wip_account
+        if not wip_account:
+            frappe.throw(
+                _(
+                    "Please set 'Capital Maintenance WIP Account' on the Asset Category "
+                    "Account for {0} / {1} before completing a capitalized repair without "
+                    "a linked Purchase Invoice."
+                ).format(asset.asset_category, company),
+                title=_("Missing WIP Account"),
+            )
+        je.user_remark = _("Capitalized repair cost for Asset {0} via {1}").format(
+            asset.asset_name, doc.name
+        )
+        je.append("accounts", {
+            "account": category_account.fixed_asset_account,
+            "debit_in_account_currency": total_cost,
+            "cost_center": doc.cost_center or None,
+            "reference_type": "Asset",
+            "reference_name": doc.asset,
+        })
+        je.append("accounts", {
+            "account": wip_account,
+            "credit_in_account_currency": total_cost,
+            "cost_center": doc.cost_center or None,
+            "reference_type": doc.doctype,
+            "reference_name": doc.name,
+        })
+    else:
+        expense_account = category_account.custom_maintenance_expense_account
+        if not expense_account:
+            frappe.throw(
+                _(
+                    "Please set 'Maintenance Expense Account' on the Asset Category Account "
+                    "for {0} / {1} before completing a repair without a linked Purchase Invoice."
+                ).format(asset.asset_category, company),
+                title=_("Missing Maintenance Expense Account"),
+            )
+        payable_account = frappe.db.get_value("Company", company, "default_payable_account")
+        if not payable_account:
+            frappe.throw(
+                _("Please set 'Default Payable Account' in Company {0}.").format(company),
+                title=_("Missing Payable Account"),
+            )
+        je.user_remark = _("Maintenance expense for Asset {0} via {1}").format(
+            asset.asset_name, doc.name
+        )
+        je.append("accounts", {
+            "account": expense_account,
+            "debit_in_account_currency": total_cost,
+            "cost_center": doc.cost_center or None,
+            "reference_type": "Asset",
+            "reference_name": doc.asset,
+        })
+        je.append("accounts", {
+            "account": payable_account,
+            "credit_in_account_currency": total_cost,
+            "cost_center": doc.cost_center or None,
+            "reference_type": doc.doctype,
+            "reference_name": doc.name,
+        })
+
+    je.insert(ignore_permissions=True)
+    je.submit()
+
+    doc.db_set("custom_journal_entry", je.name, update_modified=False)
+
+
+def _cancel_repair_cost_gl_entry(doc):
+    je_name = doc.get("custom_journal_entry")
+    if not je_name or not frappe.db.exists("Journal Entry", je_name):
+        return
+    je = frappe.get_doc("Journal Entry", je_name)
+    if je.docstatus == 1:
+        je.cancel()
+
+
 def _log_repair_activity(doc):
     """تسجيل ملخص الإصلاح في سجل نشاط الأصل."""
     labor = flt(doc.get("custom_labor_cost"))
@@ -174,6 +307,7 @@ def _log_repair_activity(doc):
 
 def on_cancel(doc, method=None):
     _update_asset_maintenance_summary(doc.asset)
+    _cancel_repair_cost_gl_entry(doc)
 
     frappe.get_doc(
         {

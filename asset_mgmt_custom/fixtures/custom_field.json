@@ -609,5 +609,42 @@
   "insert_after": "custom_last_maintenance_date",
   "read_only": 1,
   "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Category Account-custom_capital_maintenance_wip_account",
+  "dt": "Asset Category Account",
+  "fieldname": "custom_capital_maintenance_wip_account",
+  "fieldtype": "Link",
+  "options": "Account",
+  "label": "Capital Maintenance WIP Account (أصول تحت الصيانة الرأسمالية)",
+  "insert_after": "capital_work_in_progress_account",
+  "description": "حساب وساطة تُرحَّل إليه تكلفة الإصلاحات المُرسملة (CapEx) قبل ترحيلها لحساب الأصل نفسه",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Category Account-custom_maintenance_expense_account",
+  "dt": "Asset Category Account",
+  "fieldname": "custom_maintenance_expense_account",
+  "fieldtype": "Link",
+  "options": "Account",
+  "label": "Maintenance Expense Account (مصروف الصيانة التشغيلية)",
+  "insert_after": "custom_capital_maintenance_wip_account",
+  "description": "حساب مصروف يُحمَّل عليه إصلاحات الصيانة التشغيلية (OpEx) غير المُرسملة",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Repair-custom_journal_entry",
+  "dt": "Asset Repair",
+  "fieldname": "custom_journal_entry",
+  "fieldtype": "Link",
+  "options": "Journal Entry",
+  "label": "Journal Entry (قيد اليومية)",
+  "insert_after": "custom_is_warranty_repair",
+  "read_only": 1,
+  "reqd": 0,
+  "description": "يُضبط تلقائياً عند إنشاء القيد المحاسبي لتكلفة الإصلاح (فقط عند عدم ربط فاتورة شراء)"
  }
 ]

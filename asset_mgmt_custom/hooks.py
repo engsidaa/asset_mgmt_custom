@@ -11,7 +11,7 @@ app_license = "MIT"
 fixtures = [
     {
         "dt": "Custom Field",
-        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Maintenance Contract"]]],
+        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Category Account", "Asset Maintenance Contract"]]],
     },
     {
         "dt": "Property Setter",
