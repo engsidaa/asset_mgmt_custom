@@ -210,12 +210,18 @@ def _post_repair_cost_gl_entry(doc):
             title=_("Missing Account Setup"),
         )
 
+    # حقل cost_center على Asset Repair نفسه اختياري — لو فاضي، نرجع لمركز
+    # تكلفة الأصل نفسه بدل ما نسيب القيد من غير مركز تكلفة، لأن ERPNext
+    # يشترط مركز تكلفة (سطراً أو على مستوى القيد) على أي حساب أرباح وخسائر
+    # (مصروف/إيراد) — مصروف الصيانة هنا حساب من هذا النوع.
+    cost_center = doc.cost_center or asset.cost_center
+
     je = frappe.new_doc("Journal Entry")
     je.voucher_type = "Journal Entry"
     je.posting_date = doc.completion_date or today()
     je.company = company
-    if doc.cost_center:
-        je.cost_center = doc.cost_center
+    if cost_center:
+        je.cost_center = cost_center
 
     if doc.get("capitalize_repair_cost"):
         wip_account = category_account.custom_capital_maintenance_wip_account
@@ -234,14 +240,14 @@ def _post_repair_cost_gl_entry(doc):
         je.append("accounts", {
             "account": category_account.fixed_asset_account,
             "debit_in_account_currency": total_cost,
-            "cost_center": doc.cost_center or None,
+            "cost_center": cost_center,
             "reference_type": "Asset",
             "reference_name": doc.asset,
         })
         je.append("accounts", {
             "account": wip_account,
             "credit_in_account_currency": total_cost,
-            "cost_center": doc.cost_center or None,
+            "cost_center": cost_center,
             "reference_type": "Asset",
             "reference_name": doc.asset,
         })
@@ -277,14 +283,14 @@ def _post_repair_cost_gl_entry(doc):
         je.append("accounts", {
             "account": expense_account,
             "debit_in_account_currency": total_cost,
-            "cost_center": doc.cost_center or None,
+            "cost_center": cost_center,
             "reference_type": "Asset",
             "reference_name": doc.asset,
         })
         je.append("accounts", {
             "account": accrued_account,
             "credit_in_account_currency": total_cost,
-            "cost_center": doc.cost_center or None,
+            "cost_center": cost_center,
             "reference_type": "Asset",
             "reference_name": doc.asset,
         })
