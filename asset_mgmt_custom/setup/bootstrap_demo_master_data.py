@@ -118,59 +118,62 @@ def run():
     print("\nبعد كده تقدر تشغّل demo_test.run_demo_test تاني وهيكمل الاختبارات الفعلية بدل التخطي.")
 
 
+def _get_asset_root(company):
+    """SQL IN never matches NULL, so this must be raw SQL (a plain ORM
+    get_value with parent_account in ["", None] silently never matches
+    the real root row where parent_account is NULL)."""
+    row = frappe.db.sql(
+        """
+        SELECT name FROM `tabAccount`
+        WHERE company = %s AND is_group = 1 AND root_type = 'Asset'
+          AND (parent_account IS NULL OR parent_account = '')
+        LIMIT 1
+        """,
+        company,
+    )
+    return row[0][0] if row else None
+
+
 def _find_or_create_fixed_assets_group(company):
     _step("البحث عن مجموعة 'الأصول الثابتة' (Fixed Assets) في شجرة الحسابات")
 
-    group = frappe.db.get_value(
-        "Account",
-        {
-            "company": company,
-            "is_group": 1,
-            "root_type": "Asset",
-            "account_name": ["like", "%Fixed Asset%"],
-        },
-        "name",
-    )
-    if not group:
+    for pattern in ["%Fixed Asset%", "%ثابتة%"]:
         group = frappe.db.get_value(
             "Account",
-            {
-                "company": company,
-                "is_group": 1,
-                "root_type": "Asset",
-                "account_name": ["like", "%أصول ثابتة%"],
-            },
+            {"company": company, "is_group": 1, "root_type": "Asset", "account_name": ["like", pattern]},
             "name",
         )
-    if group:
-        _ok(f"موجودة بالفعل: {group}")
-        return group
+        if group:
+            _ok(f"موجودة بالفعل: {group}")
+            return group
 
-    _warn("لا توجد مجموعة 'Fixed Assets' جاهزة — سيتم إنشاؤها تحت جذر الأصول (Asset root group)")
-    asset_root = frappe.db.get_value(
-        "Account",
-        {"company": company, "is_group": 1, "root_type": "Asset", "parent_account": ["in", ["", None]]},
-        "name",
-    )
+    asset_root = _get_asset_root(company)
     if not asset_root:
         _warn("لا يوجد حتى جذر أصول (Asset root) في شجرة الحسابات — شجرة الحسابات نفسها غير مُعدَّة. توقف.")
         return None
 
-    new_group = frappe.get_doc({
-        "doctype": "Account",
-        "account_name": "الأصول الثابتة - Fixed Assets",
-        "parent_account": asset_root,
-        "company": company,
-        "is_group": 1,
-    })
-    new_group.insert(ignore_permissions=True)
-    frappe.db.commit()
-    _ok(f"تم إنشاء المجموعة: {new_group.name}")
-    return new_group.name
+    children = frappe.db.sql(
+        """
+        SELECT name, is_group FROM `tabAccount`
+        WHERE company = %s AND parent_account = %s
+        ORDER BY name
+        """,
+        (company, asset_root),
+        as_dict=True,
+    )
+    _warn(f"لم يتم العثور على مجموعة اسمها يحتوي 'Fixed Asset' أو 'ثابتة' تلقائياً تحت الجذر "
+          f"'{asset_root}'. هذه شجرة حسابات حقيقية بها 760 حساباً بالفعل — لن يتم إنشاء مجموعة "
+          f"جديدة تلقائياً تفادياً لتكرار مجموعة موجودة باسم مختلف. الحسابات/المجموعات الموجودة "
+          f"مباشرة تحت جذر الأصول هي:")
+    for c in children:
+        print(f"      - {c.name}  ({'مجموعة' if c.is_group else 'حساب فرعي'})")
+    print("\n  راجع القائمة دي وقولّي أنهي حساب/مجموعة هو المقصود بـ 'الأصول الثابتة' فعلياً،")
+    print("  أو لو مفيش أي حاجة مناسبة، قولّي أنشئ مجموعة جديدة باسم محدد منك.")
+    return None
 
 
 def _find_expense_group(company):
-    for pattern in ["%Indirect Expense%", "%مصروفات غير مباشرة%", "%Expense%", "%مصروفات%"]:
+    for pattern in ["%Indirect Expense%", "%غير مباشرة%", "%مصروفات%", "%نفقات%"]:
         group = frappe.db.get_value(
             "Account",
             {"company": company, "is_group": 1, "root_type": "Expense", "account_name": ["like", pattern]},
@@ -178,11 +181,16 @@ def _find_expense_group(company):
         )
         if group:
             return group
-    return frappe.db.get_value(
-        "Account",
-        {"company": company, "is_group": 1, "root_type": "Expense", "parent_account": ["in", ["", None]]},
-        "name",
+    row = frappe.db.sql(
+        """
+        SELECT name FROM `tabAccount`
+        WHERE company = %s AND is_group = 1 AND root_type = 'Expense'
+          AND (parent_account IS NULL OR parent_account = '')
+        LIMIT 1
+        """,
+        company,
     )
+    return row[0][0] if row else None
 
 
 def _find_or_create_leaf_account(company, parent, account_name, account_type, account_number=None):
