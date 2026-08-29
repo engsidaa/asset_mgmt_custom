@@ -57,12 +57,15 @@ def run():
         account_type="Fixed Asset",
     )
 
+    # رقم 110902 كان مطلوباً في الأصل لهذا الحساب، لكنه مُستخدَم بالفعل
+    # لحساب حقيقي آخر غير مرتبط ("اصول متداولة متنوعة اخرى - مستوى 4").
+    # بناءً على قرار المستخدم: يُنشأ بدون رقم محدد — النظام (autoname)
+    # يعطيه رقماً تلقائياً ضمن شجرة الحسابات، ويمكن تعديله لاحقاً من الواجهة.
     wip_account = _find_or_create_leaf_account(
         company,
         parent=fixed_assets_group,
         account_name="أصول تحت الصيانة الرأسمالية (حساب وساطة)",
         account_type="Capital Work in Progress",
-        account_number="110902",
     )
 
     expense_group = _find_expense_group(company)
