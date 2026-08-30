@@ -759,6 +759,15 @@ def _test_requisition_execution():
         spare.submit()
         _info(f"تم إنشاء أصل احتياطي تجريبي معتمَد: {spare.name}")
 
+        # فحص تشخيصي مباشر — لو الاكتشاف التلقائي فشل، نعرف السبب بالظبط
+        raw = frappe.db.get_value(
+            "Asset", spare.name,
+            ["asset_category", "item_code", "custom_is_spare", "docstatus"],
+            as_dict=True,
+        )
+        _info(f"تحقق مباشر من قاعدة البيانات لسجل الأصل الاحتياطي: {raw} "
+              f"(متوقع: asset_category={category}, item_code={item_code}, custom_is_spare=1, docstatus=1)")
+
         doc = frappe.new_doc("Asset Requisition")
         doc.employee = employee
         doc.branch = branch
@@ -770,7 +779,9 @@ def _test_requisition_execution():
         if doc.spare_available and doc.spare_asset == spare.name:
             _ok(f"تم اكتشاف الأصل الاحتياطي تلقائياً عند الحفظ: {doc.spare_asset}")
         else:
-            _fail(f"لم يُكتشف الأصل الاحتياطي كما هو متوقع (spare_available={doc.spare_available})")
+            _fail(f"لم يُكتشف الأصل الاحتياطي كما هو متوقع "
+                  f"(spare_available={doc.spare_available}, doc.asset_category={doc.asset_category}, "
+                  f"doc.item_code={doc.item_code})")
 
         doc.submit()
         doc.approve_finance()
