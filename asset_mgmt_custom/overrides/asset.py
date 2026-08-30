@@ -69,7 +69,17 @@ def _auto_set_uncoded_status(doc):
 def _enforce_spare_asset_rules(doc):
     """
     الأصول الاحتياطية لا تُستهلك حتى يتم تفعيلها.
-    يُجبر النظام على إيقاف الإهلاك عند وضع علامة 'احتياطي'.
+    يُجبر النظام على إيقاف الإهلاك عند وضع علامة 'احتياطي' — عن طريق
+    calculate_depreciation=0 فقط، وهو ما يمنع احتساب أي جدول إهلاك في
+    ERPNext الأساسي بغض النظر عن available_for_use_date.
+
+    ملاحظة: نسخة سابقة من هذه الدالة كانت أيضاً تمسح available_for_use_date
+    بالكامل (doc.available_for_use_date = None) بافتراض إنها خطوة إضافية
+    احترازية — لكن هذا الحقل إلزامي في ERPNext الأساسي لأي أصل غير مركّب
+    (composite) بغض النظر عن حالة الإهلاك، فمسحه كان يمنع تقديم (submit)
+    أي أصل احتياطي نهائياً برسالة "Available for use date is required".
+    مسح الحقل لم يكن ضرورياً أصلاً: calculate_depreciation=0 وحده كافٍ
+    ومضمون لمنع الإهلاك.
     """
     if not doc.get("custom_is_spare"):
         return
@@ -80,15 +90,6 @@ def _enforce_spare_asset_rules(doc):
             _("Asset {0} is marked as Spare – depreciation disabled.").format(
                 doc.name or doc.asset_name
             ),
-            alert=True,
-            indicator="orange",
-        )
-
-    # مسح تاريخ الاستخدام لمنع احتساب إهلاك بالخطأ
-    if doc.available_for_use_date:
-        doc.available_for_use_date = None
-        frappe.msgprint(
-            _("Available for Use Date cleared because asset is Spare."),
             alert=True,
             indicator="orange",
         )
