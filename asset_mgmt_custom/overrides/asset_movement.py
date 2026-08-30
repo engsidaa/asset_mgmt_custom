@@ -8,7 +8,12 @@ Validate:
 On Submit:
   - Transfer / Receipt: تحديث cost_center في الأصل من حقل Location.custom_cost_center
   - Transfer: ضبط custom_operational_status = In Transit + إشعار
-  - Receipt لأصل احتياطي: تفعيل الأصل + مسح حالة In Transit
+  - Receipt مقصود (بدون reference_doctype) لأصل احتياطي: تفعيل الأصل +
+    مسح حالة In Transit — سند الـ Receipt التلقائي اللي ERPNext نفسه بينشئه
+    عند تقديم أي أصل (Asset.on_submit -> make_asset_movement) بيُستبعد
+    عمداً هنا لأنه دايماً بيحمل reference_doctype (Purchase Receipt/Invoice)
+    حتى لو الأصل احتياطي — التفعيل الحقيقي محتاج فعل مقصود، مش نتيجة جانبية
+    لتقديم الأصل نفسه.
   - تسجيل كل حدث في Asset Activity
 
 On Cancel:
@@ -87,7 +92,17 @@ def on_submit(doc, method=None):
             _notify_target_location(doc, item)
 
         if doc.purpose == "Receipt":
-            _activate_spare_asset(doc, item)
+            # ERPNext الأساسي بيُنشئ ويُقدِّم سند "Receipt" تلقائياً بنفسه في
+            # Asset.on_submit() → make_asset_movement() — لكل أصل بيتقدَّم،
+            # مش بس الأصول الاحتياطية. سند تلقائي زي ده دائماً بيحمل
+            # reference_doctype (Purchase Receipt/Purchase Invoice، حتى لو
+            # reference_name نفسها فاضية لأصل موجود مسبقاً). لو ما فرّقناش،
+            # أي أصل احتياطي كان بيتفعَّل تلقائياً لحظة تقديمه هو نفسه —
+            # قبل ما يقعد في المخزن أصلاً، وده بيلغي فكرة "الاحتياطي" بالكامل.
+            # التفعيل الفعلي لازم يحصل بس من سند Receipt مقصود (بواسطة
+            # مستخدم حقيقي، أو create_asset_movement() على طلب الأصل).
+            if not doc.get("reference_doctype"):
+                _activate_spare_asset(doc, item)
             _clear_transit(item)
 
 
