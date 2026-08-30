@@ -183,6 +183,7 @@ def _create_asset(step, company, location, item_code, category, is_spare=0, amou
         "available_for_use_date": today(),
         "asset_quantity": 1,
         "custom_is_spare": is_spare,
+        "custom_asset_condition": "Used" if is_spare else "New",
     })
     asset.insert(ignore_permissions=True)
     asset.submit()
@@ -433,6 +434,27 @@ def step_coding_operational(r: Reporter):
     else:
         r.fail(f"set_operational: نتيجة غير متوقعة = {result2}")
 
+    # سيناريو ثانٍ: مسار الترميز بـ 'Iron Code' (نقش حديدي) بدل Barcode —
+    # مسار مختلف تماماً في mark_coded لسه معمول عليه سيناريو.
+    try:
+        asset2_name = _create_asset(
+            "coding_operational", m["company"], m["location"], m["item_code"], m["category"],
+            name_suffix=" (ترميز Iron Code)"
+        )
+        frappe.db.set_value("Asset", asset2_name, {
+            "custom_tag_type": "Iron Code",
+            "custom_iron_code": f"IRON-{asset2_name[-6:]}",
+            "custom_tagging_photo_before": "/files/demo-before.jpg",
+            "custom_tagging_photo": "/files/demo-after.jpg",
+        })
+        result3 = mark_coded(asset2_name)
+        if result3 == "Coded":
+            r.ok(f"mark_coded (Iron Code): نجح للأصل {asset2_name}")
+        else:
+            r.fail(f"mark_coded (Iron Code): نتيجة غير متوقعة = {result3}")
+    except Exception as e:
+        r.fail(f"مسار الترميز بـ Iron Code: فشل — {e}")
+
 
 # ---------------------------------------------------------------------------
 # خطوة 6: نقل أصل بين الفروع (Transfer) + تأكيد الاستلام
@@ -574,6 +596,77 @@ def step_writeoff(r: Reporter):
         r.ok(f"create_journal_entry: تم إنشاء قيد يومية {je_name} — حالة الطلب: {wo.status}")
     else:
         r.fail("create_journal_entry: لم يرجع اسم قيد يومية")
+
+
+# ---------------------------------------------------------------------------
+# خطوة: احتساب الإهلاك الدوري (calculate_depreciation) على أصل
+# ---------------------------------------------------------------------------
+
+def step_depreciation(r: Reporter):
+    step = "depreciation"
+    m = _bootstrap_master(step)
+
+    cat_acc = frappe.db.get_value(
+        "Asset Category Account",
+        {"parent": m["category"], "company_name": m["company"]},
+        ["accumulated_depreciation_account", "depreciation_expense_account"],
+        as_dict=True,
+    )
+    if not cat_acc or not cat_acc.accumulated_depreciation_account or not cat_acc.depreciation_expense_account:
+        r.skip("لا يوجد حساب 'مجمع إهلاك' و/أو 'مصروف إهلاك' معرَّف على فئة الأصل بعد — "
+               "شغّل bootstrap_demo_master_data.run أولاً (يضبط هذين الحسابين تلقائياً)، ثم أعد هذه الخطوة.")
+        return
+
+    cost_center = _get_cost_center(m["company"])
+    try:
+        asset = frappe.get_doc({
+            "doctype": "Asset",
+            "asset_name": "أصل تجريبي - Demo Wizard (إهلاك)",
+            "item_code": m["item_code"],
+            "asset_category": m["category"],
+            "company": m["company"],
+            "location": m["location"],
+            "cost_center": cost_center,
+            "is_existing_asset": 1,
+            "calculate_depreciation": 1,
+            "gross_purchase_amount": 24000,
+            "available_for_use_date": today(),
+            "asset_quantity": 1,
+            "custom_asset_condition": "New",
+            "finance_books": [{
+                "depreciation_method": "Straight Line",
+                "total_number_of_depreciations": 12,
+                "frequency_of_depreciation": 1,
+                "expected_value_after_useful_life": 0,
+            }],
+        })
+        asset.insert(ignore_permissions=True)
+        _log(step, "Asset", asset.name)
+        asset.submit()
+        asset.reload()
+        _log_auto_receipt_movement(step, asset.name)
+        r.ok(f"تم إنشاء واعتماد أصل بإهلاك محسوب: {asset.name} "
+             f"(القيمة الأصلية 24000 على 12 قسط شهري — القيمة بعد الإهلاك حالياً: "
+             f"{asset.value_after_depreciation})")
+    except Exception as e:
+        r.fail(f"إنشاء أصل بإهلاك محسوب: فشل — {e}")
+        return
+
+    schedule_name = frappe.db.get_value(
+        "Asset Depreciation Schedule", {"asset": asset.name, "status": "Active"}, "name"
+    )
+    if not schedule_name:
+        r.fail("لم يتم إنشاء جدول إهلاك (Asset Depreciation Schedule) رغم تفعيل calculate_depreciation")
+        return
+    _log(step, "Asset Depreciation Schedule", schedule_name)
+
+    schedule = frappe.get_doc("Asset Depreciation Schedule", schedule_name)
+    rows = schedule.get("depreciation_schedule") or []
+    if rows:
+        r.ok(f"تم إنشاء جدول إهلاك {schedule_name} بـ {len(rows)} قسط شهري — "
+             f"أول قسط بتاريخ {rows[0].schedule_date} بمبلغ {rows[0].depreciation_amount}")
+    else:
+        r.fail(f"جدول الإهلاك {schedule_name} تم إنشاؤه لكن بدون أي أقساط محسوبة")
 
 
 # ---------------------------------------------------------------------------
@@ -1694,6 +1787,8 @@ STEPS = [
     {"id": "retention", "group": "المالية والمحاسبة", "title": "طلب احتفاظ بعهدة (Asset Retention)", "fn": step_retention},
     {"id": "writeoff", "group": "المالية والمحاسبة", "title": "شطب أصل والقيد المحاسبي", "fn": step_writeoff},
     {"id": "disposal", "group": "المالية والمحاسبة", "title": "طلب وتنفيذ التخلص من أصل", "fn": step_disposal},
+    {"id": "depreciation", "group": "المالية والمحاسبة",
+     "title": "احتساب الإهلاك الدوري (Straight Line) على أصل جديد", "fn": step_depreciation},
     {"id": "safety_compliance", "group": "الفحص والسلامة والامتثال",
      "title": "فحص سلامة، تقييم مخاطر، تصريح عمل، شهادات وتراخيص، حوادث وشكاوى",
      "fn": step_safety_compliance},
