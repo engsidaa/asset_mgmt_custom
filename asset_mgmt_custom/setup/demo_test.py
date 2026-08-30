@@ -59,6 +59,9 @@ def run_demo_test():
         _test_asset_requisition_chain()
         _test_asset_repair_gl()
         _test_retention_and_ff_exemption()
+        coded_asset = _test_coding_and_operational()
+        _test_asset_movement_transfer(coded_asset)
+        _test_requisition_execution()
     finally:
         frappe.db.rollback()
         print("\n" + "#" * 70)
@@ -560,6 +563,264 @@ def _asset_for_row_matches(row, employee, asset):
         "Asset Movement Item", {"parent": row.reference, "to_employee": employee}, "asset"
     )
     return linked_asset == asset
+
+
+def _get_or_create_second_location(exclude_location):
+    loc = frappe.db.get_value("Location", {"name": ["!=", exclude_location]}, "name")
+    if loc:
+        return loc
+    doc = frappe.get_doc({
+        "doctype": "Location",
+        "location_name": "موقع تجريبي 2 - Demo Test",
+    })
+    doc.insert(ignore_permissions=True)
+    _info(f"تم إنشاء موقع تجريبي ثانٍ مؤقت: {doc.name}")
+    return doc.name
+
+
+def _get_or_create_branch_with_location(location):
+    """يستخدم أي فرع موجود بالفعل (ويضبط عليه مؤقتاً custom_default_location
+    لو فاضي)، أو يجهّز فرعاً تجريبياً — الحقل نفسه لازم يكون موجوداً في
+    قاعدة البيانات (bench migrate) قبل استخدامه."""
+    branch = frappe.db.get_value("Branch", {}, "name")
+    if branch:
+        frappe.db.set_value("Branch", branch, "custom_default_location", location)
+        return branch
+    doc = frappe.get_doc({
+        "doctype": "Branch",
+        "branch": "فرع تجريبي - Demo Test",
+        "custom_default_location": location,
+    })
+    doc.insert(ignore_permissions=True)
+    _info(f"تم إنشاء فرع تجريبي مؤقت: {doc.name}")
+    return doc.name
+
+
+# ---------------------------------------------------------------------------
+# اختبار 5: توثيق الترميز (Coding) والتفعيل التشغيلي (Operational)
+# ---------------------------------------------------------------------------
+
+def _test_coding_and_operational():
+    _header("5) توثيق الترميز (Coding) والتفعيل التشغيلي (Operational)")
+    try:
+        company = _get_default_company()
+        if not company:
+            _skip("لا توجد شركة")
+            return None
+
+        category, _created = _get_or_create_asset_category(company)
+        if not category:
+            return None
+        item_code = _get_or_create_fixed_asset_item(category)
+        if not item_code:
+            return None
+        location = _get_or_create_location()
+
+        asset_name = _create_demo_asset(company, location, item_code, category)
+        asset = frappe.get_doc("Asset", asset_name)
+        _ok(f"أصل تجريبي جديد جاهز: {asset_name} | ترميز: {asset.custom_coding_status} | "
+            f"تشغيلياً: {asset.custom_operational_status}")
+
+        from asset_mgmt_custom.overrides.asset import mark_coded, set_operational
+
+        blocked = False
+        try:
+            mark_coded(asset_name)
+        except frappe.ValidationError:
+            blocked = True
+        if blocked:
+            _ok("mark_coded بدون نوع/كود تاگ: تم الرفض بشكل صحيح كما هو متوقع")
+        else:
+            _fail("mark_coded بدون نوع/كود تاگ: لم يُرفض!")
+
+        frappe.db.set_value("Asset", asset_name, {
+            "custom_tag_type": "Barcode",
+            "custom_sticker_code": "DEMO-TAG-0001",
+        })
+
+        blocked2 = False
+        try:
+            mark_coded(asset_name)
+        except frappe.ValidationError:
+            blocked2 = True
+        if blocked2:
+            _ok("mark_coded بدون صورتَي قبل/بعد: تم الرفض بشكل صحيح كما هو متوقع")
+        else:
+            _fail("mark_coded بدون صورتَي قبل/بعد: لم يُرفض!")
+
+        frappe.db.set_value("Asset", asset_name, {
+            "custom_tagging_photo_before": "/files/demo-before.jpg",
+            "custom_tagging_photo": "/files/demo-after.jpg",
+        })
+
+        result = mark_coded(asset_name)
+        if result == "Coded":
+            _ok("mark_coded ببيانات كاملة: نجح، الحالة أصبحت 'Coded'")
+        else:
+            _fail(f"mark_coded: نتيجة غير متوقعة = {result}")
+            return None
+
+        result2 = set_operational(asset_name)
+        asset.reload()
+        if result2 == "Operational" and asset.custom_operational_status == "Operational" and asset.available_for_use_date:
+            _ok("set_operational: نجح، الحالة أصبحت 'Operational' وتم ضبط available_for_use_date")
+        else:
+            _fail("set_operational: نتيجة غير متوقعة")
+            return None
+
+        return asset_name
+    except Exception as e:
+        _fail("فشل اختبار الترميز والتفعيل", e)
+        return None
+
+
+# ---------------------------------------------------------------------------
+# اختبار 6: نقل أصل بين الفروع (Transfer) + تأكيد الاستلام
+# ---------------------------------------------------------------------------
+
+def _test_asset_movement_transfer(asset_name):
+    _header("6) نقل أصل بين الفروع (Asset Movement – Transfer) + تأكيد الاستلام")
+    try:
+        if not asset_name:
+            _skip("لا يوجد أصل جاهز (مُرمَّز ومُفعَّل) من الاختبار السابق لتجربة النقل عليه")
+            return
+
+        asset = frappe.get_doc("Asset", asset_name)
+        target_location = _get_or_create_second_location(asset.location)
+
+        movement = frappe.new_doc("Asset Movement")
+        movement.purpose = "Transfer"
+        movement.company = asset.company
+        movement.transaction_date = now_datetime()
+        movement.append("assets", {"asset": asset_name, "target_location": target_location})
+        movement.insert(ignore_permissions=True)
+        _ok(f"تم إنشاء سند نقل {movement.name} (Draft)")
+
+        movement.submit()
+        asset.reload()
+        if asset.custom_operational_status == "In Transit":
+            _ok("بعد التقديم: حالة الأصل التشغيلية أصبحت 'In Transit' كما هو متوقع")
+        else:
+            _fail(f"بعد التقديم: الحالة غير متوقعة = {asset.custom_operational_status}")
+
+        from asset_mgmt_custom.overrides.asset_movement import confirm_receipt
+        confirmed = confirm_receipt(movement.name)
+        asset.reload()
+        if asset_name in (confirmed or []) and asset.custom_operational_status == "Operational":
+            _ok("تأكيد الاستلام (Confirm Receipt): نجح، حالة الأصل رجعت 'Operational'")
+        else:
+            _fail(f"تأكيد الاستلام: نتيجة غير متوقعة — confirmed={confirmed}, "
+                  f"status={asset.custom_operational_status}")
+
+    except Exception as e:
+        _fail("فشل اختبار نقل الأصل بين الفروع", e)
+
+
+# ---------------------------------------------------------------------------
+# اختبار 7: تنفيذ الطلب المعتمد (نقل أصل احتياطي / إنشاء طلب شراء)
+# ---------------------------------------------------------------------------
+
+def _test_requisition_execution():
+    _header("7) تنفيذ الطلب المعتمد: نقل أصل احتياطي / إنشاء طلب شراء")
+    try:
+        employee = _get_active_employee()
+        company = _get_default_company()
+        if not employee or not company:
+            _skip("لا يوجد موظف نشط أو شركة")
+            return
+
+        category, _created = _get_or_create_asset_category(company)
+        if not category:
+            return
+        item_code = _get_or_create_fixed_asset_item(category)
+        if not item_code:
+            return
+        location = _get_or_create_location()
+        branch = _get_or_create_branch_with_location(location)
+
+        cost_center = frappe.db.get_value("Cost Center", {"company": company, "is_group": 0}, "name")
+
+        # --- سيناريو أ: يوجد أصل احتياطي جاهز ---
+        spare = frappe.get_doc({
+            "doctype": "Asset",
+            "asset_name": "أصل احتياطي تجريبي - Demo Test",
+            "item_code": item_code,
+            "asset_category": category,
+            "company": company,
+            "location": location,
+            "cost_center": cost_center,
+            "is_existing_asset": 1,
+            "calculate_depreciation": 0,
+            "gross_purchase_amount": 5000,
+            "available_for_use_date": today(),
+            "custom_is_spare": 1,
+        })
+        spare.insert(ignore_permissions=True)
+        spare.submit()
+        _info(f"تم إنشاء أصل احتياطي تجريبي معتمَد: {spare.name}")
+
+        doc = frappe.new_doc("Asset Requisition")
+        doc.employee = employee
+        doc.branch = branch
+        doc.asset_category = category
+        doc.item_code = item_code
+        doc.request_date = today()
+        doc.justification = "اختبار تنفيذ الطلب — أصل احتياطي (Demo Test)"
+        doc.insert(ignore_permissions=True)
+        if doc.spare_available and doc.spare_asset == spare.name:
+            _ok(f"تم اكتشاف الأصل الاحتياطي تلقائياً عند الحفظ: {doc.spare_asset}")
+        else:
+            _fail(f"لم يُكتشف الأصل الاحتياطي كما هو متوقع (spare_available={doc.spare_available})")
+
+        doc.submit()
+        doc.approve_finance()
+        doc.approve_branch_manager()
+        doc.approve_asset_manager()
+        doc.reload()
+
+        movement_name = doc.create_asset_movement()
+        doc.reload()
+        spare.reload()
+        if movement_name and doc.status == "Fulfilled":
+            _ok(f"create_asset_movement: تم إنشاء سند استلام {movement_name} "
+                f"وأصبحت حالة الطلب 'Fulfilled'")
+        else:
+            _fail("create_asset_movement: نتيجة غير متوقعة")
+
+        movement = frappe.get_doc("Asset Movement", movement_name)
+        if movement.purpose == "Receipt":
+            _ok("سند النقل من نوع 'Receipt' كما هو متوقع (وليس Transfer)")
+        else:
+            _fail(f"نوع سند النقل غير متوقع: {movement.purpose}")
+
+        # --- سيناريو ب: لا يوجد احتياطي ولا مخزون فعلي -> طلب شراء ---
+        doc2 = frappe.new_doc("Asset Requisition")
+        doc2.employee = employee
+        doc2.asset_category = category
+        doc2.item_code = item_code
+        doc2.quantity = 1
+        doc2.request_date = today()
+        doc2.justification = "اختبار تنفيذ الطلب — طلب شراء (Demo Test)"
+        doc2.insert(ignore_permissions=True)
+        if doc2.spare_available or doc2.stock_available:
+            _skip("سيناريو طلب الشراء: يوجد احتياطي أو مخزون فعلي متاح فعلاً بنفس الصنف — تخطي")
+            return
+
+        doc2.submit()
+        doc2.approve_finance()
+        doc2.approve_branch_manager()
+        doc2.approve_asset_manager()
+        doc2.reload()
+        mr_name = doc2.create_purchase_requisition()
+        doc2.reload()
+        if mr_name and doc2.status == "Fulfilled" and frappe.db.exists("Material Request", mr_name):
+            _ok(f"create_purchase_requisition: تم إنشاء طلب شراء {mr_name} "
+                f"وأصبحت حالة الطلب 'Fulfilled'")
+        else:
+            _fail("create_purchase_requisition: نتيجة غير متوقعة")
+
+    except Exception as e:
+        _fail("فشل اختبار تنفيذ الطلب المعتمد", e)
 
 
 # ---------------------------------------------------------------------------

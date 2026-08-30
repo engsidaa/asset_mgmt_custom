@@ -218,16 +218,51 @@ class AssetRequisition(Document):
 
     @frappe.whitelist()
     def create_asset_movement(self):
-        """Convert approved AR with spare to Asset Movement (Transfer)."""
+        """
+        Convert approved AR with spare to Asset Movement — dispatches the
+        spare asset to the requesting branch.
+
+        Uses purpose="Receipt", not "Transfer":
+          - "Transfer" requires an existing tag (Sticker/Iron Code) and
+            operational_status != Incomplete on the asset (see
+            overrides/asset_movement.py) — checks meant for an
+            already-in-service asset being relocated, not a dormant spare
+            that may never have been coded/activated yet.
+          - "Receipt" is exactly the mechanism the spare-asset lifecycle
+            already uses elsewhere (see overrides/asset_movement.py
+            _activate_spare_asset): it clears custom_is_spare and sets
+            available_for_use_date automatically on submit — the correct
+            outcome when a spare is dispatched to fulfil a real request.
+
+        Also always sets a target_location: Asset Movement's own
+        validate_asset() requires source_location, target_location,
+        from_employee or to_employee to be set — without one this call
+        threw unconditionally on every single invocation.
+        """
         if not self.spare_asset:
             frappe.throw(_("No spare asset linked to create a movement"))
         if self.status != "Approved":
             frappe.throw(_("Requisition must be Approved before creating a movement"))
+
+        target_location = None
+        if self.branch:
+            target_location = frappe.db.get_value("Branch", self.branch, "custom_default_location")
+        if not target_location:
+            frappe.throw(
+                _(
+                    "Please set a 'Default Location' on Branch {0} before dispatching "
+                    "a spare asset to it."
+                ).format(self.branch or _("(not set)")),
+                title=_("Missing Branch Location"),
+            )
+
+        company = frappe.db.get_value("Asset", self.spare_asset, "company")
+
         doc = frappe.new_doc("Asset Movement")
-        doc.purpose = "Transfer"
-        doc.company = frappe.defaults.get_user_default("Company")
+        doc.purpose = "Receipt"
+        doc.company = company
         doc.transaction_date = today()
-        doc.append("assets", {"asset": self.spare_asset})
+        doc.append("assets", {"asset": self.spare_asset, "target_location": target_location})
         doc.insert(ignore_permissions=True)
         self.db_set("status", "Fulfilled")
         return doc.name

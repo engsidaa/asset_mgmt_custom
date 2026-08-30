@@ -685,6 +685,18 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Branch-custom_default_location",
+  "dt": "Branch",
+  "fieldname": "custom_default_location",
+  "fieldtype": "Link",
+  "options": "Location",
+  "label": "الموقع الافتراضي للفرع (Default Location)",
+  "insert_after": "custom_default_warehouse",
+  "description": "موقع (Location) استلام الأصل عند تنفيذ طلب أصل بأصل احتياطي متاح — لا علاقة له بالمخزن (Warehouse)",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Movement-custom_driver",
   "dt": "Asset Movement",
   "fieldname": "custom_driver",
