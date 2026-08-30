@@ -443,11 +443,13 @@ def step_movement_transfer(r: Reporter):
     asset = frappe.get_doc("Asset", asset_name)
     target_location = _get_or_create_second_location(asset.location, "movement_transfer")
 
-    # النقل (Transfer) يشترط وجود Tag (Sticker/Iron Code) على الأصل قبل
-    # التنفيذ (asset_movement.py validate) — أصل جديد لسه ما اتحطش عليه تاگ.
+    # النقل (Transfer) يشترط وجود Tag (Sticker/Iron Code) + حالة تشغيلية
+    # ليست 'Incomplete' على الأصل قبل التنفيذ (asset_movement.py validate)
+    # — أصل جديد لسه ما اتحطش عليه تاگ ولسه بحالته الافتراضية Incomplete.
     frappe.db.set_value("Asset", asset_name, {
         "custom_tag_type": "Barcode",
         "custom_sticker_code": f"DEMO-{asset_name[-6:]}",
+        "custom_operational_status": "Operational",
     })
     asset.reload()
 
@@ -1357,6 +1359,10 @@ def step_lifecycle_custody(r: Reporter):
             b.insert(ignore_permissions=True)
             _log(step, "Branch", b.name)
             second_branch = b.name
+        # from_branch عليه fetch_from: asset.custom_branch — أي قيمة نحطها
+        # يدوياً في from_branch بتتجاهَل وتترجَع من فرع الأصل نفسه وقت
+        # الحفظ، فلازم نضبط فرع الأصل أولاً بدل ما نحاول نمرر from_branch مباشرة.
+        frappe.db.set_value("Asset", asset, "custom_branch", branch)
         tr = frappe.get_doc({
             "doctype": "Asset Transfer Request", "asset": asset, "employee": employee,
             "from_branch": branch, "to_branch": second_branch, "transfer_date": today(),
