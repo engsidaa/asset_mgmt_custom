@@ -25,7 +25,7 @@
    "fieldtype": "Link",
    "label": "الفرع",
    "options": "Branch",
-   "fetch_from": "asset.branch",
+   "fetch_from": "asset.custom_branch",
    "read_only": 1
   },
   {

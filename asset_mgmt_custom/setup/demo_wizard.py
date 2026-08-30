@@ -443,6 +443,14 @@ def step_movement_transfer(r: Reporter):
     asset = frappe.get_doc("Asset", asset_name)
     target_location = _get_or_create_second_location(asset.location, "movement_transfer")
 
+    # النقل (Transfer) يشترط وجود Tag (Sticker/Iron Code) على الأصل قبل
+    # التنفيذ (asset_movement.py validate) — أصل جديد لسه ما اتحطش عليه تاگ.
+    frappe.db.set_value("Asset", asset_name, {
+        "custom_tag_type": "Barcode",
+        "custom_sticker_code": f"DEMO-{asset_name[-6:]}",
+    })
+    asset.reload()
+
     movement = frappe.new_doc("Asset Movement")
     movement.purpose = "Transfer"
     movement.company = asset.company
@@ -668,13 +676,778 @@ def step_disposal(r: Reporter):
 
 
 # ---------------------------------------------------------------------------
-# الخطوة الأخيرة: بقية الوحدات الفرعية (تعبئة تلقائية عامة)
+# أدوات مساعدة للسيناريوهات المكتوبة يدوياً لبقية الوحدات الفرعية
+# ---------------------------------------------------------------------------
+
+def _pick_option(doctype, fieldname, prefer=None):
+    field = frappe.get_meta(doctype).get_field(fieldname)
+    options = [o.strip() for o in (field.options or "").split("\n") if o.strip()]
+    if prefer and prefer in options:
+        return prefer
+    return options[0] if options else None
+
+
+def _get_or_bootstrap_demo_asset(step):
+    """يفضّل دائماً أصلاً أنشأته الأداة نفسها (لتفادي إلحاق سجلات تجريبية
+    بأصل إنتاجي حقيقي) — ولو معندناش واحد بعد، ينشئ واحداً جديداً."""
+    existing = frappe.db.get_value("Asset Demo Run Log", {"reference_doctype": "Asset"}, "reference_name")
+    if existing and frappe.db.exists("Asset", existing):
+        return existing
+    m = _bootstrap_master(step)
+    return _create_asset(step, m["company"], m["location"], m["item_code"], m["category"],
+                          name_suffix=" (سيناريوهات إضافية)")
+
+
+# ---------------------------------------------------------------------------
+# خطوة 12: الفحص والسلامة والامتثال
+# ---------------------------------------------------------------------------
+
+def step_safety_compliance(r: Reporter):
+    step = "safety_compliance"
+    asset = _get_or_bootstrap_demo_asset(step)
+    company = _get_default_company()
+    employee = _get_active_employee(company)
+
+    try:
+        insp = frappe.get_doc({
+            "doctype": "Asset Safety Inspection",
+            "asset": asset,
+            "inspection_type": _pick_option("Asset Safety Inspection", "inspection_type", "Fire Safety"),
+            "inspection_date": today(),
+            "inspector": "مفتّش سلامة تجريبي",
+            "overall_result": "Pass",
+            "items": [
+                {"check_item": "طفايات الحريق سارية الصلاحية", "result": "Pass"},
+                {"check_item": "لوحات الإرشاد والسلامة واضحة", "result": "Pass"},
+                {"check_item": "مخارج الطوارئ غير معاقة", "result": "N/A"},
+            ],
+        })
+        insp.insert(ignore_permissions=True)
+        _log(step, "Asset Safety Inspection", insp.name)
+        insp.submit()
+        r.ok(f"تم إنشاء واعتماد فحص سلامة {insp.name} بـ 3 بنود تفتيش")
+    except Exception as e:
+        r.fail(f"Asset Safety Inspection: فشل — {e}")
+
+    try:
+        risk = frappe.get_doc({
+            "doctype": "Asset Risk Assessment",
+            "asset": asset,
+            "assessment_date": today(),
+            "risk_items": [
+                {"hazard_type": "خطر كهربائي", "likelihood": 2, "severity": 3,
+                 "mitigation_action": "فحص دوري للتوصيلات"},
+                {"hazard_type": "ضوضاء تشغيلية", "likelihood": 3, "severity": 2,
+                 "mitigation_action": "توفير واقيات سمع"},
+            ],
+        })
+        risk.insert(ignore_permissions=True)
+        _log(step, "Asset Risk Assessment", risk.name)
+        r.ok(f"تم إنشاء تقييم مخاطر {risk.name} ببندين")
+    except Exception as e:
+        r.fail(f"Asset Risk Assessment: فشل — {e}")
+
+    try:
+        permit = frappe.get_doc({
+            "doctype": "Asset Work Permit",
+            "asset": asset,
+            "permit_type": _pick_option("Asset Work Permit", "permit_type"),
+            "work_description": "بيانات تجريبية تلقائية (Demo Wizard) — تصريح عمل تجريبي",
+            "valid_from": now_datetime(),
+            "valid_to": add_days(now_datetime(), 1),
+        })
+        permit.insert(ignore_permissions=True)
+        _log(step, "Asset Work Permit", permit.name)
+        permit.submit()
+        r.ok(f"تم إنشاء واعتماد تصريح عمل {permit.name}")
+    except Exception as e:
+        r.fail(f"Asset Work Permit: فشل — {e}")
+
+    try:
+        cert = frappe.get_doc({
+            "doctype": "Asset Compliance Certificate",
+            "certificate_number": f"DEMO-CERT-{asset[-6:]}",
+            "asset": asset,
+            "certificate_type": _pick_option("Asset Compliance Certificate", "certificate_type", "Fire Safety"),
+            "issuing_authority": "جهة إصدار تجريبية",
+            "issue_date": today(),
+            "expiry_date": add_days(today(), 365),
+            "company": company,
+        })
+        cert.insert(ignore_permissions=True)
+        _log(step, "Asset Compliance Certificate", cert.name)
+        r.ok(f"تم إنشاء شهادة امتثال {cert.name}")
+    except Exception as e:
+        r.fail(f"Asset Compliance Certificate: فشل — {e}")
+
+    try:
+        lic = frappe.get_doc({
+            "doctype": "Asset License Permit",
+            "asset": asset,
+            "permit_type": _pick_option("Asset License Permit", "permit_type"),
+            "license_number": f"DEMO-LIC-{asset[-6:]}",
+            "issuing_authority": "جهة إصدار تجريبية",
+            "issue_date": today(),
+            "expiry_date": add_days(today(), 365),
+        })
+        lic.insert(ignore_permissions=True)
+        _log(step, "Asset License Permit", lic.name)
+        r.ok(f"تم إنشاء ترخيص/تصريح {lic.name}")
+    except Exception as e:
+        r.fail(f"Asset License Permit: فشل — {e}")
+
+    try:
+        calib = frappe.get_doc({
+            "doctype": "Asset Calibration Record",
+            "asset": asset,
+            "calibration_date": today(),
+            "calibrated_by": "فني معايرة تجريبي",
+            "result": "Pass",
+        })
+        calib.insert(ignore_permissions=True)
+        _log(step, "Asset Calibration Record", calib.name)
+        r.ok(f"تم إنشاء سجل معايرة {calib.name}")
+    except Exception as e:
+        r.fail(f"Asset Calibration Record: فشل — {e}")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط لتعيينه كمقيّم")
+        cond = frappe.get_doc({
+            "doctype": "Asset Condition Assessment",
+            "asset": asset,
+            "assessment_date": today(),
+            "assessed_by": employee,
+            "overall_condition": "Good",
+        })
+        cond.insert(ignore_permissions=True)
+        _log(step, "Asset Condition Assessment", cond.name)
+        r.ok(f"تم إنشاء تقييم حالة {cond.name}")
+    except Exception as e:
+        r.fail(f"Asset Condition Assessment: فشل — {e}")
+
+    try:
+        crit = frappe.get_doc({"doctype": "Asset Criticality Matrix", "asset": asset, "criticality_level": "Medium"})
+        crit.insert(ignore_permissions=True)
+        _log(step, "Asset Criticality Matrix", crit.name)
+        r.ok(f"تم إنشاء تصنيف أهمية حرجة {crit.name}")
+    except Exception as e:
+        r.fail(f"Asset Criticality Matrix: فشل — {e}")
+
+    try:
+        inc = frappe.get_doc({
+            "doctype": "Asset Incident Report",
+            "asset": asset,
+            "severity": "Low",
+            "incident_date": now_datetime(),
+            "incident_type": _pick_option("Asset Incident Report", "incident_type"),
+            "reported_by": "مُبلِّغ تجريبي",
+            "incident_description": "بيانات تجريبية تلقائية (Demo Wizard)",
+        })
+        inc.insert(ignore_permissions=True)
+        _log(step, "Asset Incident Report", inc.name)
+        inc.submit()
+        r.ok(f"تم إنشاء واعتماد بلاغ حادثة {inc.name}")
+    except Exception as e:
+        r.fail(f"Asset Incident Report: فشل — {e}")
+
+    try:
+        comp = frappe.get_doc({
+            "doctype": "Asset Complaint",
+            "asset": asset,
+            "complaint_date": today(),
+            "reported_by": "مُبلِّغ تجريبي",
+            "complaint_type": _pick_option("Asset Complaint", "complaint_type"),
+            "description": "بيانات تجريبية تلقائية (Demo Wizard)",
+        })
+        comp.insert(ignore_permissions=True)
+        _log(step, "Asset Complaint", comp.name)
+        r.ok(f"تم إنشاء شكوى {comp.name}")
+    except Exception as e:
+        r.fail(f"Asset Complaint: فشل — {e}")
+
+
+# ---------------------------------------------------------------------------
+# خطوة 13: الصيانة والأعمال التشغيلية
+# ---------------------------------------------------------------------------
+
+def step_maintenance_ops(r: Reporter):
+    step = "maintenance_ops"
+    asset = _get_or_bootstrap_demo_asset(step)
+    company = _get_default_company()
+    employee = _get_active_employee(company)
+    branch = _get_or_create_branch(_get_or_create_location(step), step)
+    fiscal_year = frappe.db.get_value("Fiscal Year", {}, "name")
+
+    try:
+        wo = frappe.get_doc({
+            "doctype": "Asset Work Order",
+            "title": "أمر شغل تجريبي - Demo Wizard",
+            "asset": asset,
+            "work_type": _pick_option("Asset Work Order", "work_type", "صيانة وقائية"),
+            "priority": _pick_option("Asset Work Order", "priority"),
+            "request_date": today(),
+        })
+        wo.insert(ignore_permissions=True)
+        _log(step, "Asset Work Order", wo.name)
+        wo.submit()
+        r.ok(f"تم إنشاء واعتماد أمر شغل {wo.name}")
+    except Exception as e:
+        r.fail(f"Asset Work Order: فشل — {e}")
+
+    try:
+        log = frappe.get_doc({
+            "doctype": "Asset Maintenance Log Custom",
+            "asset": asset,
+            "maintenance_date": today(),
+            "maintenance_type": _pick_option("Asset Maintenance Log Custom", "maintenance_type", "Preventive"),
+            "performed_by": "فني تجريبي",
+        })
+        log.insert(ignore_permissions=True)
+        _log(step, "Asset Maintenance Log Custom", log.name)
+        r.ok(f"تم إنشاء سجل صيانة {log.name}")
+    except Exception as e:
+        r.fail(f"Asset Maintenance Log Custom: فشل — {e}")
+
+    supplier = _get_or_create_supplier(step)
+    try:
+        if not supplier:
+            raise Exception("لا يوجد مورد ولا مجموعة موردين متاحة")
+        contract = frappe.get_doc({
+            "doctype": "Asset Maintenance Contract",
+            "naming_series": "AMC-.YYYY.-",
+            "supplier": supplier,
+            "start_date": today(),
+            "end_date": add_days(today(), 365),
+            "assets": [{"asset": asset}],
+        })
+        contract.insert(ignore_permissions=True)
+        _log(step, "Asset Maintenance Contract", contract.name)
+        r.ok(f"تم إنشاء عقد صيانة {contract.name} مرتبط بالأصل")
+    except Exception as e:
+        r.fail(f"Asset Maintenance Contract: فشل — {e}")
+
+    try:
+        if not (fiscal_year and branch and company):
+            raise Exception("بيانات أساسية ناقصة (سنة مالية/فرع/شركة)")
+        budget = frappe.get_doc({
+            "doctype": "Asset Maintenance Budget",
+            "fiscal_year": fiscal_year,
+            "branch": branch,
+            "company": company,
+            "total_budget": 50000,
+        })
+        budget.insert(ignore_permissions=True)
+        _log(step, "Asset Maintenance Budget", budget.name)
+        r.ok(f"تم إنشاء موازنة صيانة {budget.name}")
+    except Exception as e:
+        r.fail(f"Asset Maintenance Budget: فشل — {e}")
+
+    try:
+        spare = _get_or_create_spare_part(step)
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        req = frappe.get_doc({
+            "doctype": "Asset Spare Part Request",
+            "asset": asset,
+            "requested_by": employee,
+            "request_date": today(),
+            "spare_part": spare,
+            "quantity_requested": 2,
+        })
+        req.insert(ignore_permissions=True)
+        _log(step, "Asset Spare Part Request", req.name)
+        req.submit()
+        r.ok(f"تم إنشاء واعتماد طلب قطعة غيار {req.name}")
+    except Exception as e:
+        r.fail(f"Asset Spare Part Request: فشل — {e}")
+
+    try:
+        clean = frappe.get_doc({
+            "doctype": "Asset Cleaning Schedule",
+            "asset": asset,
+            "cleaning_type": _pick_option("Asset Cleaning Schedule", "cleaning_type", "Daily Clean"),
+            "scheduled_date": today(),
+            "assigned_to": "عامل نظافة تجريبي",
+            "status": "Scheduled",
+        })
+        clean.insert(ignore_permissions=True)
+        _log(step, "Asset Cleaning Schedule", clean.name)
+        r.ok(f"تم إنشاء جدول تنظيف {clean.name}")
+    except Exception as e:
+        r.fail(f"Asset Cleaning Schedule: فشل — {e}")
+
+    try:
+        fail = frappe.get_doc({
+            "doctype": "Asset Failure Analysis",
+            "asset": asset,
+            "failure_date": today(),
+            "failure_mode": _pick_option("Asset Failure Analysis", "failure_mode"),
+            "root_cause": "بيانات تجريبية تلقائية (Demo Wizard)",
+        })
+        fail.insert(ignore_permissions=True)
+        _log(step, "Asset Failure Analysis", fail.name)
+        r.ok(f"تم إنشاء تحليل عطل {fail.name}")
+    except Exception as e:
+        r.fail(f"Asset Failure Analysis: فشل — {e}")
+
+    try:
+        plan = frappe.get_doc({
+            "doctype": "Asset Replacement Plan",
+            "asset": asset,
+            "plan_date": today(),
+            "priority": _pick_option("Asset Replacement Plan", "priority"),
+            "replacement_reason": _pick_option("Asset Replacement Plan", "replacement_reason"),
+            "planned_replacement_date": add_days(today(), 365),
+        })
+        plan.insert(ignore_permissions=True)
+        _log(step, "Asset Replacement Plan", plan.name)
+        r.ok(f"تم إنشاء خطة إحلال {plan.name}")
+    except Exception as e:
+        r.fail(f"Asset Replacement Plan: فشل — {e}")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        ext = frappe.get_doc({
+            "doctype": "Asset Life Extension Request",
+            "asset": asset,
+            "requested_by": employee,
+            "request_date": today(),
+            "requested_extension_years": 2,
+            "new_expected_disposal_date": add_days(today(), 730),
+            "justification": "بيانات تجريبية تلقائية (Demo Wizard)",
+        })
+        ext.insert(ignore_permissions=True)
+        _log(step, "Asset Life Extension Request", ext.name)
+        ext.submit()
+        r.ok(f"تم إنشاء واعتماد طلب تمديد عمر {ext.name}")
+    except Exception as e:
+        r.fail(f"Asset Life Extension Request: فشل — {e}")
+
+
+# ---------------------------------------------------------------------------
+# خطوة 14: المراقبة والسجلات التشغيلية
+# ---------------------------------------------------------------------------
+
+def step_monitoring_logs(r: Reporter):
+    step = "monitoring_logs"
+    asset = _get_or_bootstrap_demo_asset(step)
+    employee = _get_active_employee(_get_default_company())
+
+    try:
+        m = frappe.get_doc({
+            "doctype": "Asset Meter Reading",
+            "asset": asset,
+            "reading_date": today(),
+            "meter_type": _pick_option("Asset Meter Reading", "meter_type"),
+            "current_reading": 1000,
+        })
+        m.insert(ignore_permissions=True)
+        _log(step, "Asset Meter Reading", m.name)
+        r.ok(f"تم إنشاء قراءة عداد {m.name}")
+    except Exception as e:
+        r.fail(f"Asset Meter Reading: فشل — {e}")
+
+    try:
+        u = frappe.get_doc({
+            "doctype": "Asset Utilization Log",
+            "asset": asset,
+            "log_date": today(),
+            "total_capacity_hours": 24,
+            "actual_used_hours": 18,
+        })
+        u.insert(ignore_permissions=True)
+        _log(step, "Asset Utilization Log", u.name)
+        r.ok(f"تم إنشاء سجل استخدام {u.name} (نسبة استغلال 75%)")
+    except Exception as e:
+        r.fail(f"Asset Utilization Log: فشل — {e}")
+
+    try:
+        fu = frappe.get_doc({
+            "doctype": "Asset Fuel Log",
+            "asset": asset,
+            "log_date": today(),
+            "fuel_type": _pick_option("Asset Fuel Log", "fuel_type", "Diesel"),
+            "liters_filled": 50,
+        })
+        fu.insert(ignore_permissions=True)
+        _log(step, "Asset Fuel Log", fu.name)
+        r.ok(f"تم إنشاء سجل وقود {fu.name}")
+    except Exception as e:
+        r.fail(f"Asset Fuel Log: فشل — {e}")
+
+    try:
+        en = frappe.get_doc({"doctype": "Asset Energy Log", "asset": asset, "log_month": today()[:7]})
+        en.insert(ignore_permissions=True)
+        _log(step, "Asset Energy Log", en.name)
+        r.ok(f"تم إنشاء سجل طاقة {en.name}")
+    except Exception as e:
+        r.fail(f"Asset Energy Log: فشل — {e}")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        env = frappe.get_doc({"doctype": "Asset Environmental Log", "asset": asset, "log_date": today(),
+                               "logged_by": employee})
+        env.insert(ignore_permissions=True)
+        _log(step, "Asset Environmental Log", env.name)
+        r.ok(f"تم إنشاء سجل بيئي {env.name}")
+    except Exception as e:
+        r.fail(f"Asset Environmental Log: فشل — {e}")
+
+    try:
+        perf = frappe.get_doc({
+            "doctype": "Asset Performance Rating",
+            "asset": asset,
+            "overall_rating": "Good",
+            "rating_date": today(),
+            "rated_by": "مقيّم تجريبي",
+            "performance_score": 8,
+        })
+        perf.insert(ignore_permissions=True)
+        _log(step, "Asset Performance Rating", perf.name)
+        r.ok(f"تم إنشاء تقييم أداء {perf.name}")
+    except Exception as e:
+        r.fail(f"Asset Performance Rating: فشل — {e}")
+
+    try:
+        comp = frappe.get_doc({"doctype": "Asset Component", "asset": asset,
+                                "component_name": "مكوّن تجريبي - Demo Wizard"})
+        comp.insert(ignore_permissions=True)
+        _log(step, "Asset Component", comp.name)
+        r.ok(f"تم إنشاء مكوّن أصل {comp.name}")
+    except Exception as e:
+        r.fail(f"Asset Component: فشل — {e}")
+
+    try:
+        rel = frappe.get_doc({"doctype": "Asset Relocation History", "asset": asset, "relocation_date": today()})
+        rel.insert(ignore_permissions=True)
+        _log(step, "Asset Relocation History", rel.name)
+        r.ok(f"تم إنشاء سجل تنقّل {rel.name}")
+    except Exception as e:
+        r.fail(f"Asset Relocation History: فشل — {e}")
+
+
+# ---------------------------------------------------------------------------
+# خطوة 15: الإدارة المالية والتعاقدات
+# ---------------------------------------------------------------------------
+
+def step_financial_contracts(r: Reporter):
+    step = "financial_contracts"
+    asset = _get_or_bootstrap_demo_asset(step)
+    company = _get_default_company()
+    branch = _get_or_create_branch(_get_or_create_location(step), step)
+    fiscal_year = frappe.db.get_value("Fiscal Year", {}, "name")
+    category = _get_or_create_asset_category(company, step)
+    supplier = _get_or_create_supplier(step)
+
+    try:
+        if not (fiscal_year and branch):
+            raise Exception("بيانات أساسية ناقصة (سنة مالية/فرع)")
+        capex = frappe.get_doc({
+            "doctype": "Asset CapEx Budget",
+            "fiscal_year": fiscal_year,
+            "branch": branch,
+            "company": company,
+            "total_capex_budget": 200000,
+            "items": [{
+                "asset_category": category,
+                "description": "بند تجريبي (Demo Wizard)",
+                "capex_type": _pick_option("Asset CapEx Budget Item", "capex_type", "New Acquisition"),
+                "quantity": 1,
+                "unit_cost": 20000,
+                "total_cost": 20000,
+            }],
+        })
+        capex.insert(ignore_permissions=True)
+        _log(step, "Asset CapEx Budget", capex.name)
+        capex.submit()
+        r.ok(f"تم إنشاء واعتماد موازنة رأسمالية {capex.name} ببند واحد")
+    except Exception as e:
+        r.fail(f"Asset CapEx Budget: فشل — {e}")
+
+    try:
+        if not supplier:
+            raise Exception("لا يوجد مورد ولا مجموعة موردين متاحة")
+        vc = frappe.get_doc({
+            "doctype": "Asset Vendor Contract",
+            "supplier": supplier,
+            "contract_type": "Annual Maintenance Contract",
+            "start_date": today(),
+            "end_date": add_days(today(), 365),
+            "assets": [{"asset": asset}],
+        })
+        vc.insert(ignore_permissions=True)
+        _log(step, "Asset Vendor Contract", vc.name)
+        vc.submit()
+        r.ok(f"تم إنشاء واعتماد عقد مورد {vc.name} مرتبط بالأصل")
+    except Exception as e:
+        r.fail(f"Asset Vendor Contract: فشل — {e}")
+
+    try:
+        if not supplier:
+            raise Exception("لا يوجد مورد")
+        rating = frappe.get_doc({
+            "doctype": "Asset Vendor Performance Rating",
+            "supplier": supplier,
+            "rating_period": _pick_option("Asset Vendor Performance Rating", "rating_period"),
+            "rating_date": today(),
+            "response_time_score": 8,
+            "quality_score": 8,
+            "timeliness_score": 7,
+            "pricing_score": 7,
+            "communication_score": 9,
+        })
+        rating.insert(ignore_permissions=True)
+        _log(step, "Asset Vendor Performance Rating", rating.name)
+        r.ok(f"تم إنشاء تقييم أداء مورد {rating.name}")
+    except Exception as e:
+        r.fail(f"Asset Vendor Performance Rating: فشل — {e}")
+
+    try:
+        ins = frappe.get_doc({"doctype": "Asset Insurance Renewal", "asset": asset})
+        ins.insert(ignore_permissions=True)
+        _log(step, "Asset Insurance Renewal", ins.name)
+        ins.submit()
+        r.ok(f"تم إنشاء واعتماد تجديد تأمين {ins.name}")
+    except Exception as e:
+        r.fail(f"Asset Insurance Renewal: فشل — {e}")
+
+    try:
+        lease = frappe.get_doc({
+            "doctype": "Asset Lease",
+            "asset": asset,
+            "lease_type": _pick_option("Asset Lease", "lease_type", "Operating Lease"),
+            "lessee_name": "مستأجر تجريبي - Demo Wizard",
+            "lessee_type": _pick_option("Asset Lease", "lessee_type"),
+            "start_date": today(),
+            "end_date": add_days(today(), 365),
+            "monthly_rent": 1500,
+            "company": company,
+        })
+        lease.insert(ignore_permissions=True)
+        _log(step, "Asset Lease", lease.name)
+        lease.submit()
+        r.ok(f"تم إنشاء واعتماد عقد إيجار {lease.name}")
+    except Exception as e:
+        r.fail(f"Asset Lease: فشل — {e}")
+
+    try:
+        sw = frappe.get_doc({"doctype": "Asset Software License", "software_name": "برنامج تجريبي - Demo Wizard"})
+        sw.insert(ignore_permissions=True)
+        _log(step, "Asset Software License", sw.name)
+        r.ok(f"تم إنشاء ترخيص برمجي {sw.name}")
+    except Exception as e:
+        r.fail(f"Asset Software License: فشل — {e}")
+
+    try:
+        if not supplier:
+            raise Exception("لا يوجد مورد")
+        claim = frappe.get_doc({
+            "doctype": "Asset Warranty Claim",
+            "asset": asset,
+            "supplier": supplier,
+            "claim_date": today(),
+            "warranty_expiry_date": add_days(today(), 30),
+            "issue_description": "بيانات تجريبية تلقائية (Demo Wizard)",
+        })
+        claim.insert(ignore_permissions=True)
+        _log(step, "Asset Warranty Claim", claim.name)
+        claim.submit()
+        r.ok(f"تم إنشاء واعتماد مطالبة ضمان {claim.name}")
+    except Exception as e:
+        r.fail(f"Asset Warranty Claim: فشل — {e}")
+
+    try:
+        vault = frappe.get_doc({
+            "doctype": "Asset Document Vault",
+            "asset": asset,
+            "document_type": _pick_option("Asset Document Vault", "document_type", "Warranty Card"),
+            "document_title": "مستند تجريبي - Demo Wizard",
+            "document_file": "/files/demo-wizard-placeholder.txt",
+        })
+        vault.insert(ignore_permissions=True)
+        _log(step, "Asset Document Vault", vault.name)
+        r.ok(f"تم إنشاء سجل أرشفة مستندات {vault.name} (بملف نائب تجريبي)")
+    except Exception as e:
+        r.fail(f"Asset Document Vault: فشل — {e}")
+
+
+# ---------------------------------------------------------------------------
+# خطوة 16: دورة حياة الأصل والعهدة
+# ---------------------------------------------------------------------------
+
+def step_lifecycle_custody(r: Reporter):
+    step = "lifecycle_custody"
+    asset = _get_or_bootstrap_demo_asset(step)
+    company = _get_default_company()
+    employee = _get_active_employee(company)
+    location = _get_or_create_location(step)
+    branch = _get_or_create_branch(location, step)
+    category = _get_or_create_asset_category(company, step)
+    cost_center = _get_cost_center(company)
+    fiscal_year = frappe.db.get_value("Fiscal Year", {}, "name")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        booking = frappe.get_doc({
+            "doctype": "Asset Booking", "asset": asset, "booked_by": employee,
+            "booking_date": today(),
+            # يبدأ بعد 60 يوماً (بدل الآن) لتقليل احتمال تعارض حجز مع تشغيل
+            # سابق لنفس الأصل التجريبي لو تكرر تشغيل هذه الخطوة بدون تنظيف.
+            "from_datetime": add_days(now_datetime(), 60),
+            "to_datetime": add_days(now_datetime(), 61),
+        })
+        booking.insert(ignore_permissions=True)
+        _log(step, "Asset Booking", booking.name)
+        booking.submit()
+        r.ok(f"تم إنشاء واعتماد حجز أصل {booking.name}")
+    except Exception as e:
+        r.fail(f"Asset Booking: فشل — {e}")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        checkout = frappe.get_doc({
+            "doctype": "Asset Checkout", "asset": asset, "checked_out_by": employee,
+            "checkout_datetime": now_datetime(), "expected_return": add_days(now_datetime(), 2),
+        })
+        checkout.insert(ignore_permissions=True)
+        _log(step, "Asset Checkout", checkout.name)
+        checkout.submit()
+        r.ok(f"تم إنشاء واعتماد تسليم مؤقت {checkout.name}")
+    except Exception as e:
+        r.fail(f"Asset Checkout: فشل — {e}")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        alloc = frappe.get_doc({"doctype": "Asset Employee Allocation", "asset": asset, "employee": employee,
+                                 "allocation_date": today()})
+        alloc.insert(ignore_permissions=True)
+        _log(step, "Asset Employee Allocation", alloc.name)
+        alloc.submit()
+        r.ok(f"تم إنشاء واعتماد تخصيص أصل لموظف {alloc.name}")
+    except Exception as e:
+        r.fail(f"Asset Employee Allocation: فشل — {e}")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        ret = frappe.get_doc({
+            "doctype": "Asset Return Request", "asset": asset, "current_custodian": employee,
+            "return_reason": _pick_option("Asset Return Request", "return_reason", "End of Use"),
+            "request_date": today(),
+        })
+        ret.insert(ignore_permissions=True)
+        _log(step, "Asset Return Request", ret.name)
+        ret.submit()
+        r.ok(f"تم إنشاء واعتماد طلب إعادة أصل {ret.name}")
+    except Exception as e:
+        r.fail(f"Asset Return Request: فشل — {e}")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        second_branch = frappe.db.get_value("Branch", {"name": ["!=", branch]}, "name")
+        if not second_branch:
+            b = frappe.get_doc({"doctype": "Branch", "branch": "فرع تجريبي 2 - Demo Wizard"})
+            b.insert(ignore_permissions=True)
+            _log(step, "Branch", b.name)
+            second_branch = b.name
+        tr = frappe.get_doc({
+            "doctype": "Asset Transfer Request", "asset": asset, "employee": employee,
+            "from_branch": branch, "to_branch": second_branch, "transfer_date": today(),
+            "reason": "بيانات تجريبية تلقائية (Demo Wizard)",
+        })
+        tr.insert(ignore_permissions=True)
+        _log(step, "Asset Transfer Request", tr.name)
+        tr.submit()
+        r.ok(f"تم إنشاء واعتماد طلب نقل أصل {tr.name} من {branch} إلى {second_branch}")
+    except Exception as e:
+        r.fail(f"Asset Transfer Request: فشل — {e}")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        train = frappe.get_doc({
+            "doctype": "Asset Training Record", "asset": asset, "employee": employee,
+            "training_date": today(), "training_type": _pick_option("Asset Training Record", "training_type", "Initial"),
+        })
+        train.insert(ignore_permissions=True)
+        _log(step, "Asset Training Record", train.name)
+        r.ok(f"تم إنشاء سجل تدريب {train.name}")
+    except Exception as e:
+        r.fail(f"Asset Training Record: فشل — {e}")
+
+    try:
+        if not employee:
+            raise Exception("لا يوجد موظف نشط")
+        disp_cert = frappe.get_doc({
+            "doctype": "Asset Disposal Certificate", "asset": asset, "disposal_date": today(),
+            "disposal_method": _pick_option("Asset Disposal Certificate", "disposal_method", "Scrapped"),
+            "disposed_by": employee, "authorized_by": frappe.session.user,
+        })
+        disp_cert.insert(ignore_permissions=True)
+        _log(step, "Asset Disposal Certificate", disp_cert.name)
+        disp_cert.submit()
+        r.ok(f"تم إنشاء واعتماد شهادة تخلص {disp_cert.name}")
+    except Exception as e:
+        r.fail(f"Asset Disposal Certificate: فشل — {e}")
+
+    try:
+        if not fiscal_year:
+            raise Exception("لا توجد سنة مالية")
+        kpi = frappe.get_doc({"doctype": "Asset KPI Target", "asset_category": category, "fiscal_year": fiscal_year})
+        kpi.insert(ignore_permissions=True)
+        _log(step, "Asset KPI Target", kpi.name)
+        r.ok(f"تم إنشاء مستهدف أداء {kpi.name}")
+    except Exception as e:
+        r.fail(f"Asset KPI Target: فشل — {e}")
+
+    try:
+        audit = frappe.get_doc({
+            "doctype": "Asset Physical Audit",
+            "naming_series": "APA-.YYYY.-",
+            "audit_date": today(),
+            "cost_center": cost_center,
+            "audited_by": frappe.session.user,
+            "items": [{"asset": asset, "expected_location": location, "audit_result": "Found",
+                       "actual_location": location}],
+        })
+        audit.insert(ignore_permissions=True)
+        _log(step, "Asset Physical Audit", audit.name)
+        audit.submit()
+        r.ok(f"تم إنشاء واعتماد جرد فعلي {audit.name} ببند واحد")
+    except Exception as e:
+        r.fail(f"Asset Physical Audit: فشل — {e}")
+
+
+# ---------------------------------------------------------------------------
+# الخطوة الأخيرة: أي وحدة فرعية متبقية لم تُغطَّ أعلاه (شبكة أمان)
 # ---------------------------------------------------------------------------
 
 HAND_CRAFTED_DOCTYPES = {
     "Asset Requisition", "Asset Repair", "Asset Retention Request", "Asset Movement",
     "Asset Write-off Request", "Asset Loan", "Asset Handover",
     "Asset Disposal Request", "Asset Disposal Execution",
+    "Asset Safety Inspection", "Asset Risk Assessment", "Asset Work Permit",
+    "Asset Compliance Certificate", "Asset License Permit", "Asset Calibration Record",
+    "Asset Condition Assessment", "Asset Criticality Matrix", "Asset Incident Report", "Asset Complaint",
+    "Asset Work Order", "Asset Maintenance Log Custom", "Asset Maintenance Contract",
+    "Asset Maintenance Budget", "Asset Spare Part Request", "Asset Spare Part",
+    "Asset Cleaning Schedule", "Asset Failure Analysis", "Asset Replacement Plan",
+    "Asset Life Extension Request",
+    "Asset Meter Reading", "Asset Utilization Log", "Asset Fuel Log", "Asset Energy Log",
+    "Asset Environmental Log", "Asset Performance Rating", "Asset Component", "Asset Relocation History",
+    "Asset CapEx Budget", "Asset Vendor Contract", "Asset Vendor Performance Rating",
+    "Asset Insurance Renewal", "Asset Lease", "Asset Software License", "Asset Warranty Claim",
+    "Asset Document Vault",
+    "Asset Booking", "Asset Checkout", "Asset Employee Allocation", "Asset Return Request",
+    "Asset Transfer Request", "Asset Training Record", "Asset Disposal Certificate",
+    "Asset KPI Target", "Asset Physical Audit",
 }
 
 
@@ -868,7 +1641,23 @@ STEPS = [
     {"id": "retention", "group": "المالية والمحاسبة", "title": "طلب احتفاظ بعهدة (Asset Retention)", "fn": step_retention},
     {"id": "writeoff", "group": "المالية والمحاسبة", "title": "شطب أصل والقيد المحاسبي", "fn": step_writeoff},
     {"id": "disposal", "group": "المالية والمحاسبة", "title": "طلب وتنفيذ التخلص من أصل", "fn": step_disposal},
-    {"id": "generic_modules", "group": "باقي الوحدات الفرعية", "title": "إنشاء سجل تجريبي واحد لكل وحدة فرعية متبقية", "fn": step_generic_modules},
+    {"id": "safety_compliance", "group": "الفحص والسلامة والامتثال",
+     "title": "فحص سلامة، تقييم مخاطر، تصريح عمل، شهادات وتراخيص، حوادث وشكاوى",
+     "fn": step_safety_compliance},
+    {"id": "maintenance_ops", "group": "الصيانة والأعمال التشغيلية",
+     "title": "أمر شغل، سجل صيانة، عقد صيانة، موازنة صيانة، طلب قطعة غيار، جدول تنظيف، تحليل عطل، خطة إحلال، تمديد عمر",
+     "fn": step_maintenance_ops},
+    {"id": "monitoring_logs", "group": "المراقبة والسجلات التشغيلية",
+     "title": "قراءة عداد، سجل استخدام، وقود، طاقة، بيئي، تقييم أداء، مكوّن، تنقّل",
+     "fn": step_monitoring_logs},
+    {"id": "financial_contracts", "group": "الإدارة المالية والتعاقدات",
+     "title": "موازنة رأسمالية، عقد مورد، تقييم مورد، تأمين، إيجار، ترخيص برمجي، ضمان، أرشفة مستندات",
+     "fn": step_financial_contracts},
+    {"id": "lifecycle_custody", "group": "دورة حياة الأصل والعهدة",
+     "title": "حجز، تسليم مؤقت، تخصيص، إعادة، نقل بين فروع، تدريب، شهادة تخلص، مستهدف أداء، جرد فعلي",
+     "fn": step_lifecycle_custody},
+    {"id": "generic_modules", "group": "باقي الوحدات الفرعية",
+     "title": "شبكة أمان: أي نوع مستند لم تغطّه الخطوات أعلاه", "fn": step_generic_modules},
 ]
 
 _STEP_MAP = {s["id"]: s for s in STEPS}
