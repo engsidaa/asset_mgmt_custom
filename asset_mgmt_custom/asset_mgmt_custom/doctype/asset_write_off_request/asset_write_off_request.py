@@ -33,11 +33,19 @@ class AssetWriteoffRequest(Document):
         if not book_value:
             # لا توجد قيمة خسارة مُقدَّرة مُدخَلة يدوياً — نحسبها من قيمة
             # الأصل بعد الإهلاك
+            # "Depreciation Schedule" جدول فرعي — الحقل parent بتاعه بيشاور
+            # على مستند "Asset Depreciation Schedule"، مش على الأصل نفسه
+            # مباشرة. نسخة سابقة كانت بتستعلم WHERE parent = <اسم الأصل>
+            # مباشرة، وده كان دايماً بيرجع 0 (مفيش صف واحد ليه parent بالشكل
+            # ده) — يعني القيمة الدفترية كانت دايماً = سعر الشراء الكامل بدون
+            # خصم أي إهلاك متراكم فعلي، لأي أصل قديم كان عمره ما يكن.
             book_value = flt(asset.get("gross_purchase_amount", 0)) - flt(
                 frappe.db.sql("""
-                    SELECT COALESCE(SUM(depreciation_amount), 0)
-                    FROM `tabDepreciation Schedule`
-                    WHERE parent = %s AND docstatus = 1
+                    SELECT COALESCE(SUM(ds.depreciation_amount), 0)
+                    FROM `tabDepreciation Schedule` ds
+                    JOIN `tabAsset Depreciation Schedule` ads ON ads.name = ds.parent
+                    WHERE ads.asset = %s AND ads.docstatus = 1
+                      AND ds.journal_entry IS NOT NULL AND ds.journal_entry != ''
                 """, self.asset)[0][0]
             )
 
