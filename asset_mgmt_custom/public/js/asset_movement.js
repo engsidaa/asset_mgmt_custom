@@ -178,7 +178,10 @@ function _render_movement_summary(frm) {
 }
 
 function _show_transit_badge(frm) {
-	if (frm.doc.docstatus !== 1 || frm.doc.purpose !== "Transfer") return;
+	// كانت بتظهر الشارة طول ما docstatus=1 وpurpose=Transfer، حتى بعد
+	// تأكيد الاستلام فعلاً (custom_receipt_confirmed=1) — يعني السند بيفضل
+	// شايل شارة "In Transit" للأبد حتى لو الأصل وصل ورجع Operational بالفعل.
+	if (frm.doc.docstatus !== 1 || frm.doc.purpose !== "Transfer" || frm.doc.custom_receipt_confirmed) return;
 
 	const in_transit = (frm.doc.assets || []).some(function(row) {
 		return row.asset;
