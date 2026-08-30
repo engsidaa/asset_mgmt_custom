@@ -62,6 +62,7 @@ def run_demo_test():
         coded_asset = _test_coding_and_operational()
         _test_asset_movement_transfer(coded_asset)
         _test_requisition_execution()
+        _test_asset_writeoff()
     finally:
         frappe.db.rollback()
         print("\n" + "#" * 70)
@@ -832,6 +833,61 @@ def _test_requisition_execution():
 
     except Exception as e:
         _fail("فشل اختبار تنفيذ الطلب المعتمد", e)
+
+
+# ---------------------------------------------------------------------------
+# اختبار 8: شطب أصل (Asset Write-off Request) — القيد المحاسبي التلقائي
+# ---------------------------------------------------------------------------
+
+def _test_asset_writeoff():
+    _header("8) شطب أصل (Asset Write-off Request) — القيد المحاسبي")
+    try:
+        asset, created = _get_or_create_submitted_asset()
+        if not asset:
+            return
+
+        asset_doc = frappe.get_doc("Asset", asset)
+        _ok(f"استخدام الأصل: {asset}{' (تم إنشاؤه تجريبياً)' if created else ''}")
+
+        wo = frappe.new_doc("Asset Write-off Request")
+        wo.asset = asset
+        wo.write_off_date = today()
+        wo.reason = "Obsolete"
+        wo.description = "اختبار توضيحي تلقائي (Demo Test)"
+        wo.estimated_loss_value = 750
+        wo.insert(ignore_permissions=True)
+        wo.submit()
+        wo.reload()
+        if wo.status == "Pending Approval":
+            _ok(f"تم تقديم طلب الشطب {wo.name} — الحالة 'Pending Approval' كما هو متوقع")
+        else:
+            _fail(f"بعد التقديم: الحالة غير متوقعة = {wo.status}")
+
+        frappe.db.set_value("Asset Write-off Request", wo.name, "status", "Approved")
+        wo.reload()
+
+        je_name = wo.create_journal_entry()
+        wo.reload()
+        if not je_name:
+            _fail("create_journal_entry: لم يرجع اسم قيد يومية")
+            return
+
+        je = frappe.get_doc("Journal Entry", je_name)
+        total_debit = sum(row.debit_in_account_currency for row in je.accounts)
+        total_credit = sum(row.credit_in_account_currency for row in je.accounts)
+        _ok(f"تم إنشاء قيد يومية {je.name} — إجمالي مدين={total_debit}, دائن={total_credit}")
+        if total_debit == total_credit == 750:
+            _ok("المبالغ متزنة ومطابقة للقيمة المُقدَّرة (750) — تم استخدام estimated_loss_value بشكل صحيح")
+        else:
+            _fail(f"المبالغ غير متزنة أو غير مطابقة (متوقع 750, وجد مدين={total_debit})")
+
+        if wo.status == "Executed" and wo.journal_entry == je.name:
+            _ok("حالة طلب الشطب أصبحت 'Executed' وربط قيد اليومية صحيح")
+        else:
+            _fail(f"حالة/ربط طلب الشطب غير متوقع: status={wo.status}, journal_entry={wo.journal_entry}")
+
+    except Exception as e:
+        _fail("فشل اختبار شطب الأصل", e)
 
 
 # ---------------------------------------------------------------------------
