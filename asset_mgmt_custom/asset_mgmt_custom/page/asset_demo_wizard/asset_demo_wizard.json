@@ -1,0 +1,18 @@
+{
+ "content": null,
+ "docstatus": 0,
+ "doctype": "Page",
+ "module": "Asset Mgmt Custom",
+ "name": "asset-demo-wizard",
+ "owner": "Administrator",
+ "page_name": "asset-demo-wizard",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "title": "معالج البيانات التجريبية"
+}

@@ -1,0 +1,55 @@
+{
+ "doctype": "DocType",
+ "name": "Asset Demo Run Log",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "Random",
+ "autoname": "hash",
+ "is_submittable": 0,
+ "track_changes": 0,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "description": "سجل داخلي لأداة (معالج البيانات التجريبية) — يتتبع كل مستند أنشأه المعالج حتى يمكن حذفه بأمان لاحقاً. لا يُستخدم في أي عملية تشغيلية فعلية.",
+ "fields": [
+  {
+   "fieldname": "step",
+   "fieldtype": "Data",
+   "label": "الخطوة",
+   "reqd": 1,
+   "in_list_view": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "col1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "options": "DocType",
+   "label": "نوع المستند",
+   "reqd": 1,
+   "in_list_view": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Dynamic Link",
+   "options": "reference_doctype",
+   "label": "اسم المستند",
+   "reqd": 1,
+   "in_list_view": 1,
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  }
+ ]
+}
