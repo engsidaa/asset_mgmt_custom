@@ -1730,13 +1730,21 @@ LIFECYCLE_MANAGED_FIELDS = {"status", "docstatus", "amended_from", "workflow_sta
 
 
 def _enrich_optional_fields(doc):
-    """يملأ أي حقل اختياري لسه فاضي بعد الإنشاء بقيمة معقولة حسب نوعه —
-    عشان أكبر عدد ممكن من خصائص كل مستند تتلمس فعلياً، مش بس الحقول
-    الإلزامية. أي حقل اتحط له قيمة بالفعل (يدوياً أو عبر default/fetch_from)
-    ما بيتلمسش، وكذلك أي حقل مشروط (depends_on) أو مُدار بمنطق دورة الحياة."""
+    """يملأ حقول Link/Select الاختيارية الفاضية بقيمة حقيقية — عشان علاقات
+    وتصنيفات أكتر تتلمس فعلياً، مش بس الحقول الإلزامية. أي حقل اتحط له
+    قيمة بالفعل (يدوياً أو عبر default/fetch_from) ما بيتلمسش، وكذلك أي حقل
+    مشروط (depends_on) أو مُدار بمنطق دورة الحياة.
+
+    عمداً بيتجاهل أنواع البيانات الرقمية/التاريخية (Date, Int, Currency...):
+    اختبار فعلي أثبت إنها خطرة — حقول زي 'Next Inspection Date' أو
+    'actual_return_date' مالهاش قيمة افتراضية آمنة (تصادم مع 'يجب أن يكون
+    بعد تاريخ كذا'، أو نطاق رقمي مقيد زي 'بين 1 و10')، وبعضها بيُفعّل منطق
+    حالة مخفي في validate() لمجرد وجود قيمة فيه (مثال حقيقي: Asset Loan
+    بيحوّل status لـ 'Returned' تلقائياً بمجرد ما actual_return_date يتحط،
+    حتى لو المستند لسه Active فعلياً)."""
     meta = frappe.get_meta(doc.doctype)
     for f in meta.fields:
-        if f.fieldtype in NON_FILLABLE_TYPES or f.fieldtype in SKIP_TYPES:
+        if f.fieldtype not in ("Link", "Select"):
             continue
         if f.read_only or f.fetch_from or f.hidden or f.depends_on:
             continue
@@ -1745,12 +1753,7 @@ def _enrich_optional_fields(doc):
         if doc.get(f.fieldname):
             continue
         try:
-            if f.fieldtype == "Link":
-                val = _resolve_link(f)
-            elif f.fieldtype == "Select":
-                val = _fill_select(f)
-            else:
-                val = _generate_scalar(f.fieldtype, f.label, f.fieldname)
+            val = _resolve_link(f) if f.fieldtype == "Link" else _fill_select(f)
             if val is not None:
                 doc.set(f.fieldname, val)
         except Exception:
