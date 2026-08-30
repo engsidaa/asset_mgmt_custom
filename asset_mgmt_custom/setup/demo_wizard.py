@@ -1959,6 +1959,12 @@ def cleanup_all():
             if frappe.db.exists(e.reference_doctype, e.reference_name):
                 doc = frappe.get_doc(e.reference_doctype, e.reference_name)
                 if doc.meta.is_submittable and doc.docstatus == 1:
+                    # doc.cancel() بيتحقق كمان من عدم وجود مستندات تانية لسه
+                    # شايلة Link لهذا المستند (زي Asset Write-off Request
+                    # اللي لسه موجود ولسه شايل journal_entry) — بما إننا
+                    # هنحذف كل حاجة بالترتيب العكسي على أي حال، نتجاوز هذا
+                    # الفحص هنا بأمان (زي force=1 بالظبط لكن لمرحلة الإلغاء).
+                    doc.flags.ignore_links = True
                     doc.cancel()
                 frappe.delete_doc(e.reference_doctype, e.reference_name, force=1,
                                    ignore_permissions=True, ignore_missing=True)
