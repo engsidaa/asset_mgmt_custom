@@ -753,10 +753,15 @@ def step_safety_compliance(r: Reporter):
         r.fail(f"Asset Safety Inspection: فشل — {e}")
 
     try:
-        # سيناريو ثانٍ: فحص سلامة بنتيجة 'Fail' — شكل مختلف عن الفحص الناجح أعلاه
+        # سيناريو ثانٍ: فحص سلامة بنتيجة 'Fail' — شكل مختلف عن الفحص الناجح أعلاه.
+        # لازم أصل مختلف: autoname لهذا المستند هو SAFE-{inspection_date}-{asset}،
+        # فنفس الأصل في نفس اليوم يصطدم بمفتاح أساسي مكرر مع الفحص الأول.
+        m2 = _bootstrap_master(step)
+        asset2 = _create_asset(step, m2["company"], m2["location"], m2["item_code"], m2["category"],
+                                name_suffix=" (فحص راسب)")
         insp2 = frappe.get_doc({
             "doctype": "Asset Safety Inspection",
-            "asset": asset,
+            "asset": asset2,
             "inspection_type": _pick_option("Asset Safety Inspection", "inspection_type", "Electrical Safety"),
             "inspection_date": today(),
             "inspector": "مفتّش سلامة تجريبي",
