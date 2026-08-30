@@ -11,16 +11,13 @@ frappe.ui.form.on("Asset Loan", {
 					primary_action_label: __("Confirm Return"),
 					primary_action(vals) {
 						frappe.call({
-							method: "frappe.client.set_value",
+							method: "record_return",
+							doc: frm.doc,
 							args: {
-								doctype: "Asset Loan",
-								name: frm.doc.name,
-								fieldname: {
-									actual_return_date: vals.actual_return_date,
-									return_condition: vals.return_condition,
-									status: "Returned",
-								},
+								actual_return_date: vals.actual_return_date,
+								return_condition: vals.return_condition,
 							},
+							freeze: true,
 							callback() {
 								d.hide();
 								frm.reload_doc();

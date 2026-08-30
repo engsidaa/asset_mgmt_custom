@@ -1,12 +1,13 @@
 frappe.ui.form.on("Asset Handover", {
     refresh(frm) {
         if (!frm.doc.__islocal) {
+            // مفيش قالب طباعة اسمه "Asset Handover Certificate" في النظام
+            // (القوالب المتاحة كلها لـ Asset/Asset Movement/Full and Final
+            // Statement فقط) — كان هيفتح صفحة خطأ بدل شهادة فعلية. بدل ما
+            // نتظاهر بوجود قالب مخصص غير موجود، نستخدم زر الطباعة القياسي
+            // اللي بيسيب المستخدم يختار من القوالب المتاحة فعلاً.
             frm.add_custom_button(__("Print Handover Certificate"), () => {
-                frappe.utils.print(
-                    frm.doctype,
-                    frm.docname,
-                    "Asset Handover Certificate"
-                );
+                frm.print_doc();
             }, __("Print"));
         }
 

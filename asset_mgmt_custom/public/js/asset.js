@@ -194,7 +194,9 @@ function _add_set_operational_button(frm) {
 
 function _add_print_tag_button(frm) {
 	if (frm.doc.__islocal) return;
+	// اسم قالب الطباعة الحقيقي هو "Asset Barcode Label" — مفيش قالب اسمه
+	// "Asset Tag" في النظام، كان هيفتح صفحة طباعة فاضية/خطأ بدل الملصق الفعلي.
 	frm.add_custom_button(__("Print Asset Tag"), function () {
-		frappe.utils.print(frm.doctype, frm.docname, "Asset Tag");
+		frappe.utils.print(frm.doctype, frm.docname, "Asset Barcode Label");
 	}, __("Print"));
 }

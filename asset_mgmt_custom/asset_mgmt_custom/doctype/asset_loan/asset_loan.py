@@ -26,6 +26,32 @@ class AssetLoan(Document):
         if self.original_custodian:
             frappe.db.set_value("Asset", self.asset, "custodian", self.original_custodian)
 
+    @frappe.whitelist()
+    def record_return(self, actual_return_date, return_condition):
+        """
+        زر "Record Return" في الواجهة كان بيستخدم frappe.client.set_value
+        العام مباشرة — بيضبط status/actual_return_date/return_condition
+        بس، وأبداً معيدش عهدة الأصل (custodian) للشخص الأصلي. الاسترداد
+        الوحيد كان بيحصل عند إلغاء (Cancel) المستند بالكامل، مش عند
+        "الإرجاع" العادي — يعني الأصل كان فعلياً بيفضل في عهدة المقترض
+        للأبد حتى بعد تسجيل إرجاعه في الشاشة.
+        """
+        if self.status != "Active":
+            frappe.throw(_("Only an Active loan can be marked as returned."))
+
+        self.db_set({
+            "actual_return_date": actual_return_date,
+            "return_condition": return_condition,
+            "status": "Returned",
+        })
+
+        if self.original_custodian:
+            frappe.db.set_value("Asset", self.asset, "custodian", self.original_custodian)
+        else:
+            frappe.db.set_value("Asset", self.asset, "custodian", "")
+
+        return self.status
+
     def _notify_loan(self):
         # كانت بتضبط for_user = frappe.session.user، يعني بتبلّغ الشخص اللي
         # عمل الإجراء بنفسه (وهو أصلاً عارف إنه عمله) — مش أي حد محتاج

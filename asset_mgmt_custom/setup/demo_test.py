@@ -63,6 +63,7 @@ def run_demo_test():
         _test_asset_movement_transfer(coded_asset)
         _test_requisition_execution()
         _test_asset_writeoff()
+        _test_asset_loan_return()
     finally:
         frappe.db.rollback()
         print("\n" + "#" * 70)
@@ -888,6 +889,61 @@ def _test_asset_writeoff():
 
     except Exception as e:
         _fail("فشل اختبار شطب الأصل", e)
+
+
+# ---------------------------------------------------------------------------
+# اختبار 9: إعارة أصل (Asset Loan) — استرداد العهدة عند تسجيل الإرجاع
+# ---------------------------------------------------------------------------
+
+def _test_asset_loan_return():
+    _header("9) إعارة أصل (Asset Loan) — استرداد العهدة عند الإرجاع")
+    try:
+        asset, created = _get_or_create_submitted_asset()
+        if not asset:
+            return
+
+        asset_doc = frappe.get_doc("Asset", asset)
+        original_custodian = asset_doc.custodian
+        employee = _get_active_employee(asset_doc.company)
+        if not employee:
+            _skip("لا يوجد موظف نشط لتجربة الإعارة عليه")
+            return
+        _ok(f"استخدام الأصل: {asset}{' (تم إنشاؤه تجريبياً)' if created else ''} | "
+            f"العهدة الأصلية: {original_custodian or '(بدون)'}")
+
+        loan = frappe.new_doc("Asset Loan")
+        loan.asset = asset
+        loan.loaned_to = employee
+        loan.loan_date = today()
+        loan.expected_return_date = add_days(today(), 7)
+        loan.purpose = "اختبار توضيحي تلقائي (Demo Test)"
+        loan.insert(ignore_permissions=True)
+        loan.submit()
+
+        asset_doc.reload()
+        if asset_doc.custodian == employee:
+            _ok(f"بعد الإعارة: عهدة الأصل انتقلت للموظف {employee} كما هو متوقع")
+        else:
+            _fail(f"بعد الإعارة: العهدة غير متوقعة = {asset_doc.custodian}")
+
+        loan.record_return(actual_return_date=today(), return_condition="Good")
+        loan.reload()
+        asset_doc.reload()
+
+        if loan.status == "Returned":
+            _ok("بعد تسجيل الإرجاع: حالة الإعارة أصبحت 'Returned'")
+        else:
+            _fail(f"بعد تسجيل الإرجاع: الحالة غير متوقعة = {loan.status}")
+
+        if asset_doc.custodian == (original_custodian or ""):
+            _ok(f"بعد تسجيل الإرجاع: عهدة الأصل رجعت للأصل الصحيح "
+                f"({original_custodian or '(بدون)'}) — لم تعد عالقة عند المُقترِض")
+        else:
+            _fail(f"بعد تسجيل الإرجاع: العهدة لم تُسترجع كما هو متوقع "
+                  f"(وجدت={asset_doc.custodian}, متوقع={original_custodian or '(بدون)'})")
+
+    except Exception as e:
+        _fail("فشل اختبار إعارة الأصل", e)
 
 
 # ---------------------------------------------------------------------------
