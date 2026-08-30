@@ -175,14 +175,23 @@ def check_overdue_transit(threshold_days=3):
 
 def check_requisition_sla(sla_hours=48):
     """
-    Daily: alert when an Asset Requisition has been Pending Approval for > sla_hours.
+    Daily: alert when an Asset Requisition has been pending at any approval
+    stage for > sla_hours.
+
+    "Pending Approval" was the single status used by the old one-step
+    Workflow, before Phase 4 replaced it with a real 3-stage chain (Finance
+    -> Branch Manager -> Asset Manager) and three distinct "Pending * Approval"
+    statuses. This job was never updated after that rewrite — it's been
+    watching for a status value that hasn't existed since, so the SLA
+    breach alert has silently never fired for any real requisition.
     """
     cutoff = frappe.utils.add_to_date(now_datetime(), hours=-sla_hours)
 
     pending = frappe.db.sql("""
         SELECT name, asset_category, creation
         FROM `tabAsset Requisition`
-        WHERE status = 'Pending Approval'
+        WHERE status IN ('Pending Finance Approval', 'Pending Branch Manager Approval',
+                          'Pending Asset Manager Approval')
           AND docstatus < 2
           AND creation <= %(cutoff)s
     """, {"cutoff": cutoff}, as_dict=True)
