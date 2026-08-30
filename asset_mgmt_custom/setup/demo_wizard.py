@@ -28,7 +28,7 @@ def _log(step, doctype, name):
         return
     if frappe.db.exists("Asset Demo Run Log", {"reference_doctype": doctype, "reference_name": name}):
         return
-    frappe.get_doc({
+    _new({
         "doctype": "Asset Demo Run Log",
         "step": step,
         "reference_doctype": doctype,
@@ -73,7 +73,7 @@ def _get_or_create_location(step="master"):
     loc = frappe.db.get_value("Location", {}, "name")
     if loc:
         return loc
-    doc = frappe.get_doc({"doctype": "Location", "location_name": "موقع تجريبي - Demo Wizard"})
+    doc = _new({"doctype": "Location", "location_name": "موقع تجريبي - Demo Wizard"})
     doc.insert(ignore_permissions=True)
     _log(step, "Location", doc.name)
     return doc.name
@@ -83,7 +83,7 @@ def _get_or_create_second_location(exclude_location, step="movement_transfer"):
     loc = frappe.db.get_value("Location", {"name": ["!=", exclude_location]}, "name")
     if loc:
         return loc
-    doc = frappe.get_doc({"doctype": "Location", "location_name": "موقع تجريبي 2 - Demo Wizard"})
+    doc = _new({"doctype": "Location", "location_name": "موقع تجريبي 2 - Demo Wizard"})
     doc.insert(ignore_permissions=True)
     _log(step, "Location", doc.name)
     return doc.name
@@ -99,7 +99,7 @@ def _get_or_create_asset_category(company, step="master"):
     if not fixed_asset_account:
         frappe.throw(_("لا يوجد أي حساب من نوع 'Fixed Asset' في شجرة حسابات الشركة — "
                        "يجب تجهيز الإعداد الأساسي (Chart of Accounts) أولاً قبل استخدام هذا المعالج."))
-    cat = frappe.get_doc({
+    cat = _new({
         "doctype": "Asset Category",
         "asset_category_name": "فئة تجريبية - Demo Wizard",
         "accounts": [{"company_name": company, "fixed_asset_account": fixed_asset_account}],
@@ -116,7 +116,7 @@ def _get_or_create_fixed_asset_item(asset_category, step="master"):
     item_group = frappe.db.get_value("Item Group", {}, "name")
     if not item_group:
         frappe.throw(_("لا توجد أي مجموعة أصناف (Item Group) في النظام."))
-    item = frappe.get_doc({
+    item = _new({
         "doctype": "Item",
         "item_code": code,
         "item_name": "صنف أصل ثابت تجريبي - Demo Wizard",
@@ -137,7 +137,7 @@ def _get_or_create_branch(location, step="master"):
         if not frappe.db.get_value("Branch", branch, "custom_default_location"):
             frappe.db.set_value("Branch", branch, "custom_default_location", location)
         return branch
-    doc = frappe.get_doc({
+    doc = _new({
         "doctype": "Branch",
         "branch": "فرع تجريبي - Demo Wizard",
         "custom_default_location": location,
@@ -169,7 +169,7 @@ def _log_auto_receipt_movement(step, asset_name):
 
 def _create_asset(step, company, location, item_code, category, is_spare=0, amount=10000, name_suffix=""):
     cost_center = _get_cost_center(company)
-    asset = frappe.get_doc({
+    asset = _new({
         "doctype": "Asset",
         "asset_name": ("أصل احتياطي تجريبي" if is_spare else "أصل تجريبي") + f" - Demo Wizard{name_suffix}",
         "item_code": item_code,
@@ -259,6 +259,7 @@ def step_requisition_chain(r: Reporter):
     doc.asset_category = category
     doc.request_date = today()
     doc.justification = "بيانات تجريبية تلقائية (Demo Wizard)"
+    _enrich_optional_fields(doc)
     doc.insert(ignore_permissions=True)
     _log("requisition_chain", "Asset Requisition", doc.name)
     doc.submit()
@@ -276,6 +277,7 @@ def step_requisition_chain(r: Reporter):
     doc2.asset_category = category
     doc2.request_date = today()
     doc2.justification = "اختبار رفض — بيانات تجريبية (Demo Wizard)"
+    _enrich_optional_fields(doc2)
     doc2.insert(ignore_permissions=True)
     _log("requisition_chain", "Asset Requisition", doc2.name)
     doc2.submit()
@@ -320,6 +322,7 @@ def step_repair_gl(r: Reporter):
         repair.capitalize_repair_cost = 0
         repair.custom_technician_name = "فني تجريبي"
         repair.custom_repair_notes = "بيانات تجريبية تلقائية (Demo Wizard)"
+        _enrich_optional_fields(repair)
         repair.insert(ignore_permissions=True)
         _log("repair_gl", "Asset Repair", repair.name)
         repair.submit()
@@ -344,6 +347,7 @@ def step_repair_gl(r: Reporter):
         repair2.increase_in_asset_life = 6
         repair2.custom_technician_name = "فني تجريبي"
         repair2.custom_repair_notes = "بيانات تجريبية تلقائية - رسملة (Demo Wizard)"
+        _enrich_optional_fields(repair2)
         repair2.insert(ignore_permissions=True)
         _log("repair_gl", "Asset Repair", repair2.name)
         repair2.submit()
@@ -369,7 +373,7 @@ def step_retention(r: Reporter):
         r.skip("لا يوجد موظف نشط لتخصيص عهدة تجريبية له.")
         return
 
-    am = frappe.get_doc({
+    am = _new({
         "doctype": "Asset Movement",
         "purpose": "Issue",
         "company": asset_doc.company,
@@ -388,6 +392,7 @@ def step_retention(r: Reporter):
     retention.travel_end = add_days(today(), 30)
     retention.destination = "بيانات تجريبية (Demo Wizard)"
     retention.justification = "بيانات تجريبية تلقائية (Demo Wizard)"
+    _enrich_optional_fields(retention)
     retention.insert(ignore_permissions=True)
     _log("retention", "Asset Retention Request", retention.name)
     retention.db_set("status", "Approved")
@@ -480,6 +485,7 @@ def step_movement_transfer(r: Reporter):
     movement.company = asset.company
     movement.transaction_date = now_datetime()
     movement.append("assets", {"asset": asset_name, "target_location": target_location})
+    _enrich_optional_fields(movement)
     movement.insert(ignore_permissions=True)
     _log("movement_transfer", "Asset Movement", movement.name)
     movement.submit()
@@ -519,7 +525,7 @@ def step_requisition_execution(r: Reporter):
     doc.item_code = m["item_code"]
     doc.request_date = today()
     doc.justification = "بيانات تجريبية — تنفيذ عبر أصل احتياطي (Demo Wizard)"
-    doc.insert(ignore_permissions=True)
+    doc.insert(ignore_permissions=True)  # لا نُغني الحقول هنا: أي حقل إضافي (زي quantity) ممكن يغيّر اكتشاف الاحتياطي/المخزون تلقائياً
     _log("requisition_execution", "Asset Requisition", doc.name)
     if not (doc.spare_available and doc.spare_asset == spare):
         r.fail(f"لم يُكتشف الأصل الاحتياطي تلقائياً (spare_available={doc.spare_available})")
@@ -548,7 +554,7 @@ def step_requisition_execution(r: Reporter):
     doc2.quantity = 1
     doc2.request_date = today()
     doc2.justification = "بيانات تجريبية — تنفيذ عبر طلب شراء (Demo Wizard)"
-    doc2.insert(ignore_permissions=True)
+    doc2.insert(ignore_permissions=True)  # نفس السبب: مبنغيّرش حقول ممكن تأثر على اكتشاف المخزون/الاحتياطي
     _log("requisition_execution", "Asset Requisition", doc2.name)
     if doc2.spare_available or doc2.stock_available:
         r.info("سيناريو طلب الشراء: يوجد احتياطي/مخزون فعلي متاح بنفس الصنف — تم تخطي هذا الجزء.")
@@ -581,6 +587,7 @@ def step_writeoff(r: Reporter):
     wo.reason = "Obsolete"
     wo.description = "بيانات تجريبية تلقائية (Demo Wizard)"
     wo.estimated_loss_value = 750
+    _enrich_optional_fields(wo)
     wo.insert(ignore_permissions=True)
     _log("writeoff", "Asset Write-off Request", wo.name)
     wo.submit()
@@ -619,6 +626,11 @@ def step_depreciation(r: Reporter):
 
     cost_center = _get_cost_center(m["company"])
     try:
+        # ملحوظة: عمداً بدون _new/enrichment هنا — أصل بـ is_existing_asset=1
+        # و calculate_depreciation=1 عنده تحقق متبادل حساس بين
+        # opening_accumulated_depreciation و opening_number_of_booked_depreciations
+        # في core ERPNext، وملء عشوائي لحقول اختيارية زيها ممكن يكسر حساب
+        # الإهلاك الصحيح بدل ما يزود التغطية.
         asset = frappe.get_doc({
             "doctype": "Asset",
             "asset_name": "أصل تجريبي - Demo Wizard (إهلاك)",
@@ -688,6 +700,7 @@ def step_loan(r: Reporter):
     loan.loan_date = today()
     loan.expected_return_date = add_days(today(), 7)
     loan.purpose = "بيانات تجريبية تلقائية (Demo Wizard)"
+    _enrich_optional_fields(loan)
     loan.insert(ignore_permissions=True)
     _log("loan", "Asset Loan", loan.name)
     loan.submit()
@@ -720,6 +733,7 @@ def step_handover(r: Reporter):
     handover.outgoing_manager = "مدير خارج تجريبي - Demo Wizard"
     handover.incoming_manager = "مدير وارد تجريبي - Demo Wizard"
     handover.append("items", {"asset": asset, "condition": "Good"})
+    _enrich_optional_fields(handover)
     handover.insert(ignore_permissions=True)
     _log("handover", "Asset Handover", handover.name)
     handover.submit()
@@ -744,6 +758,7 @@ def step_disposal(r: Reporter):
     req.asset = asset
     req.disposal_date = today()
     req.disposal_reason = "End of Life"
+    _enrich_optional_fields(req)
     req.insert(ignore_permissions=True)
     _log("disposal", "Asset Disposal Request", req.name)
     req.submit()
@@ -759,6 +774,7 @@ def step_disposal(r: Reporter):
     execution.disposal_request = req.name
     execution.disposal_method = "Scrapped"
     execution.execution_date = today()
+    _enrich_optional_fields(execution)
     execution.insert(ignore_permissions=True)
     _log("disposal", "Asset Disposal Execution", execution.name)
     execution.submit()
@@ -778,6 +794,7 @@ def step_disposal(r: Reporter):
         req2.asset = asset2
         req2.disposal_date = today()
         req2.disposal_reason = "Surplus"
+        _enrich_optional_fields(req2)
         req2.insert(ignore_permissions=True)
         _log("disposal", "Asset Disposal Request", req2.name)
         req2.submit()
@@ -825,7 +842,7 @@ def step_safety_compliance(r: Reporter):
     employee = _get_active_employee(company)
 
     try:
-        insp = frappe.get_doc({
+        insp = _new({
             "doctype": "Asset Safety Inspection",
             "asset": asset,
             "inspection_type": _pick_option("Asset Safety Inspection", "inspection_type", "Fire Safety"),
@@ -852,7 +869,7 @@ def step_safety_compliance(r: Reporter):
         m2 = _bootstrap_master(step)
         asset2 = _create_asset(step, m2["company"], m2["location"], m2["item_code"], m2["category"],
                                 name_suffix=" (فحص راسب)")
-        insp2 = frappe.get_doc({
+        insp2 = _new({
             "doctype": "Asset Safety Inspection",
             "asset": asset2,
             "inspection_type": _pick_option("Asset Safety Inspection", "inspection_type", "Electrical Safety"),
@@ -872,7 +889,7 @@ def step_safety_compliance(r: Reporter):
         r.fail(f"Asset Safety Inspection (Fail): فشل — {e}")
 
     try:
-        risk = frappe.get_doc({
+        risk = _new({
             "doctype": "Asset Risk Assessment",
             "asset": asset,
             "assessment_date": today(),
@@ -890,7 +907,7 @@ def step_safety_compliance(r: Reporter):
         r.fail(f"Asset Risk Assessment: فشل — {e}")
 
     try:
-        permit = frappe.get_doc({
+        permit = _new({
             "doctype": "Asset Work Permit",
             "asset": asset,
             "permit_type": _pick_option("Asset Work Permit", "permit_type"),
@@ -906,7 +923,7 @@ def step_safety_compliance(r: Reporter):
         r.fail(f"Asset Work Permit: فشل — {e}")
 
     try:
-        cert = frappe.get_doc({
+        cert = _new({
             "doctype": "Asset Compliance Certificate",
             "certificate_number": f"DEMO-CERT-{asset[-6:]}",
             "asset": asset,
@@ -923,7 +940,7 @@ def step_safety_compliance(r: Reporter):
         r.fail(f"Asset Compliance Certificate: فشل — {e}")
 
     try:
-        lic = frappe.get_doc({
+        lic = _new({
             "doctype": "Asset License Permit",
             "asset": asset,
             "permit_type": _pick_option("Asset License Permit", "permit_type"),
@@ -939,7 +956,7 @@ def step_safety_compliance(r: Reporter):
         r.fail(f"Asset License Permit: فشل — {e}")
 
     try:
-        calib = frappe.get_doc({
+        calib = _new({
             "doctype": "Asset Calibration Record",
             "asset": asset,
             "calibration_date": today(),
@@ -955,7 +972,7 @@ def step_safety_compliance(r: Reporter):
     try:
         if not employee:
             raise Exception("لا يوجد موظف نشط لتعيينه كمقيّم")
-        cond = frappe.get_doc({
+        cond = _new({
             "doctype": "Asset Condition Assessment",
             "asset": asset,
             "assessment_date": today(),
@@ -969,7 +986,7 @@ def step_safety_compliance(r: Reporter):
         r.fail(f"Asset Condition Assessment: فشل — {e}")
 
     try:
-        crit = frappe.get_doc({"doctype": "Asset Criticality Matrix", "asset": asset, "criticality_level": "Medium"})
+        crit = _new({"doctype": "Asset Criticality Matrix", "asset": asset, "criticality_level": "Medium"})
         crit.insert(ignore_permissions=True)
         _log(step, "Asset Criticality Matrix", crit.name)
         r.ok(f"تم إنشاء تصنيف أهمية حرجة {crit.name}")
@@ -977,7 +994,7 @@ def step_safety_compliance(r: Reporter):
         r.fail(f"Asset Criticality Matrix: فشل — {e}")
 
     try:
-        inc = frappe.get_doc({
+        inc = _new({
             "doctype": "Asset Incident Report",
             "asset": asset,
             "severity": "Low",
@@ -994,7 +1011,7 @@ def step_safety_compliance(r: Reporter):
         r.fail(f"Asset Incident Report: فشل — {e}")
 
     try:
-        comp = frappe.get_doc({
+        comp = _new({
             "doctype": "Asset Complaint",
             "asset": asset,
             "complaint_date": today(),
@@ -1022,7 +1039,7 @@ def step_maintenance_ops(r: Reporter):
     fiscal_year = frappe.db.get_value("Fiscal Year", {}, "name")
 
     try:
-        wo = frappe.get_doc({
+        wo = _new({
             "doctype": "Asset Work Order",
             "title": "أمر شغل تجريبي - Demo Wizard",
             "asset": asset,
@@ -1038,7 +1055,7 @@ def step_maintenance_ops(r: Reporter):
         r.fail(f"Asset Work Order: فشل — {e}")
 
     try:
-        log = frappe.get_doc({
+        log = _new({
             "doctype": "Asset Maintenance Log Custom",
             "asset": asset,
             "maintenance_date": today(),
@@ -1055,7 +1072,7 @@ def step_maintenance_ops(r: Reporter):
     try:
         if not supplier:
             raise Exception("لا يوجد مورد ولا مجموعة موردين متاحة")
-        contract = frappe.get_doc({
+        contract = _new({
             "doctype": "Asset Maintenance Contract",
             "naming_series": "AMC-.YYYY.-",
             "supplier": supplier,
@@ -1072,7 +1089,7 @@ def step_maintenance_ops(r: Reporter):
     try:
         if not (fiscal_year and branch and company):
             raise Exception("بيانات أساسية ناقصة (سنة مالية/فرع/شركة)")
-        budget = frappe.get_doc({
+        budget = _new({
             "doctype": "Asset Maintenance Budget",
             "fiscal_year": fiscal_year,
             "branch": branch,
@@ -1089,7 +1106,7 @@ def step_maintenance_ops(r: Reporter):
         spare = _get_or_create_spare_part(step)
         if not employee:
             raise Exception("لا يوجد موظف نشط")
-        req = frappe.get_doc({
+        req = _new({
             "doctype": "Asset Spare Part Request",
             "asset": asset,
             "requested_by": employee,
@@ -1105,7 +1122,7 @@ def step_maintenance_ops(r: Reporter):
         r.fail(f"Asset Spare Part Request: فشل — {e}")
 
     try:
-        clean = frappe.get_doc({
+        clean = _new({
             "doctype": "Asset Cleaning Schedule",
             "asset": asset,
             "cleaning_type": _pick_option("Asset Cleaning Schedule", "cleaning_type", "Daily Clean"),
@@ -1120,7 +1137,7 @@ def step_maintenance_ops(r: Reporter):
         r.fail(f"Asset Cleaning Schedule: فشل — {e}")
 
     try:
-        fail = frappe.get_doc({
+        fail = _new({
             "doctype": "Asset Failure Analysis",
             "asset": asset,
             "failure_date": today(),
@@ -1134,7 +1151,7 @@ def step_maintenance_ops(r: Reporter):
         r.fail(f"Asset Failure Analysis: فشل — {e}")
 
     try:
-        plan = frappe.get_doc({
+        plan = _new({
             "doctype": "Asset Replacement Plan",
             "asset": asset,
             "plan_date": today(),
@@ -1151,7 +1168,7 @@ def step_maintenance_ops(r: Reporter):
     try:
         if not employee:
             raise Exception("لا يوجد موظف نشط")
-        ext = frappe.get_doc({
+        ext = _new({
             "doctype": "Asset Life Extension Request",
             "asset": asset,
             "requested_by": employee,
@@ -1178,7 +1195,7 @@ def step_monitoring_logs(r: Reporter):
     employee = _get_active_employee(_get_default_company())
 
     try:
-        m = frappe.get_doc({
+        m = _new({
             "doctype": "Asset Meter Reading",
             "asset": asset,
             "reading_date": today(),
@@ -1192,7 +1209,7 @@ def step_monitoring_logs(r: Reporter):
         r.fail(f"Asset Meter Reading: فشل — {e}")
 
     try:
-        u = frappe.get_doc({
+        u = _new({
             "doctype": "Asset Utilization Log",
             "asset": asset,
             "log_date": today(),
@@ -1206,7 +1223,7 @@ def step_monitoring_logs(r: Reporter):
         r.fail(f"Asset Utilization Log: فشل — {e}")
 
     try:
-        fu = frappe.get_doc({
+        fu = _new({
             "doctype": "Asset Fuel Log",
             "asset": asset,
             "log_date": today(),
@@ -1220,7 +1237,7 @@ def step_monitoring_logs(r: Reporter):
         r.fail(f"Asset Fuel Log: فشل — {e}")
 
     try:
-        en = frappe.get_doc({"doctype": "Asset Energy Log", "asset": asset, "log_month": today()[:7]})
+        en = _new({"doctype": "Asset Energy Log", "asset": asset, "log_month": today()[:7]})
         en.insert(ignore_permissions=True)
         _log(step, "Asset Energy Log", en.name)
         r.ok(f"تم إنشاء سجل طاقة {en.name}")
@@ -1230,7 +1247,7 @@ def step_monitoring_logs(r: Reporter):
     try:
         if not employee:
             raise Exception("لا يوجد موظف نشط")
-        env = frappe.get_doc({"doctype": "Asset Environmental Log", "asset": asset, "log_date": today(),
+        env = _new({"doctype": "Asset Environmental Log", "asset": asset, "log_date": today(),
                                "logged_by": employee})
         env.insert(ignore_permissions=True)
         _log(step, "Asset Environmental Log", env.name)
@@ -1239,7 +1256,7 @@ def step_monitoring_logs(r: Reporter):
         r.fail(f"Asset Environmental Log: فشل — {e}")
 
     try:
-        perf = frappe.get_doc({
+        perf = _new({
             "doctype": "Asset Performance Rating",
             "asset": asset,
             "overall_rating": "Good",
@@ -1254,7 +1271,7 @@ def step_monitoring_logs(r: Reporter):
         r.fail(f"Asset Performance Rating: فشل — {e}")
 
     try:
-        comp = frappe.get_doc({"doctype": "Asset Component", "asset": asset,
+        comp = _new({"doctype": "Asset Component", "asset": asset,
                                 "component_name": "مكوّن تجريبي - Demo Wizard"})
         comp.insert(ignore_permissions=True)
         _log(step, "Asset Component", comp.name)
@@ -1263,7 +1280,7 @@ def step_monitoring_logs(r: Reporter):
         r.fail(f"Asset Component: فشل — {e}")
 
     try:
-        rel = frappe.get_doc({"doctype": "Asset Relocation History", "asset": asset, "relocation_date": today()})
+        rel = _new({"doctype": "Asset Relocation History", "asset": asset, "relocation_date": today()})
         rel.insert(ignore_permissions=True)
         _log(step, "Asset Relocation History", rel.name)
         r.ok(f"تم إنشاء سجل تنقّل {rel.name}")
@@ -1287,7 +1304,7 @@ def step_financial_contracts(r: Reporter):
     try:
         if not (fiscal_year and branch):
             raise Exception("بيانات أساسية ناقصة (سنة مالية/فرع)")
-        capex = frappe.get_doc({
+        capex = _new({
             "doctype": "Asset CapEx Budget",
             "fiscal_year": fiscal_year,
             "branch": branch,
@@ -1312,7 +1329,7 @@ def step_financial_contracts(r: Reporter):
     try:
         if not supplier:
             raise Exception("لا يوجد مورد ولا مجموعة موردين متاحة")
-        vc = frappe.get_doc({
+        vc = _new({
             "doctype": "Asset Vendor Contract",
             "supplier": supplier,
             "contract_type": "Annual Maintenance Contract",
@@ -1330,7 +1347,7 @@ def step_financial_contracts(r: Reporter):
     try:
         if not supplier:
             raise Exception("لا يوجد مورد")
-        rating = frappe.get_doc({
+        rating = _new({
             "doctype": "Asset Vendor Performance Rating",
             "supplier": supplier,
             "rating_period": _pick_option("Asset Vendor Performance Rating", "rating_period"),
@@ -1348,7 +1365,7 @@ def step_financial_contracts(r: Reporter):
         r.fail(f"Asset Vendor Performance Rating: فشل — {e}")
 
     try:
-        ins = frappe.get_doc({"doctype": "Asset Insurance Renewal", "asset": asset})
+        ins = _new({"doctype": "Asset Insurance Renewal", "asset": asset})
         ins.insert(ignore_permissions=True)
         _log(step, "Asset Insurance Renewal", ins.name)
         ins.submit()
@@ -1357,7 +1374,7 @@ def step_financial_contracts(r: Reporter):
         r.fail(f"Asset Insurance Renewal: فشل — {e}")
 
     try:
-        lease = frappe.get_doc({
+        lease = _new({
             "doctype": "Asset Lease",
             "asset": asset,
             "lease_type": _pick_option("Asset Lease", "lease_type", "Operating Lease"),
@@ -1376,7 +1393,7 @@ def step_financial_contracts(r: Reporter):
         r.fail(f"Asset Lease: فشل — {e}")
 
     try:
-        sw = frappe.get_doc({"doctype": "Asset Software License", "software_name": "برنامج تجريبي - Demo Wizard"})
+        sw = _new({"doctype": "Asset Software License", "software_name": "برنامج تجريبي - Demo Wizard"})
         sw.insert(ignore_permissions=True)
         _log(step, "Asset Software License", sw.name)
         r.ok(f"تم إنشاء ترخيص برمجي {sw.name}")
@@ -1386,7 +1403,7 @@ def step_financial_contracts(r: Reporter):
     try:
         if not supplier:
             raise Exception("لا يوجد مورد")
-        claim = frappe.get_doc({
+        claim = _new({
             "doctype": "Asset Warranty Claim",
             "asset": asset,
             "supplier": supplier,
@@ -1402,7 +1419,7 @@ def step_financial_contracts(r: Reporter):
         r.fail(f"Asset Warranty Claim: فشل — {e}")
 
     try:
-        vault = frappe.get_doc({
+        vault = _new({
             "doctype": "Asset Document Vault",
             "asset": asset,
             "document_type": _pick_option("Asset Document Vault", "document_type", "Warranty Card"),
@@ -1434,7 +1451,7 @@ def step_lifecycle_custody(r: Reporter):
     try:
         if not employee:
             raise Exception("لا يوجد موظف نشط")
-        booking = frappe.get_doc({
+        booking = _new({
             "doctype": "Asset Booking", "asset": asset, "booked_by": employee,
             "booking_date": today(),
             # يبدأ بعد 60 يوماً (بدل الآن) لتقليل احتمال تعارض حجز مع تشغيل
@@ -1452,7 +1469,7 @@ def step_lifecycle_custody(r: Reporter):
     try:
         if not employee:
             raise Exception("لا يوجد موظف نشط")
-        checkout = frappe.get_doc({
+        checkout = _new({
             "doctype": "Asset Checkout", "asset": asset, "checked_out_by": employee,
             "checkout_datetime": now_datetime(), "expected_return": add_days(now_datetime(), 2),
         })
@@ -1466,7 +1483,7 @@ def step_lifecycle_custody(r: Reporter):
     try:
         if not employee:
             raise Exception("لا يوجد موظف نشط")
-        alloc = frappe.get_doc({"doctype": "Asset Employee Allocation", "asset": asset, "employee": employee,
+        alloc = _new({"doctype": "Asset Employee Allocation", "asset": asset, "employee": employee,
                                  "allocation_date": today()})
         alloc.insert(ignore_permissions=True)
         _log(step, "Asset Employee Allocation", alloc.name)
@@ -1478,7 +1495,7 @@ def step_lifecycle_custody(r: Reporter):
     try:
         if not employee:
             raise Exception("لا يوجد موظف نشط")
-        ret = frappe.get_doc({
+        ret = _new({
             "doctype": "Asset Return Request", "asset": asset, "current_custodian": employee,
             "return_reason": _pick_option("Asset Return Request", "return_reason", "End of Use"),
             "request_date": today(),
@@ -1495,7 +1512,7 @@ def step_lifecycle_custody(r: Reporter):
             raise Exception("لا يوجد موظف نشط")
         second_branch = frappe.db.get_value("Branch", {"name": ["!=", branch]}, "name")
         if not second_branch:
-            b = frappe.get_doc({"doctype": "Branch", "branch": "فرع تجريبي 2 - Demo Wizard"})
+            b = _new({"doctype": "Branch", "branch": "فرع تجريبي 2 - Demo Wizard"})
             b.insert(ignore_permissions=True)
             _log(step, "Branch", b.name)
             second_branch = b.name
@@ -1503,7 +1520,7 @@ def step_lifecycle_custody(r: Reporter):
         # يدوياً في from_branch بتتجاهَل وتترجَع من فرع الأصل نفسه وقت
         # الحفظ، فلازم نضبط فرع الأصل أولاً بدل ما نحاول نمرر from_branch مباشرة.
         frappe.db.set_value("Asset", asset, "custom_branch", branch)
-        tr = frappe.get_doc({
+        tr = _new({
             "doctype": "Asset Transfer Request", "asset": asset, "employee": employee,
             "from_branch": branch, "to_branch": second_branch, "transfer_date": today(),
             "reason": "بيانات تجريبية تلقائية (Demo Wizard)",
@@ -1518,7 +1535,7 @@ def step_lifecycle_custody(r: Reporter):
     try:
         if not employee:
             raise Exception("لا يوجد موظف نشط")
-        train = frappe.get_doc({
+        train = _new({
             "doctype": "Asset Training Record", "asset": asset, "employee": employee,
             "training_date": today(), "training_type": _pick_option("Asset Training Record", "training_type", "Initial"),
         })
@@ -1531,7 +1548,7 @@ def step_lifecycle_custody(r: Reporter):
     try:
         if not employee:
             raise Exception("لا يوجد موظف نشط")
-        disp_cert = frappe.get_doc({
+        disp_cert = _new({
             "doctype": "Asset Disposal Certificate", "asset": asset, "disposal_date": today(),
             "disposal_method": _pick_option("Asset Disposal Certificate", "disposal_method", "Scrapped"),
             "disposed_by": employee, "authorized_by": frappe.session.user,
@@ -1546,7 +1563,7 @@ def step_lifecycle_custody(r: Reporter):
     try:
         if not fiscal_year:
             raise Exception("لا توجد سنة مالية")
-        kpi = frappe.get_doc({"doctype": "Asset KPI Target", "asset_category": category, "fiscal_year": fiscal_year})
+        kpi = _new({"doctype": "Asset KPI Target", "asset_category": category, "fiscal_year": fiscal_year})
         kpi.insert(ignore_permissions=True)
         _log(step, "Asset KPI Target", kpi.name)
         r.ok(f"تم إنشاء مستهدف أداء {kpi.name}")
@@ -1554,7 +1571,7 @@ def step_lifecycle_custody(r: Reporter):
         r.fail(f"Asset KPI Target: فشل — {e}")
 
     try:
-        audit = frappe.get_doc({
+        audit = _new({
             "doctype": "Asset Physical Audit",
             "naming_series": "APA-.YYYY.-",
             "audit_date": today(),
@@ -1604,7 +1621,7 @@ def _get_or_create_supplier(step="generic_modules"):
     supplier_group = frappe.db.get_value("Supplier Group", {}, "name")
     if not supplier_group:
         return None
-    doc = frappe.get_doc({
+    doc = _new({
         "doctype": "Supplier",
         "supplier_name": "مورد تجريبي - Demo Wizard",
         "supplier_group": supplier_group,
@@ -1619,7 +1636,7 @@ def _get_or_create_spare_part(step="generic_modules"):
     existing = frappe.db.get_value("Asset Spare Part", {}, "name")
     if existing:
         return existing
-    doc = frappe.get_doc({
+    doc = _new({
         "doctype": "Asset Spare Part",
         "item_name": "قطعة غيار تجريبية - Demo Wizard",
         "quantity": 10,
@@ -1705,6 +1722,48 @@ def _resolve_link(field):
 
 NON_FILLABLE_TYPES = ("Table", "Section Break", "Column Break", "Tab Break", "HTML", "Button", "Table MultiSelect")
 SKIP_TYPES = ("Attach", "Attach Image", "Signature", "Image")
+
+# حقول بنسيبها للمنطق البرمجي الخاص بكل مستند (status/docstatus بيُداروا
+# بالكود نفسه حسب دورة حياة المستند — لو حشرنا فيهم قيمة عشوائية ممكن
+# نكسر منطق دورة الحياة بدل ما نزود التغطية)
+LIFECYCLE_MANAGED_FIELDS = {"status", "docstatus", "amended_from", "workflow_state"}
+
+
+def _enrich_optional_fields(doc):
+    """يملأ أي حقل اختياري لسه فاضي بعد الإنشاء بقيمة معقولة حسب نوعه —
+    عشان أكبر عدد ممكن من خصائص كل مستند تتلمس فعلياً، مش بس الحقول
+    الإلزامية. أي حقل اتحط له قيمة بالفعل (يدوياً أو عبر default/fetch_from)
+    ما بيتلمسش، وكذلك أي حقل مشروط (depends_on) أو مُدار بمنطق دورة الحياة."""
+    meta = frappe.get_meta(doc.doctype)
+    for f in meta.fields:
+        if f.fieldtype in NON_FILLABLE_TYPES or f.fieldtype in SKIP_TYPES:
+            continue
+        if f.read_only or f.fetch_from or f.hidden or f.depends_on:
+            continue
+        if f.fieldname in LIFECYCLE_MANAGED_FIELDS:
+            continue
+        if doc.get(f.fieldname):
+            continue
+        try:
+            if f.fieldtype == "Link":
+                val = _resolve_link(f)
+            elif f.fieldtype == "Select":
+                val = _fill_select(f)
+            else:
+                val = _generate_scalar(f.fieldtype, f.label, f.fieldname)
+            if val is not None:
+                doc.set(f.fieldname, val)
+        except Exception:
+            continue
+    return doc
+
+
+def _new(values):
+    """بديل frappe.get_doc({...}) لأي مستند جديد ينشئه المعالج — نفس
+    الاستخدام تماماً، لكن بيغني المستند بأكبر عدد من الحقول الاختيارية
+    قبل الإرجاع (انظر _enrich_optional_fields)."""
+    doc = frappe.get_doc(values)
+    return _enrich_optional_fields(doc)
 
 
 def run_generic_doctype(doctype_name, r: Reporter):
