@@ -39,10 +39,10 @@ def get_data(filters):
     params = {}
 
     if filters.get("from_date"):
-        conditions += " AND ul.date >= %(from_date)s"
+        conditions += " AND ul.log_date >= %(from_date)s"
         params["from_date"] = filters["from_date"]
     if filters.get("to_date"):
-        conditions += " AND ul.date <= %(to_date)s"
+        conditions += " AND ul.log_date <= %(to_date)s"
         params["to_date"] = filters["to_date"]
     if filters.get("asset_category"):
         conditions += " AND a.asset_category = %(asset_category)s"
@@ -51,13 +51,17 @@ def get_data(filters):
         conditions += " AND a.company = %(company)s"
         params["company"] = filters["company"]
 
+    # ملاحظة: Asset Utilization Log مفهاش حقول اسمها date/planned_hours/
+    # actual_hours — الأسماء الحقيقية log_date/total_capacity_hours/
+    # actual_used_hours. النسخة القديمة كانت هتفشل بخطأ SQL خام
+    # ("Unknown column") أول ما حد يفتح التقرير.
     util_data = frappe.db.sql(f"""
         SELECT
             ul.asset,
             a.asset_name,
             a.asset_category,
-            SUM(COALESCE(ul.planned_hours, 0)) AS planned_hours,
-            SUM(COALESCE(ul.actual_hours, 0)) AS actual_hours,
+            SUM(COALESCE(ul.total_capacity_hours, 0)) AS planned_hours,
+            SUM(COALESCE(ul.actual_used_hours, 0)) AS actual_hours,
             SUM(COALESCE(ul.idle_hours, 0)) AS idle_hours
         FROM `tabAsset Utilization Log` ul
         JOIN `tabAsset` a ON a.name = ul.asset

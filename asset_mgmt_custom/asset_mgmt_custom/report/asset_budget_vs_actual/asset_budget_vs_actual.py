@@ -83,6 +83,13 @@ def get_columns():
 
 
 def get_data(filters):
+    # ملاحظة: "Asset CapEx Budget" نفسها لا تحمل حقل asset_category —
+    # الفئة موجودة فقط في جدولها الفرعي "items" (Asset CapEx Budget Item)،
+    # لأن ميزانية واحدة ممكن تغطي أكتر من فئة أصل. النسخة السابقة من هذا
+    # التقرير كانت بتستعلم b.asset_category على الجدول الأب مباشرة — عمود
+    # غير موجود، وكانت هتفشل بخطأ SQL خام أول ما حد يفتح التقرير. الحل هنا:
+    # ننضم للجدول الفرعي، وناخد total_cost بتاع كل صف فئة كميزانيتها
+    # (بدل تكرار الميزانية الإجمالية لكل المستند على كل فئة).
     conditions = ""
     params = {}
 
@@ -91,7 +98,7 @@ def get_data(filters):
         params["fiscal_year"] = filters["fiscal_year"]
 
     if filters.get("asset_category"):
-        conditions += " AND b.asset_category = %(asset_category)s"
+        conditions += " AND i.asset_category = %(asset_category)s"
         params["asset_category"] = filters["asset_category"]
 
     if filters.get("company"):
@@ -102,16 +109,16 @@ def get_data(filters):
         """
         SELECT
             b.name AS budget,
-            b.asset_category,
+            i.asset_category,
             b.fiscal_year,
-            b.total_capex_budget,
+            i.total_cost AS total_capex_budget,
             b.new_acquisition_budget,
             b.replacement_budget,
             b.upgrade_budget,
             COALESCE((
                 SELECT SUM(gross_purchase_amount)
                 FROM `tabAsset`
-                WHERE asset_category = b.asset_category
+                WHERE asset_category = i.asset_category
                   AND docstatus = 1
                   AND YEAR(purchase_date) = (
                       SELECT YEAR(year_start_date)
@@ -122,9 +129,10 @@ def get_data(filters):
             ), 0) AS actual_spent,
             b.status
         FROM `tabAsset CapEx Budget` b
+        JOIN `tabAsset CapEx Budget Item` i ON i.parent = b.name
         WHERE b.docstatus = 1
         {conditions}
-        ORDER BY b.fiscal_year DESC, b.asset_category
+        ORDER BY b.fiscal_year DESC, i.asset_category
         """.format(conditions=conditions),
         params,
         as_dict=True,

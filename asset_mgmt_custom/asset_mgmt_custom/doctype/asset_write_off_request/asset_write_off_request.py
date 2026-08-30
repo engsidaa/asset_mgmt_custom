@@ -22,10 +22,17 @@ class AssetWriteoffRequest(Document):
 
         asset = frappe.get_doc("Asset", self.asset)
         company = asset.company or frappe.defaults.get_user_default("Company")
-        book_value = flt(getattr(self, "book_value", None) or getattr(self, "amount", None) or 0)
+
+        # estimated_loss_value هو الحقل الحقيقي في هذا المستند (اللي المستخدم
+        # بيملاه فعلياً من الشاشة) — نسخة سابقة من هذا الكود كانت بتقرأ
+        # book_value/amount بدل منه، وهما حقلان غير موجودين إطلاقاً في هذا
+        # الـ DocType، فكانت القيمة المُدخَلة من المستخدم بتتجاهَل بالكامل
+        # وبيُحتسَب مبلغ تلقائي من جدول الإهلاك دايماً بدلها.
+        book_value = flt(self.get("estimated_loss_value"))
 
         if not book_value:
-            # Try to compute from asset's value after depreciation
+            # لا توجد قيمة خسارة مُقدَّرة مُدخَلة يدوياً — نحسبها من قيمة
+            # الأصل بعد الإهلاك
             book_value = flt(asset.get("gross_purchase_amount", 0)) - flt(
                 frappe.db.sql("""
                     SELECT COALESCE(SUM(depreciation_amount), 0)
@@ -53,9 +60,15 @@ class AssetWriteoffRequest(Document):
             ))
 
         # Write-off expense account
+        # disposal_account ("Gain/Loss Account on Asset Disposal") هو الحقل
+        # الحقيقي والمخصص لهذا الغرض تحديداً في Company. النسخة السابقة
+        # كانت بتستخدم write_off_account كأولوية أولى، وبتحاول كـ fallback
+        # قراءة حقل "loss_on_disposal_of_assets" غير موجود إطلاقاً في
+        # ERPNext — كان هيتسبب في خطأ SQL خام ("Unknown column") لو
+        # write_off_account فاضي، بدل رسالة واضحة.
         writeoff_account = (
-            frappe.db.get_value("Company", company, "write_off_account")
-            or frappe.db.get_value("Company", company, "loss_on_disposal_of_assets")
+            frappe.db.get_value("Company", company, "disposal_account")
+            or frappe.db.get_value("Company", company, "write_off_account")
         )
         if not writeoff_account:
             frappe.throw(_(
@@ -63,27 +76,37 @@ class AssetWriteoffRequest(Document):
                 "حدد 'Write Off Account' في إعدادات الشركة."
             ))
 
+        # مركز التكلفة إلزامي في ERPNext لأي حساب أرباح وخسائر (زي حساب
+        # الشطب هنا) — لو الحقل فاضي على المستند، نرجع لمركز تكلفة الأصل
+        # نفسه بدل ما نسيب القيد يفشل بدون مركز تكلفة.
+        cost_center = self.cost_center or asset.get("cost_center")
+
         je = frappe.new_doc("Journal Entry")
         je.voucher_type = "Write Off Entry"
         je.posting_date = today()
         je.company = company
         je.user_remark = f"شطب الأصل: {asset.asset_name} — {self.name}"
-        if self.cost_center:
-            je.cost_center = self.cost_center
+        if cost_center:
+            je.cost_center = cost_center
 
         # Debit: Write-off expense (loss)
+        # ملاحظة: reference_type لازم يكون واحداً من القيم المسموحة في
+        # Journal Entry Account (Sales/Purchase Invoice، Asset، إلخ) —
+        # "Asset Write Off Request" (self.doctype) مش من ضمنها، وكانت
+        # بتُفشل هذا القيد دايماً. نرجع للأصل نفسه كمرجع بدلاً منه.
         je.append("accounts", {
             "account": writeoff_account,
             "debit_in_account_currency": book_value,
-            "cost_center": self.cost_center or None,
-            "reference_type": self.doctype,
-            "reference_name": self.name,
+            "cost_center": cost_center,
+            "reference_type": "Asset",
+            "reference_name": self.asset,
         })
 
         # Credit: Fixed asset account
         je.append("accounts", {
             "account": asset_account,
             "credit_in_account_currency": book_value,
+            "cost_center": cost_center,
             "reference_type": "Asset",
             "reference_name": self.asset,
         })

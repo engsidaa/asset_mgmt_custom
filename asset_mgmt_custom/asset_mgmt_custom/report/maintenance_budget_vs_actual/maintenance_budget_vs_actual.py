@@ -71,16 +71,20 @@ def get_data(filters):
     repair_map = {r.branch: r.total or 0 for r in repair_costs}
 
     # Actual AMC costs: sum of contract_value from Asset Maintenance Contract where branch covered
+    # ملاحظة: "Asset Maintenance Contract Item" مفهاش حقل custom_branch —
+    # الفرع موجود على الأصل نفسه (Asset.custom_branch)، فلازم ننضم لجدول
+    # الأصل عشان نوصله. النسخة القديمة كانت هتفشل بخطأ SQL خام.
     amc_costs = frappe.db.sql("""
-        SELECT ami.custom_branch AS branch, SUM(amc.contract_value) AS total
+        SELECT a.custom_branch AS branch, SUM(amc.contract_value) AS total
         FROM `tabAsset Maintenance Contract` amc
         JOIN `tabAsset Maintenance Contract Item` ami ON ami.parent = amc.name
+        JOIN `tabAsset` a ON a.name = ami.asset
         WHERE amc.docstatus < 2
           AND amc.status != 'Expired'
-          AND ami.custom_branch IN %(branches)s
+          AND a.custom_branch IN %(branches)s
           AND amc.start_date <= %(to_date)s
           AND amc.end_date >= %(from_date)s
-        GROUP BY ami.custom_branch
+        GROUP BY a.custom_branch
     """, dict(params, branches=branches), as_dict=True)
     amc_map = {r.branch: r.total or 0 for r in amc_costs}
 
