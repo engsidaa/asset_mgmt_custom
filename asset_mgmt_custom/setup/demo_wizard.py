@@ -676,6 +676,27 @@ def step_disposal(r: Reporter):
     else:
         r.fail(f"حالة تنفيذ التخلص غير متوقعة = {execution.disposal_status}")
 
+    try:
+        # سيناريو ثانٍ: طلب تخلص يُرفض — شكل مختلف عن المسار المعتمد أعلاه
+        asset2 = _create_asset(
+            "disposal", m["company"], m["location"], m["item_code"], m["category"], name_suffix=" (تخلص مرفوض)"
+        )
+        req2 = frappe.new_doc("Asset Disposal Request")
+        req2.asset = asset2
+        req2.disposal_date = today()
+        req2.disposal_reason = "Surplus"
+        req2.insert(ignore_permissions=True)
+        _log("disposal", "Asset Disposal Request", req2.name)
+        req2.submit()
+        req2.reject("سبب رفض تجريبي (Demo Wizard)")
+        req2.reload()
+        if req2.status == "Rejected":
+            r.ok(f"تم رفض طلب التخلص {req2.name} بنجاح (سيناريو الرفض)")
+        else:
+            r.fail(f"طلب التخلص {req2.name}: حالة الرفض غير متوقعة = {req2.status}")
+    except Exception as e:
+        r.fail(f"Asset Disposal Request (رفض): فشل — {e}")
+
 
 # ---------------------------------------------------------------------------
 # أدوات مساعدة للسيناريوهات المكتوبة يدوياً لبقية الوحدات الفرعية
@@ -730,6 +751,27 @@ def step_safety_compliance(r: Reporter):
         r.ok(f"تم إنشاء واعتماد فحص سلامة {insp.name} بـ 3 بنود تفتيش")
     except Exception as e:
         r.fail(f"Asset Safety Inspection: فشل — {e}")
+
+    try:
+        # سيناريو ثانٍ: فحص سلامة بنتيجة 'Fail' — شكل مختلف عن الفحص الناجح أعلاه
+        insp2 = frappe.get_doc({
+            "doctype": "Asset Safety Inspection",
+            "asset": asset,
+            "inspection_type": _pick_option("Asset Safety Inspection", "inspection_type", "Electrical Safety"),
+            "inspection_date": today(),
+            "inspector": "مفتّش سلامة تجريبي",
+            "overall_result": "Fail",
+            "items": [
+                {"check_item": "توصيلات كهربائية سليمة", "result": "Fail",
+                 "remarks": "يوجد تلف في العزل - يحتاج إصلاح فوري"},
+            ],
+        })
+        insp2.insert(ignore_permissions=True)
+        _log(step, "Asset Safety Inspection", insp2.name)
+        insp2.submit()
+        r.ok(f"تم إنشاء واعتماد فحص سلامة {insp2.name} بنتيجة 'Fail' (سيناريو الرسوب)")
+    except Exception as e:
+        r.fail(f"Asset Safety Inspection (Fail): فشل — {e}")
 
     try:
         risk = frappe.get_doc({
@@ -1705,6 +1747,40 @@ def get_summary():
     )
     total = sum(r.cnt for r in rows)
     return {"total": total, "by_doctype": rows}
+
+
+@frappe.whitelist()
+def coverage_report():
+    """مراقبة: يقارن كل أنواع المستندات في هذا التطبيق (ما عدا الجداول
+    الفرعية والسجلات المفردة وسجل المعالج نفسه) بما تم إنشاؤه فعلاً في هذا
+    التشغيل — عشان نعرف بالضبط أي وحدة فرعية لسه محدش اختبرها، بدل ما
+    نفترض إن "خلص كل حاجة" لمجرد إن آخر خطوة قالت نجحت."""
+    _guard()
+    all_doctypes = frappe.get_all(
+        "DocType",
+        filters={"module": "Asset Mgmt Custom", "istable": 0, "issingle": 0},
+        fields=["name", "is_submittable"],
+    )
+    counts = {
+        row.reference_doctype: row.cnt
+        for row in frappe.db.sql(
+            "SELECT reference_doctype, COUNT(*) AS cnt FROM `tabAsset Demo Run Log` GROUP BY reference_doctype",
+            as_dict=True,
+        )
+    }
+
+    covered, missing = [], []
+    for d in sorted(all_doctypes, key=lambda x: x.name):
+        if d.name == "Asset Demo Run Log":
+            continue
+        cnt = counts.get(d.name, 0)
+        (covered if cnt else missing).append({"doctype": d.name, "count": cnt})
+
+    return {
+        "total_doctypes": len(covered) + len(missing),
+        "covered": covered,
+        "missing": missing,
+    }
 
 
 @frappe.whitelist()

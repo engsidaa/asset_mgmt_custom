@@ -17,6 +17,7 @@ class AssetDemoWizard {
 		this.page.set_indicator(__('أداة لمدير النظام فقط'), 'orange');
 
 		this.page.add_button(__('تشغيل كل الخطوات'), () => this.run_all(), { icon: 'play' });
+		this.page.add_button(__('تقرير التغطية'), () => this.show_coverage(), { icon: 'small-file' });
 		this.page.add_button(__('حذف كل البيانات التجريبية'), () => this.confirm_cleanup(), {
 			icon: 'delete',
 		}).addClass('btn-danger');
@@ -134,6 +135,34 @@ class AssetDemoWizard {
 		}
 		this.log_header(__('انتهى تشغيل كل الخطوات.'));
 		frappe.show_alert({ message: __('تم الانتهاء من كل الخطوات.'), indicator: 'green' });
+		this.show_coverage();
+	}
+
+	show_coverage() {
+		frappe.call({
+			method: 'asset_mgmt_custom.setup.demo_wizard.coverage_report',
+			freeze: true,
+			freeze_message: __('جارٍ فحص التغطية...'),
+			callback: (r) => {
+				const rep = r.message || { total_doctypes: 0, covered: [], missing: [] };
+				this.log_header(__('تقرير التغطية: {0} من {1} نوع مستند تم اختباره',
+					[rep.covered.length, rep.total_doctypes]));
+
+				if (rep.missing.length) {
+					this.log('fail', __('لم يتم اختبار {0} نوع مستند إطلاقاً:', [rep.missing.length]));
+					rep.missing.forEach((m) => this.log('fail', `  — ${m.doctype}`));
+				} else {
+					this.log('ok', __('كل أنواع المستندات في التطبيق تم اختبارها مرة واحدة على الأقل.'));
+				}
+
+				const low = rep.covered.filter((c) => c.count === 1);
+				if (low.length) {
+					this.log('info', __('{0} نوع تم اختباره بسيناريو واحد فقط (شكل واحد) — راجعها لو عايز '
+						+ 'سيناريوهات متعددة (نجاح/فشل، اعتماد/رفض، إلخ):', [low.length]));
+					low.forEach((c) => this.log('info', `  — ${c.doctype}`));
+				}
+			},
+		});
 	}
 
 	refresh_summary() {
