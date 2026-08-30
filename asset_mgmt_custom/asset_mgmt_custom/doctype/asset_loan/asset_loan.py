@@ -27,18 +27,35 @@ class AssetLoan(Document):
             frappe.db.set_value("Asset", self.asset, "custodian", self.original_custodian)
 
     def _notify_loan(self):
+        # كانت بتضبط for_user = frappe.session.user، يعني بتبلّغ الشخص اللي
+        # عمل الإجراء بنفسه (وهو أصلاً عارف إنه عمله) — مش أي حد محتاج
+        # يتابع فعلاً. الصح إشعار أصحاب دور "Asset Manager" (نفس النمط
+        # المُستخدَم في باقي التطبيق) بدل تبليغ الشخص لنفسه.
         try:
-            frappe.get_doc({
-                "doctype": "Notification Log",
-                "subject": _("Asset {0} loaned to {1}").format(
-                    self.asset_name or self.asset, self.loaned_to_name or self.loaned_to),
-                "email_content": _("Asset <b>{0}</b> has been loaned to <b>{1}</b>. "
-                                   "Expected return: <b>{2}</b>.").format(
-                    self.asset_name, self.loaned_to_name, self.expected_return_date),
-                "document_type": "Asset Loan",
-                "document_name": self.name,
-                "for_user": frappe.session.user,
-                "type": "Alert",
-            }).insert(ignore_permissions=True)
+            recipients = [r[0] for r in frappe.db.sql("""
+                SELECT u.name
+                FROM `tabUser` u
+                JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
+                WHERE hr.role = 'Asset Manager' AND u.enabled = 1
+                  AND u.name NOT IN ('Administrator', 'All', 'Guest')
+            """)]
+            if not recipients:
+                return
+
+            from frappe.desk.doctype.notification_log.notification_log import enqueue_create_notification
+            enqueue_create_notification(
+                users=recipients,
+                doc=frappe._dict(
+                    subject=_("Asset {0} loaned to {1}").format(
+                        self.asset_name or self.asset, self.loaned_to_name or self.loaned_to),
+                    email_content=_("Asset <b>{0}</b> has been loaned to <b>{1}</b>. "
+                                    "Expected return: <b>{2}</b>.").format(
+                        self.asset_name, self.loaned_to_name, self.expected_return_date),
+                    document_type="Asset Loan",
+                    document_name=self.name,
+                    from_user=frappe.session.user,
+                    type="Alert",
+                ),
+            )
         except Exception:
-            pass
+            frappe.log_error(title="asset_loan: failed to notify Asset Managers")
