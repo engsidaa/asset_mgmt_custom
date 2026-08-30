@@ -97,6 +97,30 @@ def run():
     else:
         _warn("لم يتم العثور على مجموعة التزامات (Liability) — تم تخطي حساب الالتزامات المستحقة")
 
+    depreciation_group = _find_depreciation_group(company)
+    accumulated_depreciation_account = None
+    if depreciation_group:
+        accumulated_depreciation_account = _find_or_create_leaf_account(
+            company,
+            parent=depreciation_group,
+            account_name="مجمع إهلاك أصول عامة",
+            account_type="Accumulated Depreciation",
+        )
+    else:
+        _warn("لم يتم العثور على مجموعة 'مجمع إهلاك' (Accumulated Depreciation) في شجرة "
+              "الحسابات — تم تخطي حساب مجمع الإهلاك. راجع القسم أدناه.")
+
+    depreciation_expense_account = None
+    if expense_group:
+        depreciation_expense_account = _find_or_create_leaf_account(
+            company,
+            parent=expense_group,
+            account_name="مصروف إهلاك أصول عامة",
+            account_type="Depreciation",
+        )
+    else:
+        _warn("لم يتم العثور على مجموعة مصروفات (Expense) — تم تخطي حساب مصروف الإهلاك")
+
     _step("إنشاء/تحديث فئة أصل واحدة تربط الحسابات السابقة")
     category_name = "أصول عامة"
     if frappe.db.exists("Asset Category", category_name):
@@ -122,6 +146,8 @@ def run():
     row.custom_capital_maintenance_wip_account = wip_account
     row.custom_maintenance_expense_account = maintenance_expense_account
     row.custom_maintenance_accrued_liability_account = accrued_liability_account
+    row.accumulated_depreciation_account = accumulated_depreciation_account
+    row.depreciation_expense_account = depreciation_expense_account
 
     if cat.is_new():
         cat.insert(ignore_permissions=True)
@@ -138,6 +164,10 @@ def run():
     print(f"  حساب الوساطة (Capital Work in Progress): {wip_account or '(لم يُنشأ — راجع التحذيرات أعلاه)'}")
     print(f"  حساب مصروف الصيانة (Indirect Expense): {maintenance_expense_account or '(لم يُنشأ)'}")
     print(f"  حساب التزامات الصيانة المستحقة (Current Liability): {accrued_liability_account or '(لم يُنشأ)'}")
+    print(f"  حساب مجمع الإهلاك (Accumulated Depreciation): {accumulated_depreciation_account or '(لم يُنشأ — راجع التحذيرات أعلاه)'}")
+    print(f"  حساب مصروف الإهلاك (Depreciation): {depreciation_expense_account or '(لم يُنشأ — راجع التحذيرات أعلاه)'}")
+    print("\nهذان الحسابان الأخيران ضروريان فقط للأصول التي تُفعَّل عليها 'calculate_depreciation' —")
+    print("الأصول التجريبية التي أنشأناها هذا الجلسة لم تستخدمهما (calculate_depreciation=0 عمداً).")
     print("\nراجع هذه الحسابات في شجرة الحسابات (Chart of Accounts) وعدّل الأسماء/الأرقام")
     print("لو حابب تناسب ترقيمك المحاسبي الفعلي — دي بداية جاهزة للعمل، مش نهائية بالضرورة.")
     print("\nبعد كده تقدر تشغّل demo_test.run_demo_test تاني وهيكمل الاختبارات الفعلية بدل التخطي.")
@@ -204,6 +234,30 @@ def _find_or_create_fixed_assets_group(company):
         print(f"      - {c.name}  ({'مجموعة' if c.is_group else 'حساب فرعي'})")
     print("\n  راجع القائمة دي وقولّي أنهي حساب/مجموعة هو المقصود بـ 'الأصول الثابتة' فعلياً،")
     print("  أو لو مفيش أي حاجة مناسبة، قولّي أنشئ مجموعة جديدة باسم محدد منك.")
+    return None
+
+
+def _find_depreciation_group(company):
+    """عكس منطق _find_or_create_fixed_assets_group تماماً: هنا بالذات
+    بندوّر على مجموعة 'مجمع إهلاك' (Accumulated Depreciation) — وهي نفس
+    المجموعة اللي استبعدناها عمداً هناك (أول تشغيل لقى '120108 - مجمع
+    اهلاك الاصول الثابتة' موجودة فعلاً في شجرة حسابات هذه الشركة)."""
+    _step("البحث عن مجموعة 'مجمع إهلاك الأصول' (Accumulated Depreciation) في شجرة الحسابات")
+
+    include_keywords = ["اهلاك", "إهلاك", "مجمع", "Depreciation", "Accumulated"]
+    candidates = frappe.db.get_all(
+        "Account",
+        filters={"company": company, "is_group": 1, "root_type": "Asset"},
+        fields=["name", "account_name"],
+    )
+    for c in candidates:
+        if any(k in c.account_name for k in include_keywords):
+            _ok(f"موجودة بالفعل: {c.name}")
+            return c.name
+
+    _warn("لا توجد أي مجموعة بشجرة حسابات هذه الشركة تحت الأصول (Asset) تحتوي اسمها على "
+          "'إهلاك' أو 'مجمع' أو 'Depreciation' — لن يتم إنشاء مجموعة جديدة تلقائياً "
+          "تفادياً لتكرار مجموعة موجودة باسم مختلف. راجع شجرة الحسابات وحدّد اسم المجموعة الصحيح.")
     return None
 
 
