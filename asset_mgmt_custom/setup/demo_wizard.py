@@ -14,6 +14,9 @@
 لا يحتاج bench execute ولا وصول للسيرفر.
 """
 
+import io
+import contextlib
+
 import frappe
 from frappe import _
 from frappe.utils import today, now_datetime, add_days, get_first_day
@@ -2026,6 +2029,36 @@ def get_summary():
     )
     total = sum(r.cnt for r in rows)
     return {"total": total, "by_doctype": rows}
+
+
+@frappe.whitelist()
+def run_bootstrap():
+    """يشغّل إعداد الحسابات المحاسبية الأساسي (نفس
+    bootstrap_demo_master_data.run) من جوه الصفحة مباشرة — عشان محدش
+    محتاج يدخل السيرفر بنفسه (bench execute) قبل ما يستخدم المعالج.
+    آمن يتكرر أكتر من مرة (كل خطوة فيه بتتأكد الأول قبل ما تنشئ حاجة)."""
+    _guard()
+    from asset_mgmt_custom.setup import bootstrap_demo_master_data
+
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        bootstrap_demo_master_data.run()
+    frappe.db.commit()
+
+    lines = []
+    for raw in buf.getvalue().splitlines():
+        text = raw.strip()
+        if not text or set(text) <= {"#"}:
+            continue
+        if text.startswith("✅"):
+            lines.append({"level": "ok", "text": text[1:].strip()})
+        elif text.startswith("⚠️"):
+            lines.append({"level": "fail", "text": text[2:].strip()})
+        elif text.startswith("→"):
+            lines.append({"level": "info", "text": text[1:].strip()})
+        else:
+            lines.append({"level": "info", "text": text})
+    return {"lines": lines}
 
 
 @frappe.whitelist()

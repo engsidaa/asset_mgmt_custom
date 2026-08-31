@@ -16,10 +16,11 @@ class AssetDemoWizard {
 
 		this.page.set_indicator(__('أداة لمدير النظام فقط'), 'orange');
 
-		this.page.add_button(__('تشغيل كل الخطوات'), () => this.run_all(), { icon: 'play' });
-		this.page.add_button(__('تقرير التغطية'), () => this.show_coverage(), { icon: 'small-file' });
-		this.page.add_button(__('تشغيل كل التقارير'), () => this.run_all_reports(), { icon: 'file' });
-		this.page.add_button(__('حذف كل البيانات التجريبية'), () => this.confirm_cleanup(), {
+		this.page.add_button(__('١. تجهيز الحسابات الأساسية'), () => this.run_bootstrap(), { icon: 'setting' });
+		this.page.add_button(__('٢. تشغيل كل الخطوات'), () => this.run_all(), { icon: 'play' });
+		this.page.add_button(__('٣. تقرير التغطية'), () => this.show_coverage(), { icon: 'small-file' });
+		this.page.add_button(__('٤. تشغيل كل التقارير'), () => this.run_all_reports(), { icon: 'file' });
+		this.page.add_button(__('٥. حذف كل البيانات التجريبية'), () => this.confirm_cleanup(), {
 			icon: 'delete',
 		}).addClass('btn-danger');
 
@@ -162,6 +163,20 @@ class AssetDemoWizard {
 						+ 'سيناريوهات متعددة (نجاح/فشل، اعتماد/رفض، إلخ):', [low.length]));
 					low.forEach((c) => this.log('info', `  — ${c.doctype}`));
 				}
+			},
+		});
+	}
+
+	run_bootstrap() {
+		this.log_header(__('تجهيز الحسابات الأساسية...'));
+		frappe.call({
+			method: 'asset_mgmt_custom.setup.demo_wizard.run_bootstrap',
+			freeze: true,
+			freeze_message: __('جارٍ تجهيز الحسابات الأساسية...'),
+			callback: (r) => {
+				const lines = (r.message && r.message.lines) || [];
+				lines.forEach((l) => this.log(l.level, l.text));
+				this.log_header(__('انتهى تجهيز الحسابات الأساسية.'));
 			},
 		});
 	}
