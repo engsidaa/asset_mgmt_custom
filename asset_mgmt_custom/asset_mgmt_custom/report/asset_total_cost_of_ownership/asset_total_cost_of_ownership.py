@@ -48,14 +48,14 @@ def get_data(filters):
     assets = frappe.db.sql(
         """
         SELECT
-            name AS asset,
-            asset_name,
-            asset_category,
-            gross_purchase_amount AS purchase_value,
-            IFNULL(custom_total_maintenance_cost, 0) AS total_maintenance_cost,
-            ROUND(DATEDIFF(CURDATE(), purchase_date) / 365.25, 1) AS age_years
-        FROM `tabAsset`
-        WHERE docstatus < 2 AND status != 'Disposed of'
+            a.name AS asset,
+            a.asset_name,
+            a.asset_category,
+            a.gross_purchase_amount AS purchase_value,
+            IFNULL(a.custom_total_maintenance_cost, 0) AS total_maintenance_cost,
+            ROUND(DATEDIFF(CURDATE(), a.purchase_date) / 365.25, 1) AS age_years
+        FROM `tabAsset` a
+        WHERE a.docstatus < 2 AND a.status != 'Disposed of'
         {asset_cond}
         """.format(asset_cond=asset_cond),
         params,
