@@ -126,7 +126,7 @@ def get_data(filters):
             (SELECT MAX(failure_date) FROM `tabAsset Repair`
              WHERE asset = a.name AND docstatus = 1) AS last_repair_date,
             (SELECT overall_condition FROM `tabAsset Condition Assessment`
-             WHERE asset = a.name ORDER BY assessment_date DESC LIMIT 1) AS condition
+             WHERE asset = a.name ORDER BY assessment_date DESC LIMIT 1) AS `condition`
         FROM `tabAsset` a
         WHERE a.docstatus < 2
         {conditions}

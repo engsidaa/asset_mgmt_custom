@@ -78,10 +78,10 @@ def get_data(filters):
 
     downtime_map = {}
     repair_data = frappe.db.sql(f"""
-        SELECT asset, SUM(COALESCE(downtime, 0)) AS downtime_hours
-        FROM `tabAsset Repair`
+        SELECT r.asset, SUM(COALESCE(r.custom_downtime_hours, 0)) AS downtime_hours
+        FROM `tabAsset Repair` r
         {repair_conditions}
-        GROUP BY asset
+        GROUP BY r.asset
     """, params, as_dict=True)
     for r in repair_data:
         downtime_map[r["asset"]] = flt(r["downtime_hours"])

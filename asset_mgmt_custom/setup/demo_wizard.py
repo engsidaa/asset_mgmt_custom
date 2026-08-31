@@ -2033,10 +2033,27 @@ def run_all_reports():
     """يشغّل كل تقرير (Script/Query Report) في هذا التطبيق فعلياً بنفس الطريقة
     اللي Frappe بيشغّله بيها لما تفتح صفحة التقرير من الواجهة — عشان نتأكد إن
     كل تقرير بيفتح وبيقرأ من البيانات الحقيقية/التجريبية من غير ما يطلع خطأ،
-    وليس مجرد مراجعة الكود ثابتاً. بدون أي فلاتر (زي ما يحصل أول ما تفتح
-    صفحة التقرير في المتصفح قبل ما تختار أي فلتر)."""
+    وليس مجرد مراجعة الكود ثابتاً.
+
+    بيمرر مجموعة فلاتر افتراضية معقولة (شركة/فرع/مركز تكلفة/فئة أصل/سنة
+    مالية/فترة تاريخ) بدل ما يسيب الفلاتر فاضية تماماً — عشان التقارير اللي
+    محتاجة فلتر إلزامي فعلاً (زي 'Branch Asset Handover') تتنفذ فعلياً
+    وتتفحص، مش بس توقف عند بوابة "الفلتر مفقود"."""
     _guard()
     from frappe.desk.query_report import run as run_report
+
+    company = _get_default_company()
+    generic_filters = {
+        "company": company,
+        "branch": frappe.db.get_value("Branch", {}, "name"),
+        "cost_center": _get_cost_center(company) if company else None,
+        "asset_category": frappe.db.get_value("Asset Category", {}, "name"),
+        "fiscal_year": frappe.db.get_value("Fiscal Year", {}, "name"),
+        "from_date": add_days(today(), -365),
+        "to_date": today(),
+        "as_of_date": today(),
+    }
+    generic_filters = {k: v for k, v in generic_filters.items() if v}
 
     report_names = frappe.get_all(
         "Report",
@@ -2047,7 +2064,7 @@ def run_all_reports():
     lines = []
     for report_name in report_names:
         try:
-            result = run_report(report_name, filters={})
+            result = run_report(report_name, filters=generic_filters)
             row_count = len(result.get("result") or [])
             lines.append({"level": "ok", "text": f"{report_name}: نجح — {row_count} صف"})
         except Exception as e:

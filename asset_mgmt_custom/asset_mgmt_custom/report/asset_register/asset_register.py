@@ -40,7 +40,10 @@ def execute(filters=None):
          "options": "Cost Center", "width": 130},
     ]
 
-    conditions = "WHERE a.docstatus < 2 AND a.company = %(company)s"
+    conditions = "WHERE a.docstatus < 2"
+
+    if filters.get("company"):
+        conditions += " AND a.company = %(company)s"
 
     if not filters.get("include_scrapped"):
         conditions += " AND a.status NOT IN ('Scrapped', 'Sold')"

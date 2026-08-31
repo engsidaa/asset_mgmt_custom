@@ -117,7 +117,7 @@ def get_data(filters):
             a.purchase_date,
             ROUND(DATEDIFF(CURDATE(), a.purchase_date) / 365.25, 1) AS age_years,
             a.gross_purchase_amount,
-            a.accumulated_depreciation_amount,
+            (a.gross_purchase_amount - a.value_after_depreciation) AS accumulated_depreciation_amount,
             a.value_after_depreciation,
             a.status,
             a.location

@@ -27,8 +27,10 @@ def execute(filters=None):
          "fieldtype": "Data", "width": 100},
     ]
 
-    conditions = "WHERE ar.docstatus = 1 AND a.company = %(company)s"
+    conditions = "WHERE ar.docstatus = 1"
 
+    if filters.get("company"):
+        conditions += " AND a.company = %(company)s"
     if filters.get("from_date"):
         conditions += " AND DATE(ar.failure_date) >= %(from_date)s"
     if filters.get("to_date"):
