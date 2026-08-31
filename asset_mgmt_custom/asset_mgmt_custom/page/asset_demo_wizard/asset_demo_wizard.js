@@ -18,6 +18,7 @@ class AssetDemoWizard {
 
 		this.page.add_button(__('تشغيل كل الخطوات'), () => this.run_all(), { icon: 'play' });
 		this.page.add_button(__('تقرير التغطية'), () => this.show_coverage(), { icon: 'small-file' });
+		this.page.add_button(__('تشغيل كل التقارير'), () => this.run_all_reports(), { icon: 'file' });
 		this.page.add_button(__('حذف كل البيانات التجريبية'), () => this.confirm_cleanup(), {
 			icon: 'delete',
 		}).addClass('btn-danger');
@@ -161,6 +162,20 @@ class AssetDemoWizard {
 						+ 'سيناريوهات متعددة (نجاح/فشل، اعتماد/رفض، إلخ):', [low.length]));
 					low.forEach((c) => this.log('info', `  — ${c.doctype}`));
 				}
+			},
+		});
+	}
+
+	run_all_reports() {
+		this.log_header(__('تشغيل كل التقارير...'));
+		frappe.call({
+			method: 'asset_mgmt_custom.setup.demo_wizard.run_all_reports',
+			freeze: true,
+			freeze_message: __('جارٍ تشغيل كل التقارير...'),
+			callback: (r) => {
+				const lines = (r.message && r.message.lines) || [];
+				lines.forEach((l) => this.log(l.level, l.text));
+				this.log_header(__('انتهى تشغيل التقارير.'));
 			},
 		});
 	}

@@ -2029,6 +2029,35 @@ def get_summary():
 
 
 @frappe.whitelist()
+def run_all_reports():
+    """يشغّل كل تقرير (Script/Query Report) في هذا التطبيق فعلياً بنفس الطريقة
+    اللي Frappe بيشغّله بيها لما تفتح صفحة التقرير من الواجهة — عشان نتأكد إن
+    كل تقرير بيفتح وبيقرأ من البيانات الحقيقية/التجريبية من غير ما يطلع خطأ،
+    وليس مجرد مراجعة الكود ثابتاً. بدون أي فلاتر (زي ما يحصل أول ما تفتح
+    صفحة التقرير في المتصفح قبل ما تختار أي فلتر)."""
+    _guard()
+    from frappe.desk.query_report import run as run_report
+
+    report_names = frappe.get_all(
+        "Report",
+        filters={"module": "Asset Mgmt Custom", "disabled": 0},
+        pluck="name",
+        order_by="name",
+    )
+    lines = []
+    for report_name in report_names:
+        try:
+            result = run_report(report_name, filters={})
+            row_count = len(result.get("result") or [])
+            lines.append({"level": "ok", "text": f"{report_name}: نجح — {row_count} صف"})
+        except Exception as e:
+            lines.append({"level": "fail", "text": f"{report_name}: فشل — {e}"})
+    ok_count = sum(1 for l in lines if l["level"] == "ok")
+    lines.insert(0, {"level": "info", "text": f"{ok_count} من {len(lines)} تقرير نجح"})
+    return {"lines": lines}
+
+
+@frappe.whitelist()
 def coverage_report():
     """مراقبة: يقارن كل أنواع المستندات في هذا التطبيق (ما عدا الجداول
     الفرعية والسجلات المفردة وسجل المعالج نفسه) بما تم إنشاؤه فعلاً في هذا
