@@ -16,7 +16,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import today, now_datetime, add_days
+from frappe.utils import today, now_datetime, add_days, get_first_day
 
 
 # ---------------------------------------------------------------------------
@@ -360,6 +360,30 @@ def step_repair_gl(r: Reporter):
     except Exception as e:
         r.fail(f"CapEx: فشل السيناريو — {e}")
 
+    # اختبار سلبي: رسملة (CapEx) بدون تحديد زيادة العمر الإنتاجي يجب أن تُرفض
+    try:
+        repair3 = frappe.new_doc("Asset Repair")
+        repair3.asset = asset
+        repair3.failure_date = today()
+        repair3.completion_date = today()
+        repair3.repair_status = "Completed"
+        repair3.repair_cost = 1000
+        repair3.capitalize_repair_cost = 1
+        repair3.custom_technician_name = "فني تجريبي"
+        repair3.custom_repair_notes = "اختبار رفض — رسملة بدون تمديد عمر (Demo Wizard)"
+        blocked = False
+        try:
+            repair3.insert(ignore_permissions=True)
+            _log("repair_gl", "Asset Repair", repair3.name)
+        except frappe.ValidationError:
+            blocked = True
+        if blocked:
+            r.ok("CapEx بدون 'زيادة العمر الإنتاجي': تم الرفض بشكل صحيح كما هو متوقع (سيناريو سلبي)")
+        else:
+            r.fail("CapEx بدون 'زيادة العمر الإنتاجي': لم يُرفض كما هو متوقع!")
+    except Exception as e:
+        r.fail(f"اختبار الرفض السلبي (CapEx بدون تمديد عمر): فشل غير متوقع — {e}")
+
 
 # ---------------------------------------------------------------------------
 # خطوة 4: طلب احتفاظ بالعهدة (Asset Retention Request)
@@ -604,6 +628,28 @@ def step_writeoff(r: Reporter):
     else:
         r.fail("create_journal_entry: لم يرجع اسم قيد يومية")
 
+    # سيناريو ثانٍ: طلب شطب يُرفض — شكل مختلف عن المسار المعتمد أعلاه
+    try:
+        asset2 = _get_or_create_submitted_asset("writeoff", " (شطب مرفوض)")
+        wo2 = frappe.new_doc("Asset Write-off Request")
+        wo2.asset = asset2
+        wo2.write_off_date = today()
+        wo2.reason = "Damaged"
+        wo2.description = "اختبار رفض — بيانات تجريبية (Demo Wizard)"
+        wo2.estimated_loss_value = 300
+        _enrich_optional_fields(wo2)
+        wo2.insert(ignore_permissions=True)
+        _log("writeoff", "Asset Write-off Request", wo2.name)
+        wo2.submit()
+        frappe.db.set_value("Asset Write-off Request", wo2.name, "status", "Rejected")
+        wo2.reload()
+        if wo2.status == "Rejected":
+            r.ok(f"تم رفض طلب الشطب {wo2.name} بنجاح (سيناريو الرفض)")
+        else:
+            r.fail(f"طلب الشطب {wo2.name}: حالة الرفض غير متوقعة = {wo2.status}")
+    except Exception as e:
+        r.fail(f"Asset Write-off Request (رفض): فشل — {e}")
+
 
 # ---------------------------------------------------------------------------
 # خطوة: احتساب الإهلاك الدوري (calculate_depreciation) على أصل
@@ -642,7 +688,11 @@ def step_depreciation(r: Reporter):
             "is_existing_asset": 1,
             "calculate_depreciation": 1,
             "gross_purchase_amount": 24000,
-            "available_for_use_date": today(),
+            # أول يوم في الشهر عمداً (مش النهاردة): لو تاريخ "متاح للاستخدام"
+            # وقع في نص/آخر الشهر، ERPNext بيضيف قسط إهلاك أول صغير مُجزَّأ
+            # (Prorated Stub) بدل جدول نظيف بعدد الأقساط المطلوب بالظبط.
+            # أول الشهر يضمن جدول 12 قسط كامل ومتساوي بدون هذا القسط الإضافي.
+            "available_for_use_date": get_first_day(today()),
             "asset_quantity": 1,
             "custom_asset_condition": "New",
             "finance_books": [{
@@ -1326,6 +1376,36 @@ def step_financial_contracts(r: Reporter):
     except Exception as e:
         r.fail(f"Asset CapEx Budget: فشل — {e}")
 
+    # اختبار سلبي: مجموع الموازنات الفرعية أكبر من الإجمالي يجب أن يُرفض.
+    # لازم فرع مختلف عن الموازنة الأولى: autoname هنا CAPEX-{fiscal_year}-{branch}،
+    # فنفس الفرع/السنة المالية هيصطدم بمفتاح أساسي مكرر بدل ما نختبر الرفض المقصود.
+    try:
+        neg_branch = frappe.db.get_value("Branch", {"name": ["!=", branch]}, "name")
+        if not neg_branch:
+            neg_branch_doc = frappe.get_doc({"doctype": "Branch", "branch": "فرع تجريبي 3 - Demo Wizard"})
+            neg_branch_doc.insert(ignore_permissions=True)
+            _log(step, "Branch", neg_branch_doc.name)
+            neg_branch = neg_branch_doc.name
+        capex2 = frappe.new_doc("Asset CapEx Budget")
+        capex2.fiscal_year = fiscal_year
+        capex2.branch = neg_branch
+        capex2.company = company
+        capex2.total_capex_budget = 10000
+        capex2.new_acquisition_budget = 6000
+        capex2.replacement_budget = 6000
+        blocked = False
+        try:
+            capex2.insert(ignore_permissions=True)
+            _log(step, "Asset CapEx Budget", capex2.name)
+        except frappe.ValidationError:
+            blocked = True
+        if blocked:
+            r.ok("موازنة رأسمالية بمجموع فرعي أكبر من الإجمالي: تم الرفض بشكل صحيح (سيناريو سلبي)")
+        else:
+            r.fail("موازنة رأسمالية بمجموع فرعي أكبر من الإجمالي: لم تُرفض كما هو متوقع!")
+    except Exception as e:
+        r.fail(f"اختبار الرفض السلبي (CapEx Budget): فشل غير متوقع — {e}")
+
     try:
         if not supplier:
             raise Exception("لا يوجد مورد ولا مجموعة موردين متاحة")
@@ -1463,6 +1543,25 @@ def step_lifecycle_custody(r: Reporter):
         _log(step, "Asset Booking", booking.name)
         booking.submit()
         r.ok(f"تم إنشاء واعتماد حجز أصل {booking.name}")
+
+        # اختبار سلبي: حجز ثانٍ لنفس الأصل بفترة متداخلة يجب أن يُرفض
+        conflict = frappe.new_doc("Asset Booking")
+        conflict.asset = asset
+        conflict.booked_by = employee
+        conflict.booking_date = today()
+        conflict.from_datetime = booking.from_datetime
+        conflict.to_datetime = booking.to_datetime
+        blocked = False
+        try:
+            conflict.insert(ignore_permissions=True)
+            conflict.submit()
+            _log(step, "Asset Booking", conflict.name)
+        except frappe.ValidationError:
+            blocked = True
+        if blocked:
+            r.ok("حجز بفترة متداخلة مع حجز قائم لنفس الأصل: تم الرفض بشكل صحيح (سيناريو سلبي)")
+        else:
+            r.fail("حجز بفترة متداخلة: لم يُرفض كما هو متوقع!")
     except Exception as e:
         r.fail(f"Asset Booking: فشل — {e}")
 
@@ -1586,6 +1685,24 @@ def step_lifecycle_custody(r: Reporter):
         r.ok(f"تم إنشاء واعتماد جرد فعلي {audit.name} ببند واحد")
     except Exception as e:
         r.fail(f"Asset Physical Audit: فشل — {e}")
+
+    try:
+        # سيناريو ثانٍ: بند "مفقود" — شكل مختلف يفعّل تسجيل النشاط وإشعار المدراء
+        audit2 = frappe.new_doc("Asset Physical Audit")
+        audit2.naming_series = "APA-.YYYY.-"
+        audit2.audit_date = today()
+        audit2.cost_center = cost_center
+        audit2.audited_by = frappe.session.user
+        audit2.append("items", {
+            "asset": asset, "expected_location": location, "audit_result": "Missing",
+            "remarks": "لم يُعثر على الأصل في الموقع المتوقع (Demo Wizard)",
+        })
+        audit2.insert(ignore_permissions=True)
+        _log(step, "Asset Physical Audit", audit2.name)
+        audit2.submit()
+        r.ok(f"تم إنشاء واعتماد جرد فعلي {audit2.name} ببند 'مفقود' (سيناريو استثنائي)")
+    except Exception as e:
+        r.fail(f"Asset Physical Audit (مفقود): فشل — {e}")
 
 
 # ---------------------------------------------------------------------------
