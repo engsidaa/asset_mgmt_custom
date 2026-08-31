@@ -634,7 +634,7 @@ def step_writeoff(r: Reporter):
         wo2 = frappe.new_doc("Asset Write-off Request")
         wo2.asset = asset2
         wo2.write_off_date = today()
-        wo2.reason = "Damaged"
+        wo2.reason = "Stolen"
         wo2.description = "اختبار رفض — بيانات تجريبية (Demo Wizard)"
         wo2.estimated_loss_value = 300
         _enrich_optional_fields(wo2)
