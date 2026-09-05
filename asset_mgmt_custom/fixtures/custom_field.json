@@ -534,6 +534,28 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset Category-custom_spare_parts_section",
+  "dt": "Asset Category",
+  "fieldname": "custom_spare_parts_section",
+  "fieldtype": "Section Break",
+  "label": "قطع الغيار القياسية (BOM)",
+  "insert_after": "custom_repair_replace_threshold_pct",
+  "collapsible": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Category-custom_standard_spare_parts",
+  "dt": "Asset Category",
+  "fieldname": "custom_standard_spare_parts",
+  "fieldtype": "Table",
+  "options": "Asset Category Spare Part",
+  "label": "قائمة قطع الغيار القياسية",
+  "insert_after": "custom_spare_parts_section",
+  "description": "قطع الغيار المتوقع استهلاكها عادةً لأي أصل من هذه الفئة — مرجع سريع عند تجهيز طلب قطعة غيار أو أمر عمل",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Repair-custom_downtime_section",
   "dt": "Asset Repair",
   "fieldname": "custom_downtime_section",

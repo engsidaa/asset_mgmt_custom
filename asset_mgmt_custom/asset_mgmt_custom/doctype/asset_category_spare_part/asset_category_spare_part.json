@@ -1,0 +1,43 @@
+{
+ "doctype": "DocType",
+ "name": "Asset Category Spare Part",
+ "module": "Asset Mgmt Custom",
+ "istable": 1,
+ "editable_grid": 1,
+ "fields": [
+  {
+   "fieldname": "spare_part",
+   "fieldtype": "Link",
+   "options": "Asset Spare Part",
+   "label": "قطعة الغيار",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "spare_part_name",
+   "fieldtype": "Data",
+   "label": "اسم القطعة",
+   "fetch_from": "spare_part.item_name",
+   "read_only": 1,
+   "in_list_view": 1,
+   "columns": 3
+  },
+  {
+   "fieldname": "standard_qty",
+   "fieldtype": "Float",
+   "label": "الكمية القياسية",
+   "default": "1",
+   "in_list_view": 1,
+   "columns": 2,
+   "description": "الكمية المعتادة من هذه القطعة لكل صيانة/إصلاح على أصل من هذه الفئة"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات",
+   "in_list_view": 1,
+   "columns": 3
+  }
+ ]
+}
