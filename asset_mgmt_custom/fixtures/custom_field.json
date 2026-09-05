@@ -522,6 +522,18 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset Category-custom_repair_replace_threshold_pct",
+  "dt": "Asset Category",
+  "fieldname": "custom_repair_replace_threshold_pct",
+  "fieldtype": "Percent",
+  "label": "Repair vs Replace Threshold (%)",
+  "insert_after": "custom_maintenance_frequency_days",
+  "description": "إذا تجاوز إجمالي تكلفة الصيانة التراكمية على الأصل هذه النسبة من قيمته الدفترية الحالية (بعد الإهلاك)، يُوصى باستبداله بدل إصلاحه. القيمة الافتراضية عند الترك فارغاً: 60%",
+  "reqd": 0,
+  "default": "60"
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Repair-custom_downtime_section",
   "dt": "Asset Repair",
   "fieldname": "custom_downtime_section",

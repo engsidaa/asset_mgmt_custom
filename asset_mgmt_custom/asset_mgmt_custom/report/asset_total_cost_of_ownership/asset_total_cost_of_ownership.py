@@ -1,4 +1,5 @@
 import frappe
+from frappe.utils import flt
 
 
 def execute(filters=None):
@@ -14,6 +15,7 @@ def get_columns():
         {"fieldname": "asset_name", "label": "Asset Name", "fieldtype": "Data", "width": 170},
         {"fieldname": "asset_category", "label": "Asset Category", "fieldtype": "Link", "options": "Asset Category", "width": 130},
         {"fieldname": "purchase_value", "label": "Purchase Value", "fieldtype": "Currency", "width": 120},
+        {"fieldname": "book_value", "label": "Current Book Value", "fieldtype": "Currency", "width": 130},
         {"fieldname": "total_maintenance_cost", "label": "Maintenance & Repair", "fieldtype": "Currency", "width": 140},
         {"fieldname": "total_insurance_cost", "label": "Insurance", "fieldtype": "Currency", "width": 110},
         {"fieldname": "total_contract_cost", "label": "Vendor Contracts", "fieldtype": "Currency", "width": 130},
@@ -26,6 +28,8 @@ def get_columns():
         {"fieldname": "tco", "label": "Total Cost of Ownership", "fieldtype": "Currency", "width": 150},
         {"fieldname": "age_years", "label": "Age (Yrs)", "fieldtype": "Float", "width": 85},
         {"fieldname": "annual_tco", "label": "Annual TCO", "fieldtype": "Currency", "width": 120},
+        {"fieldname": "repair_to_value_pct", "label": "Maintenance / Book Value %", "fieldtype": "Percent", "width": 150},
+        {"fieldname": "recommendation", "label": "Repair vs Replace", "fieldtype": "Data", "width": 140},
     ]
 
 
@@ -52,6 +56,7 @@ def get_data(filters):
             a.asset_name,
             a.asset_category,
             a.gross_purchase_amount AS purchase_value,
+            IFNULL(a.value_after_depreciation, a.gross_purchase_amount) AS book_value,
             IFNULL(a.custom_total_maintenance_cost, 0) AS total_maintenance_cost,
             ROUND(DATEDIFF(CURDATE(), a.purchase_date) / 365.25, 1) AS age_years
         FROM `tabAsset` a
@@ -61,6 +66,17 @@ def get_data(filters):
         params,
         as_dict=True,
     )
+
+    # عتبة "إصلاح أم استبدال" لكل فئة أصل — نسبة مئوية من القيمة الدفترية
+    # الحالية (بعد الإهلاك)، تُقارَن بها تكلفة الصيانة التراكمية. القيمة
+    # الافتراضية 60% عند عدم تحديد الفئة عتبة خاصة بها.
+    thresholds = {
+        r.name: flt(r.custom_repair_replace_threshold_pct) or 60
+        for r in frappe.db.sql(
+            "SELECT name, custom_repair_replace_threshold_pct FROM `tabAsset Category`",
+            as_dict=True,
+        )
+    }
 
     # Insurance: sum of renewal premiums recorded against the asset.
     insurance_costs = _sum_by_asset(
@@ -177,6 +193,23 @@ def get_data(filters):
         )
         age = row.age_years or 0
         row.annual_tco = round(row.tco / age, 2) if age > 0 else row.tco
+
+        # قرار إصلاح مقابل استبدال: يُقارَن بالقيمة الدفترية الحالية (بعد
+        # الإهلاك) وليس بسعر الشراء الأصلي — أصل قديم بالكامل مُهلَك تكون
+        # أي تكلفة صيانة عليه نسبة كبيرة من قيمته الدفترية، حتى لو كانت
+        # صغيرة قياساً بسعر الشراء الأصلي.
+        book_value = flt(row.book_value)
+        if book_value > 0:
+            row.repair_to_value_pct = round((row.total_maintenance_cost / book_value) * 100, 1)
+            threshold = thresholds.get(row.asset_category, 60)
+            row.recommendation = "Consider Replacement" if row.repair_to_value_pct >= threshold else "Repair"
+        elif row.total_maintenance_cost > 0:
+            row.repair_to_value_pct = None
+            row.recommendation = "Consider Replacement"
+        else:
+            row.repair_to_value_pct = None
+            row.recommendation = "Repair"
+
         data.append(row)
 
     return sorted(data, key=lambda x: x.tco, reverse=True)
