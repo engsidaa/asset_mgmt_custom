@@ -133,20 +133,38 @@ def on_submit(doc, method=None):
 
 def _update_asset_maintenance_summary(asset_name):
     """
-    يُعيد حساب:
-    - إجمالي تكلفة جميع الإصلاحات المُقدَّمة على الأصل
-    - تاريخ آخر إصلاح مكتمل
+    يُعيد حساب على مستوى الأصل نفسه (وليس على مستوى مستند واحد)، مجمِّعاً
+    التكلفة من كل مصادر الصيانة الموجودة فعلياً في هذا التطبيق معاً — Asset
+    Repair وAsset Work Order — حتى يعكس custom_total_maintenance_cost
+    التكلفة الكاملة عبر عمر الأصل، بغض النظر عن أي مستند صدرت منه:
+    - إجمالي تكلفة جميع الإصلاحات وأوامر العمل المكتملة على الأصل
+    - تاريخ آخر صيانة مكتملة (من أي من المصدرين)
     """
     totals = frappe.db.sql(
         """
         SELECT
-            SUM(total_repair_cost + IFNULL(custom_labor_cost, 0)) AS total_cost,
-            MAX(CASE WHEN repair_status = 'Completed' THEN DATE(completion_date) END) AS last_date,
-            SUM(IFNULL(custom_downtime_hours, 0)) AS total_downtime
-        FROM `tabAsset Repair`
-        WHERE asset = %s AND docstatus = 1
+            SUM(cost) AS total_cost,
+            MAX(last_date) AS last_date,
+            SUM(downtime) AS total_downtime
+        FROM (
+            SELECT
+                (total_repair_cost + IFNULL(custom_labor_cost, 0)) AS cost,
+                CASE WHEN repair_status = 'Completed' THEN DATE(completion_date) END AS last_date,
+                IFNULL(custom_downtime_hours, 0) AS downtime
+            FROM `tabAsset Repair`
+            WHERE asset = %(asset)s AND docstatus = 1
+
+            UNION ALL
+
+            SELECT
+                IFNULL(actual_cost, 0) AS cost,
+                CASE WHEN status = 'مكتمل' THEN completion_date END AS last_date,
+                0 AS downtime
+            FROM `tabAsset Work Order`
+            WHERE asset = %(asset)s AND docstatus = 1
+        ) combined
         """,
-        asset_name,
+        {"asset": asset_name},
         as_dict=True,
     )
 

@@ -75,7 +75,8 @@
    "label": "الحالة",
    "options": "مفتوح\nقيد التنفيذ\nمكتمل\nمعلق\nملغي",
    "default": "مفتوح",
-   "in_list_view": 1
+   "in_list_view": 1,
+   "allow_on_submit": 1
   },
   {
    "fieldname": "sec_break_request",
@@ -100,13 +101,15 @@
    "fieldname": "start_date",
    "fieldtype": "Date",
    "label": "تاريخ البدء الفعلي",
-   "description": "التاريخ الذي بدأ فيه تنفيذ العمل فعلياً"
+   "description": "التاريخ الذي بدأ فيه تنفيذ العمل فعلياً",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "completion_date",
    "fieldtype": "Date",
    "label": "تاريخ الإتمام",
-   "description": "التاريخ الذي اكتمل فيه تنفيذ أمر العمل"
+   "description": "التاريخ الذي اكتمل فيه تنفيذ أمر العمل",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "sec_break_assign",
@@ -141,7 +144,8 @@
    "fieldname": "actual_hours",
    "fieldtype": "Float",
    "label": "الوقت الفعلي (ساعة)",
-   "description": "الوقت الذي استغرقه التنفيذ فعلياً"
+   "description": "الوقت الذي استغرقه التنفيذ فعلياً",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "sec_break_details",
@@ -164,7 +168,8 @@
    "fieldname": "completion_notes",
    "fieldtype": "Long Text",
    "label": "ملاحظات الإتمام",
-   "description": "ما تم إنجازه وأي ملاحظات عند إغلاق الأمر"
+   "description": "ما تم إنجازه وأي ملاحظات عند إغلاق الأمر",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "sec_break_cost",
@@ -182,13 +187,14 @@
    "fieldtype": "Link",
    "label": "مركز التكلفة",
    "options": "Cost Center",
-   "description": "مركز التكلفة الذي تُحمَّل عليه تكاليف هذا الأمر."
+   "description": "مركز التكلفة الذي تُحمَّل عليه تكاليف هذا الأمر. إذا تُرك فارغاً، تُستخدم مركز تكلفة الفرع ثم مركز تكلفة الأصل."
   },
   {
    "fieldname": "actual_cost",
    "fieldtype": "Currency",
    "label": "التكلفة الفعلية",
-   "description": "إجمالي ما أُنفق فعلياً بما في ذلك المواد والعمالة"
+   "description": "إجمالي ما أُنفق فعلياً بما في ذلك المواد والعمالة",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "col_break_3",
@@ -198,13 +204,23 @@
    "fieldname": "spare_parts_cost",
    "fieldtype": "Currency",
    "label": "تكلفة قطع الغيار",
-   "description": "قيمة قطع الغيار المستخدمة في هذا الأمر"
+   "description": "قيمة قطع الغيار المستخدمة في هذا الأمر",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "labor_cost",
    "fieldtype": "Currency",
    "label": "تكلفة العمالة",
-   "description": "أجور الفنيين والعمالة المستخدمة"
+   "description": "أجور الفنيين والعمالة المستخدمة",
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "قيد اليومية",
+   "options": "Journal Entry",
+   "read_only": 1,
+   "description": "القيد المحاسبي الذي تم إنشاؤه تلقائياً عند إتمام أمر العمل بتكلفة"
   },
   {
    "fieldname": "sec_break_refs",

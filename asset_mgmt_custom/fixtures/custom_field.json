@@ -697,6 +697,30 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Branch-custom_cost_center",
+  "dt": "Branch",
+  "fieldname": "custom_cost_center",
+  "fieldtype": "Link",
+  "options": "Cost Center",
+  "label": "مركز التكلفة (Cost Center)",
+  "insert_after": "custom_default_location",
+  "description": "مركز التكلفة المحاسبي المرتبط بالفرع — تُرحَّل عليه كل قيود مصاريف الصيانة الخاصة بأصول هذا الفرع",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Branch-custom_territory",
+  "dt": "Branch",
+  "fieldname": "custom_territory",
+  "fieldtype": "Link",
+  "options": "Territory",
+  "label": "المنطقة الجغرافية (Territory)",
+  "insert_after": "custom_cost_center",
+  "description": "المستوى الجغرافي الأعلى من الفرع (منطقة/إقليم) — يُستخدم لتقسيم التقارير حسب المنطقة وليس الفرع فقط",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Movement-custom_driver",
   "dt": "Asset Movement",
   "fieldname": "custom_driver",
