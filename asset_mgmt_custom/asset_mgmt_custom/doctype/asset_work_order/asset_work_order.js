@@ -1,25 +1,51 @@
+const FINAL_STATUSES = ["مكتمل", "ملغي", "مرفوض"];
+const MAINTENANCE_ROLES = ["Asset Technician", "Asset Manager", "System Manager"];
+
 frappe.ui.form.on("Asset Work Order", {
 	refresh(frm) {
-		if (frm.doc.docstatus === 1 && frm.doc.status !== "مكتمل" && frm.doc.status !== "ملغي") {
+		const is_open = frm.doc.docstatus === 1 && !FINAL_STATUSES.includes(frm.doc.status);
+		const is_maintenance_staff = MAINTENANCE_ROLES.some((r) => frappe.user_roles.includes(r));
+
+		if (is_open && is_maintenance_staff) {
 			frm.add_custom_button(__("إتمام أمر العمل"), () => {
 				frappe.confirm(
 					__("سيتم تحديد الحالة كـ 'مكتمل' وترحيل تكلفته الفعلية محاسبياً (إن وُجدت). متابعة؟"),
 					() => {
 						frappe.call({
-							method: "frappe.client.set_value",
-							args: {
-								doctype: frm.doc.doctype,
-								name: frm.doc.name,
-								fieldname: "status",
-								value: "مكتمل",
-							},
+							method: "complete_work_order",
+							doc: frm.doc,
 							freeze: true,
 							freeze_message: __("جارٍ إتمام أمر العمل..."),
-							callback() {
-								frm.reload_doc();
+							callback(r) {
+								if (r.message) frm.reload_doc();
 							},
 						});
 					}
+				);
+			}, __("الحالة"));
+
+			frm.add_custom_button(__("رفض الطلب"), () => {
+				frappe.prompt(
+					{
+						fieldname: "reason",
+						fieldtype: "Small Text",
+						label: __("سبب الرفض"),
+						reqd: 1,
+					},
+					(values) => {
+						frappe.call({
+							method: "reject_work_order",
+							doc: frm.doc,
+							args: { reason: values.reason },
+							freeze: true,
+							freeze_message: __("جارٍ رفض الطلب..."),
+							callback(r) {
+								if (r.message) frm.reload_doc();
+							},
+						});
+					},
+					__("رفض طلب الصيانة"),
+					__("رفض")
 				);
 			}, __("الحالة"));
 		}

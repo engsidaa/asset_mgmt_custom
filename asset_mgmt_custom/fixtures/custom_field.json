@@ -646,6 +646,20 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset Maintenance-custom_branch",
+  "dt": "Asset Maintenance",
+  "fieldname": "custom_branch",
+  "fieldtype": "Link",
+  "options": "Branch",
+  "label": "الفرع",
+  "insert_after": "asset_name",
+  "fetch_from": "asset_name.custom_branch",
+  "read_only": 1,
+  "description": "يُجلَب تلقائياً من فرع الأصل (Asset.custom_branch) — بدون هذا الحقل، صلاحية User Permission المبنية على Branch لا يمكنها تقييد رؤية Asset Maintenance تلقائياً، لأن الحقل الوحيد عليه أصلاً هو asset_name (Link إلى Asset)، وليس Link مباشر إلى Branch",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Category Account-custom_capital_maintenance_wip_account",
   "dt": "Asset Category Account",
   "fieldname": "custom_capital_maintenance_wip_account",

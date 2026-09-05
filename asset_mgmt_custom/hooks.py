@@ -11,11 +11,15 @@ app_license = "MIT"
 fixtures = [
     {
         "dt": "Custom Field",
-        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Category Account", "Asset Maintenance Contract", "Branch", "Maintenance Team Member"]]],
+        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Category Account", "Asset Maintenance Contract", "Asset Maintenance", "Branch", "Maintenance Team Member"]]],
     },
     {
         "dt": "Property Setter",
         "filters": [["doc_type", "=", "Asset Repair"], ["field_name", "=", "downtime"]],
+    },
+    {
+        "dt": "Custom DocPerm",
+        "filters": [["role", "=", "Branch Manager"]],
     },
     {
         "dt": "Workflow",
@@ -81,6 +85,9 @@ doc_events = {
         "validate": "asset_mgmt_custom.overrides.full_and_final_statement.validate",
         "on_submit": "asset_mgmt_custom.overrides.full_and_final_statement.on_submit",
     },
+    "Branch": {
+        "on_update": "asset_mgmt_custom.overrides.branch.on_update",
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -138,4 +145,5 @@ after_migrate = [
     "asset_mgmt_custom.setup.after_migrate.unify_asset_manager_role",
     "asset_mgmt_custom.setup.after_migrate.backfill_asset_coding_status",
     "asset_mgmt_custom.setup.after_migrate.remove_old_asset_requisition_workflow",
+    "asset_mgmt_custom.setup.after_migrate.sync_branch_manager_user_permissions",
 ]

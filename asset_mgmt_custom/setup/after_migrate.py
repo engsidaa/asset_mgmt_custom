@@ -124,3 +124,32 @@ def remove_old_asset_requisition_workflow():
         )
 
     frappe.db.commit()
+
+
+def sync_branch_manager_user_permissions():
+    """
+    الهوك on_update على Branch (overrides/branch.py) يزامن User Permission
+    فور تعديل أي فرع من الواجهة — لكن ده مش كافٍ وحده لضمان الاتساق: لو
+    custom_branch_manager اتحدد لأول مرة عبر استيراد بيانات مباشر (Data
+    Import) أو أي طريق تاني ميعديش من Document.save() الطبيعي، الهوك مش
+    هيتنفذ. إعادة تشغيل هذه الدالة على كل bench migrate تضمن إن كل فرع في
+    القاعدة مطابق فعلياً (مدير محدد = عنده User Permission + دور Branch
+    Manager)، بغض النظر عن الطريقة اللي اتغيّر بيها.
+
+    آمنة للتشغيل في كل مرة: بتعتمد بالكامل على نفس منطق sync الموجود في
+    overrides/branch.py (idempotent — لا تُنشئ صفاً مكرراً ولا تُزيل صلاحية
+    لا تزال صحيحة).
+    """
+    if not frappe.db.has_column("Branch", "custom_branch_manager"):
+        return
+
+    from asset_mgmt_custom.overrides.branch import sync_branch_manager_permission
+
+    branches = frappe.get_all("Branch", pluck="name")
+    for branch_name in branches:
+        try:
+            sync_branch_manager_permission(branch_name)
+        except Exception:
+            frappe.log_error(title=f"sync_branch_manager_user_permissions failed for {branch_name}")
+
+    frappe.db.commit()

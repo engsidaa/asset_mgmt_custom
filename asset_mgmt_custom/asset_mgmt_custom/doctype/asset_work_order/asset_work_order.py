@@ -7,6 +7,9 @@ from asset_mgmt_custom.overrides.asset_repair import _update_asset_maintenance_s
 
 
 class AssetWorkOrder(Document):
+    FINAL_STATUSES = ("مكتمل", "ملغي", "مرفوض")
+    MAINTENANCE_ROLES = ("Asset Technician", "Asset Manager", "System Manager")
+
     def before_insert(self):
         self._apply_sla_policy()
         if not self.assigned_technician:
@@ -31,6 +34,67 @@ class AssetWorkOrder(Document):
         self.db_set("status", "ملغي")
         self._cancel_maintenance_cost_gl_entry()
         _update_asset_maintenance_summary(self.asset)
+
+    @frappe.whitelist()
+    def complete_work_order(self):
+        """
+        مسار مُصرَّح به (whitelisted) وحيد لإتمام أمر العمل — يستخدمه زر
+        الواجهة، وسيستخدمه لاحقاً تطبيق الموبايل بنفس الطريقة بالضبط
+        (استدعاء واحد على /api/resource/Asset Work Order/<name>
+        ?run_method=complete_work_order)، بدل تكرار نفس المنطق في أكثر
+        من مكان. يستخدم self.save() الكامل (وليس db_set) عمداً، لأن
+        on_update_after_submit (ترحيل القيد المحاسبي) لا يُنفَّذ إلا عبر
+        دورة الحفظ الكاملة لمستند submitted.
+        """
+        self._check_maintenance_role()
+        if self.docstatus != 1:
+            frappe.throw(_("Work order must be submitted before it can be completed."))
+        if self.status in self.FINAL_STATUSES:
+            frappe.throw(
+                _("This work order is already in a final status ({0}).").format(self.status)
+            )
+        self.status = "مكتمل"
+        if not self.completion_date:
+            self.completion_date = today()
+        self.save()
+        return self.status
+
+    @frappe.whitelist()
+    def reject_work_order(self, reason):
+        """
+        رفض نهائي (بدون رجوع لمقدّم الطلب) بسبب مسجَّل إجبارياً — نفس
+        القرار المتَّبع في Asset Requisition.reject()، بفارق واحد: هنا
+        الرفض نهائي بدون خطوة "إعادة تقديم" لاحقة، حسب ما تقرر صراحة.
+        """
+        self._check_maintenance_role()
+        if self.docstatus != 1:
+            frappe.throw(_("Work order must be submitted before it can be rejected."))
+        if self.status in self.FINAL_STATUSES:
+            frappe.throw(
+                _("This work order is already in a final status ({0}).").format(self.status)
+            )
+        if not reason or not str(reason).strip():
+            frappe.throw(_("Please provide a rejection reason."))
+
+        self.status = "مرفوض"
+        self.rejection_reason = reason
+        self.rejected_by = frappe.session.user
+        self.rejected_on = now_datetime()
+        self.save()
+        return self.status
+
+    def _check_maintenance_role(self):
+        """
+        Branch Manager عنده write=1 على هذا الـ DocType (عشان يعدّل مسودته
+        قبل التسليم)، لكن ده لازم ميدّيهوش صلاحية إتمام أو رفض طلب صيانة —
+        دي مسؤولية فريق الصيانة فقط (Asset Technician/Asset Manager)،
+        مش صاحب الطلب نفسه.
+        """
+        if not set(self.MAINTENANCE_ROLES) & set(frappe.get_roles()):
+            frappe.throw(
+                _("Only maintenance staff (Asset Technician / Asset Manager) can perform this action."),
+                frappe.PermissionError,
+            )
 
     def _post_maintenance_cost_gl_entry(self):
         """
