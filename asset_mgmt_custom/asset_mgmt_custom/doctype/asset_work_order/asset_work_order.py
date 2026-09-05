@@ -9,6 +9,8 @@ from asset_mgmt_custom.overrides.asset_repair import _update_asset_maintenance_s
 class AssetWorkOrder(Document):
     def before_insert(self):
         self._apply_sla_policy()
+        if not self.assigned_technician:
+            self._auto_dispatch_technician()
 
     def on_submit(self):
         self.db_set("status", "قيد التنفيذ")
@@ -141,3 +143,50 @@ class AssetWorkOrder(Document):
         self.sla_policy = policy.name
         self.response_due_by = add_to_date(base, hours=flt(policy.response_hours))
         self.resolution_due_by = add_to_date(base, hours=flt(policy.resolution_hours))
+
+    def _auto_dispatch_technician(self):
+        """
+        توزيع تلقائي لأمر العمل على الفني الأقل تحميلاً حالياً من بين
+        الفنيين المؤهلين (المسجَّلين ضمن Asset Maintenance Team بنفس شركة
+        الأصل، وتخصصهم (custom_skill_category) يطابق فئة الأصل أو عام بلا
+        تخصص محدد) — بدل ترك أمر العمل بلا فني مُكلَّف دائماً حتى يُسند
+        يدوياً. لا يفعل شيئاً إذا لم يوجد أي فني مؤهل متاح (تحت الحد
+        الأقصى للتحميل المتزامن)، فيبقى التكليف اليدوي كما كان.
+        """
+        if not self.asset:
+            return
+
+        asset_info = frappe.db.get_value("Asset", self.asset, ["asset_category", "company"], as_dict=True)
+        if not asset_info:
+            return
+
+        candidates = frappe.db.sql("""
+            SELECT mtm.team_member AS technician, mtm.custom_max_concurrent_orders AS max_orders
+            FROM `tabMaintenance Team Member` mtm
+            JOIN `tabAsset Maintenance Team` amt ON amt.name = mtm.parent
+            WHERE amt.company = %(company)s
+              AND (
+                  IFNULL(mtm.custom_skill_category, '') = ''
+                  OR mtm.custom_skill_category = %(category)s
+              )
+        """, {"company": asset_info.company, "category": asset_info.asset_category}, as_dict=True)
+        if not candidates:
+            return
+
+        best_technician = None
+        best_load = None
+        for candidate in candidates:
+            load = frappe.db.count("Asset Work Order", {
+                "assigned_technician": candidate.technician,
+                "status": ["in", ["مفتوح", "قيد التنفيذ"]],
+                "docstatus": ["<", 2],
+            })
+            cap = candidate.max_orders or 0
+            if cap and load >= cap:
+                continue
+            if best_load is None or load < best_load:
+                best_technician = candidate.technician
+                best_load = load
+
+        if best_technician:
+            self.assigned_technician = best_technician

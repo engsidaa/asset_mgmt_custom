@@ -721,6 +721,30 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Maintenance Team Member-custom_skill_category",
+  "dt": "Maintenance Team Member",
+  "fieldname": "custom_skill_category",
+  "fieldtype": "Link",
+  "options": "Asset Category",
+  "label": "فئة التخصص (Skill Category)",
+  "insert_after": "maintenance_role",
+  "description": "فئة الأصل التي يتخصص فيها هذا الفني — تُترك فارغة إذا كان الفني عاماً (يصلح لكل الفئات) لأغراض التوزيع التلقائي لأوامر العمل",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Maintenance Team Member-custom_max_concurrent_orders",
+  "dt": "Maintenance Team Member",
+  "fieldname": "custom_max_concurrent_orders",
+  "fieldtype": "Int",
+  "label": "الحد الأقصى لأوامر العمل المتزامنة",
+  "insert_after": "custom_skill_category",
+  "description": "أقصى عدد أوامر عمل مفتوحة يُسمح بتكليف هذا الفني بها في نفس الوقت أثناء التوزيع التلقائي (0 = بلا حد)",
+  "reqd": 0,
+  "default": "0"
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Movement-custom_driver",
   "dt": "Asset Movement",
   "fieldname": "custom_driver",
