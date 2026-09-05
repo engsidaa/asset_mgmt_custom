@@ -1,0 +1,105 @@
+{
+ "doctype": "DocType",
+ "name": "Asset Maintenance SLA Policy",
+ "module": "Asset Mgmt Custom",
+ "naming_rule": "By fieldname",
+ "autoname": "field:priority",
+ "is_submittable": 0,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "الأولوية",
+   "options": "عادي\nمتوسط\nعاجل\nحرج",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1,
+   "description": "يجب أن تطابق قيم هذا الحقل خيارات حقل 'الأولوية' (priority) في Asset Work Order تماماً"
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "response_hours",
+   "fieldtype": "Float",
+   "label": "مهلة الاستجابة (ساعة)",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "عدد الساعات المسموح بها من إنشاء أمر العمل حتى بدء الاستجابة الفعلية"
+  },
+  {
+   "fieldname": "resolution_hours",
+   "fieldtype": "Float",
+   "label": "مهلة الحل (ساعة)",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "عدد الساعات المسموح بها من إنشاء أمر العمل حتى إتمامه (مكتمل)"
+  },
+  {
+   "fieldname": "sec_break_escalation",
+   "fieldtype": "Section Break",
+   "label": "التصعيد عند الخرق"
+  },
+  {
+   "fieldname": "escalation_level",
+   "fieldtype": "Select",
+   "label": "مستوى التصعيد",
+   "options": "مستوى ١ - المشرف المباشر\nمستوى ٢ - مدير الأصول\nمستوى ٣ - الإدارة العليا",
+   "default": "مستوى ١ - المشرف المباشر",
+   "description": "مستوى التصعيد الافتراضي عند خرق مهلة الحل لهذه الأولوية"
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "escalate_to",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "التصعيد إلى",
+   "description": "المستخدم الذي يُبلَّغ إضافةً لمدراء الأصول عند خرق مهلة الحل لهذه الأولوية (اختياري)"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset User",
+   "read": 1,
+   "print": 1
+  }
+ ]
+}

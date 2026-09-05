@@ -1,12 +1,15 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt, today
+from frappe.utils import add_to_date, flt, now_datetime, today
 
 from asset_mgmt_custom.overrides.asset_repair import _update_asset_maintenance_summary
 
 
 class AssetWorkOrder(Document):
+    def before_insert(self):
+        self._apply_sla_policy()
+
     def on_submit(self):
         self.db_set("status", "قيد التنفيذ")
 
@@ -115,3 +118,26 @@ class AssetWorkOrder(Document):
         je = frappe.get_doc("Journal Entry", je_name)
         if je.docstatus == 1:
             je.cancel()
+
+    def _apply_sla_policy(self):
+        """
+        تُحدَّد مواعيد الاستجابة/الحل المستحقة مرة واحدة عند الإنشاء بناءً
+        على سياسة SLA المطابقة لأولوية أمر العمل، بدل الثوابت الثابتة
+        (48 ساعة/3 أيام) التي كانت مكتوبة مباشرة في الكود سابقاً.
+        """
+        if not self.priority:
+            return
+
+        policy = frappe.db.get_value(
+            "Asset Maintenance SLA Policy",
+            self.priority,
+            ["name", "response_hours", "resolution_hours"],
+            as_dict=True,
+        )
+        if not policy:
+            return
+
+        base = now_datetime()
+        self.sla_policy = policy.name
+        self.response_due_by = add_to_date(base, hours=flt(policy.response_hours))
+        self.resolution_due_by = add_to_date(base, hours=flt(policy.resolution_hours))

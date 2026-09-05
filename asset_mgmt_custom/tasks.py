@@ -863,24 +863,52 @@ def check_expired_work_permits():
 # ---------------------------------------------------------------------------
 
 def check_overdue_work_orders():
-    """Daily: alert managers about open work orders with no progress after 3 days."""
-    cutoff = add_days(today(), -3)
+    """
+    Daily: alert managers about open work orders that breached their SLA
+    resolution deadline (resolution_due_by, from the matching Asset
+    Maintenance SLA Policy). Work orders with no SLA policy applied (no
+    policy configured for their priority) fall back to the original fixed
+    3-day-since-request no-progress rule.
+    """
+    now = now_datetime()
+    fallback_cutoff = add_days(today(), -3)
+
     overdue = frappe.db.sql("""
-        SELECT name, title, asset, asset_name, assigned_technician, priority, request_date
+        SELECT name, title, asset, asset_name, assigned_technician, priority,
+               request_date, resolution_due_by, sla_policy
         FROM `tabAsset Work Order`
         WHERE docstatus = 1
           AND status IN ('مفتوح', 'قيد التنفيذ')
-          AND request_date <= %(cutoff)s
           AND completion_date IS NULL
-    """, {"cutoff": cutoff}, as_dict=True)
+          AND (
+              (resolution_due_by IS NOT NULL AND resolution_due_by < %(now)s)
+              OR (resolution_due_by IS NULL AND request_date <= %(fallback_cutoff)s)
+          )
+    """, {"now": now, "fallback_cutoff": fallback_cutoff}, as_dict=True)
 
     if not overdue:
         return
 
     manager_users = _get_manager_users()
     for wo in overdue:
-        subject = _("Overdue Work Order: {0}").format(wo.title)
-        content = _("Work order <b>{0}</b> on asset <b>{1}</b> (priority: {2}) "
-                    "has been open since <b>{3}</b> with no completion.").format(
-            wo.title, wo.asset_name or wo.asset, wo.priority, wo.request_date)
-        _create_notification(subject, content, "Asset Work Order", wo.name, manager_users)
+        if wo.sla_policy:
+            subject = _("SLA Breached — Overdue Work Order: {0}").format(wo.title)
+            content = _("Work order <b>{0}</b> on asset <b>{1}</b> (priority: {2}) "
+                        "breached its SLA resolution deadline of <b>{3}</b>.").format(
+                wo.title, wo.asset_name or wo.asset, wo.priority, wo.resolution_due_by)
+        else:
+            subject = _("Overdue Work Order: {0}").format(wo.title)
+            content = _("Work order <b>{0}</b> on asset <b>{1}</b> (priority: {2}) "
+                        "has been open since <b>{3}</b> with no completion.").format(
+                wo.title, wo.asset_name or wo.asset, wo.priority, wo.request_date)
+
+        frappe.db.set_value("Asset Work Order", wo.name, "sla_breached", 1, update_modified=False)
+
+        recipients = list(manager_users)
+        policy_escalate_to = wo.sla_policy and frappe.db.get_value(
+            "Asset Maintenance SLA Policy", wo.sla_policy, "escalate_to"
+        )
+        if policy_escalate_to and policy_escalate_to not in recipients:
+            recipients.append(policy_escalate_to)
+
+        _create_notification(subject, content, "Asset Work Order", wo.name, recipients)

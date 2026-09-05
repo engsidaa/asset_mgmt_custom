@@ -148,6 +148,43 @@
    "allow_on_submit": 1
   },
   {
+   "fieldname": "sec_break_sla",
+   "fieldtype": "Section Break",
+   "label": "اتفاقية مستوى الخدمة (SLA)"
+  },
+  {
+   "fieldname": "sla_policy",
+   "fieldtype": "Link",
+   "options": "Asset Maintenance SLA Policy",
+   "label": "سياسة SLA المطبقة",
+   "read_only": 1,
+   "description": "تُحدَّد تلقائياً عند الإنشاء بناءً على الأولوية (priority)"
+  },
+  {
+   "fieldname": "response_due_by",
+   "fieldtype": "Datetime",
+   "label": "موعد الاستجابة المستحق",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_sla",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "resolution_due_by",
+   "fieldtype": "Datetime",
+   "label": "موعد الحل المستحق",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sla_breached",
+   "fieldtype": "Check",
+   "label": "تم خرق SLA",
+   "read_only": 1,
+   "default": "0",
+   "allow_on_submit": 1
+  },
+  {
    "fieldname": "sec_break_details",
    "fieldtype": "Section Break",
    "label": "تفاصيل العمل"
