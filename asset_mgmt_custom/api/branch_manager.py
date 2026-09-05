@@ -18,6 +18,12 @@ overrides/branch.py لكل مستخدم مدير فرع). لذلك:
     عبر `frappe.has_permission(..., doc=...)` قبل إرجاع أي بيانات — لأن
     User Permission تُقيِّد فقط ما يظهر في القوائم، ولا تمنع تلقائياً
     استعلاماً مباشراً بمُعرِّف مُخمَّن لمستند خارج الفرع.
+
+**استثناء وحيد صريح:** Asset Movement مستند أساسي بلا أي حقل Link مباشر
+لـ Branch (فقط target_location على مستوى كل بند)، فلا تنطبق عليه آلية
+User Permission التلقائية إطلاقاً — دوال `list_pending_receipts`/
+`confirm_receipt` أسفل هذا الملف تُصفِّي يدوياً بمطابقة
+`Branch.custom_default_location` بدل الاعتماد على `get_list`.
 """
 
 import frappe
@@ -306,3 +312,54 @@ def add_reminder(reference_doctype, reference_name, reminder_date, note=None):
     })
     todo.insert()
     return {"name": todo.name}
+
+
+def _my_managed_locations():
+    """المواقع الافتراضية لكل فرع يديره المستخدم الحالي فعلياً."""
+    return frappe.get_all(
+        "Branch",
+        filters={
+            "custom_branch_manager": frappe.session.user,
+            "custom_default_location": ["is", "set"],
+        },
+        pluck="custom_default_location",
+    )
+
+
+@frappe.whitelist()
+def list_pending_receipts():
+    """
+    أوامر نقل (Asset Movement من نوع Transfer) لسه محتاجة تأكيد استلام
+    فعلي، موجَّهة لمواقع فروع يديرها المستخدم الحالي — التصفية هنا يدوية
+    عمداً (انظر ملاحظة أعلى الملف عن سبب استثناء Asset Movement من
+    آلية get_list التلقائية).
+    """
+    locations = _my_managed_locations()
+    if not locations:
+        return []
+
+    return frappe.db.sql(
+        """
+        SELECT DISTINCT am.name, am.transaction_date, am.company
+        FROM `tabAsset Movement` am
+        JOIN `tabAsset Movement Item` ami ON ami.parent = am.name
+        WHERE am.docstatus = 1
+          AND am.purpose = 'Transfer'
+          AND IFNULL(am.custom_receipt_confirmed, 0) = 0
+          AND ami.target_location IN %(locations)s
+        ORDER BY am.transaction_date DESC
+        """,
+        {"locations": locations},
+        as_dict=True,
+    )
+
+
+@frappe.whitelist()
+def confirm_receipt(movement_name):
+    """
+    اسم موحَّد مع باقي دوال هذا الملف لراحة عميل الموبايل — تُنفِّذ فعلياً
+    نفس overrides.asset_movement.confirm_receipt (بما في ذلك فحص
+    الصلاحيات فيها) بدون تكرار أي منطق.
+    """
+    from asset_mgmt_custom.overrides.asset_movement import confirm_receipt as _confirm_receipt
+    return _confirm_receipt(movement_name)

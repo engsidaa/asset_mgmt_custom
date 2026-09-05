@@ -169,6 +169,8 @@ Link→Branch، `fetch_from: "asset_name.custom_branch"`, للقراءة فقط 
 | `create_maintenance_request(asset, problem_description, work_type=None, priority=None)` | اسم الأصل + وصف العطل (إجباري) + نوع/أولوية اختياريان | `{name, status}` لأمر العمل الذي أُنشئ **وسُلِّم فوراً** | صورة العطل تُرفَع بعدها منفصلة (انظر أدناه) |
 | `list_my_work_orders(status=None)` | حالة اختيارية | قائمة أوامر عمل الفرع | |
 | `add_reminder(reference_doctype, reference_name, reminder_date, note=None)` | نوع مستند (Asset / Asset Requisition / Asset Work Order فقط) + اسمه + تاريخ | `{name}` لسجل ToDo الذي أُنشئ | تذكيرات = ToDo قياسي في Frappe، وليس مفهوماً جديداً |
+| `list_pending_receipts()` | — | أوامر نقل (Transfer) لسه محتاجة تأكيد استلام، موجَّهة لمواقع فروعه | **الوحيدة هنا بتصفية يدوية** (Asset Movement بلا Link مباشر لـ Branch) بدل `get_list` |
+| `confirm_receipt(movement_name)` | اسم أمر النقل | قائمة الأصول التي تم تأكيد استلامها فعلياً | غلاف رقيق حول `overrides.asset_movement.confirm_receipt` الذي أُضيف له تحقق صلاحية لم يكن موجوداً إطلاقاً من قبل (انظر أدناه) |
 
 ### رفع صورة العطل (fault_photo)
 
@@ -284,6 +286,45 @@ curl -X POST https://e-u40.hosetia.com/api/method/asset_mgmt_custom.api.branch_m
 `get_asset_detail`، `create_maintenance_request` (بجسم JSON يحمل
 `asset` و`problem_description`)، وتأكد أن كل استدعاء بـ `asset` من فرع
 آخر يرجع خطأ صلاحية (`PermissionError`) وليس بيانات.
+
+### 6. اختبار استلام الأصل (Asset Movement)
+
+1. أنشئ **Asset Movement** من نوع Transfer بين فرعين (مصدر ← هدف)، اعتمده.
+2. سجّل دخول بمستخدم هو مدير فرع **غير** الفرع الهدف ← استدعِ
+   `confirm_receipt(movement_name)` ← تأكد أنها ترجع خطأ صلاحية
+   (`PermissionError`)، **وليس** تأكيد استلام ناجحاً (هذا كان ممكناً قبل
+   هذا الإصلاح).
+3. سجّل دخول بمدير الفرع **الهدف الصحيح** ← استدعِ `list_pending_receipts()`
+   ← تأكد أن هذا الأمر يظهر فيها.
+4. استدعِ `confirm_receipt(movement_name)` بنفس المستخدم ← تأكد من نجاحه،
+   ومن أن حالة الأصول المعنية أصبحت "Operational"، وأن `custom_receipt_confirmed`
+   أصبح 1.
+
+---
+
+### استلام الأصل (Asset Movement) — ثغرة صلاحيات حقيقية تم اكتشافها وإصلاحها
+
+طلبك الأصلي شمل صراحة "يقدر يستلم اصل" — عند فحص الكود وُجدت دالة
+`confirm_receipt()` جاهزة بالفعل من عمل سابق على هذا التطبيق (تعليقها
+يقول حرفياً "Called by the receiving branch manager")، **لكن بلا أي
+تحقق صلاحيات إطلاقاً** — أي مستخدم مسجَّل دخوله كان يقدر يستدعيها بأي
+`movement_name` ويؤكد استلام أصول لا علاقة له بها. تم إصلاحها:
+
+- دالة جديدة `_check_receipt_permission()` في `overrides/asset_movement.py`:
+  System Manager/Asset Manager مخوَّلان دائماً، وإلا يُشترَط أن يكون
+  المستخدم الحالي هو `custom_branch_manager` لفرع تُطابق
+  `custom_default_location` بتاعته أحد `target_location` في بنود هذا
+  الـ Movement تحديداً — نفس أسلوب "الشخص المحدد عبر حقل مستند آخر"
+  المُستخدَم بالفعل في `Asset Requisition.approve_branch_manager`.
+- **لماذا التصفية هنا مختلفة عن باقي هذا الملف:** `Asset Movement` مستند
+  أساسي بلا أي حقل Link مباشر لـ Branch (فقط `target_location` على
+  مستوى كل بند فرعي) — فلا تنطبق عليه آلية User Permission التلقائية
+  إطلاقاً، بعكس Asset/Asset Maintenance/Asset Work Order. لذلك
+  `list_pending_receipts()` هي الدالة **الوحيدة** في `api/branch_manager.py`
+  التي تُصفِّي يدوياً بدل الاعتماد على `get_list`.
+- `Custom DocPerm` جديد يمنح "Branch Manager" قراءة على `Asset Movement`
+  (بدونها، حتى `frappe.get_list` العادي كان سيرجع قائمة فارغة دائماً
+  لهذا الدور).
 
 ---
 

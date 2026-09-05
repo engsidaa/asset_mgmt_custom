@@ -253,6 +253,40 @@ def _revert_cost_center(item):
 # Confirm Receipt (whitelist)
 # ---------------------------------------------------------------------------
 
+def _check_receipt_permission(doc):
+    """
+    كانت هذه الدالة بلا أي تحقق صلاحيات إطلاقاً — أي مستخدم مسجَّل دخوله
+    يقدر يستدعيها بأي movement_name ويؤكد الاستلام. Asset Movement مستند
+    أساسي (Core) بلا أي حقل Link مباشر لـ Branch (فقط target_location)،
+    فتقييد User Permission التلقائي المُستخدَم في باقي هذا التطبيق لا
+    ينطبق عليه. لذلك التحقق هنا يعتمد على نفس أسلوب "الشخص المحدد عبر
+    حقل مستند آخر" المُستخدَم بالفعل في
+    Asset Requisition.approve_branch_manager: مدير النظام/مدير الأصول
+    مخوَّلان دائماً، وإلا لازم يكون المستخدم الحالي هو
+    custom_branch_manager لفرع تُطابق custom_default_location بتاعته أحد
+    target_location الموجودة في بنود هذا الـ Movement تحديداً.
+    """
+    if "System Manager" in frappe.get_roles() or "Asset Manager" in frappe.get_roles():
+        return
+
+    target_locations = {item.target_location for item in doc.assets if item.target_location}
+    if not target_locations:
+        frappe.throw(_("Not authorized to confirm receipt for this movement."), frappe.PermissionError)
+
+    is_manager_of_target = frappe.db.exists(
+        "Branch",
+        {
+            "custom_branch_manager": frappe.session.user,
+            "custom_default_location": ["in", list(target_locations)],
+        },
+    )
+    if not is_manager_of_target:
+        frappe.throw(
+            _("Only the branch manager of the receiving location can confirm this receipt."),
+            frappe.PermissionError,
+        )
+
+
 @frappe.whitelist()
 def confirm_receipt(movement_name):
     """
@@ -264,6 +298,8 @@ def confirm_receipt(movement_name):
         frappe.throw(_("Confirm Receipt is only for Transfer movements."))
     if doc.docstatus != 1:
         frappe.throw(_("Movement must be submitted."))
+
+    _check_receipt_permission(doc)
 
     confirmed = []
     for item in doc.assets:
