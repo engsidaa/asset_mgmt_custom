@@ -76,7 +76,8 @@
    "fieldtype": "Float",
    "label": "الكمية الصادرة",
    "read_only": 1,
-   "default": "0"
+   "default": "0",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "purpose",
@@ -89,7 +90,8 @@
    "fieldtype": "Select",
    "label": "الحالة",
    "options": "Pending\nApproved\nIssued\nRejected\nCancelled",
-   "default": "Pending"
+   "default": "Pending",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "approved_by",
@@ -97,6 +99,15 @@
    "options": "User",
    "label": "معتمد من",
    "read_only": 1
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "options": "Stock Entry",
+   "label": "حركة المخزون",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "description": "حركة صرف المخزون (Material Issue) التي أُنشئت تلقائياً عند تسليم قطعة الغيار"
   },
   {
    "fieldname": "notes",
