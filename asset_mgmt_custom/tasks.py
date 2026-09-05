@@ -96,16 +96,21 @@ def send_incomplete_asset_alerts():
 
 def send_maintenance_due_alerts():
     """
-    Daily: notify Asset Managers of maintenance tasks due in <= 7 days or overdue.
+    Daily: notify Asset Managers of maintenance tasks due in <= 7 days or
+    overdue. Tasks that are actually due (days_left <= 0) also get an Asset
+    Work Order auto-generated, instead of only a notification — nothing
+    used to act on this alert beyond a human reading it.
     """
     cutoff = add_days(today(), 7)
 
     tasks = frappe.db.sql("""
         SELECT
             mt.name        AS task_name,
-            am.asset_name,
+            am.name        AS maintenance_schedule,
+            am.asset_name  AS asset,
             mt.next_due_date,
             mt.maintenance_type,
+            mt.assign_to,
             mt.assign_to_name,
             DATEDIFF(mt.next_due_date, CURDATE()) AS days_left
         FROM `tabAsset Maintenance Task` mt
@@ -122,18 +127,67 @@ def send_maintenance_due_alerts():
     manager_users = _get_manager_users()
 
     for task in tasks:
+        asset_display = frappe.db.get_value("Asset", task.asset, "asset_name") or task.asset
         days = task.days_left or 0
         if days < 0:
-            subject = _("Overdue Maintenance: {0}").format(task.asset_name)
+            subject = _("Overdue Maintenance: {0}").format(asset_display)
             content = _("Maintenance task for <b>{0}</b> was due on <b>{1}</b> ({2} days ago). "
                         "Please take action immediately.").format(
-                task.asset_name, task.next_due_date, abs(days))
+                asset_display, task.next_due_date, abs(days))
         else:
-            subject = _("Maintenance Due in {0} days: {1}").format(days, task.asset_name)
+            subject = _("Maintenance Due in {0} days: {1}").format(days, asset_display)
             content = _("Maintenance task for <b>{0}</b> is due on <b>{1}</b>.").format(
-                task.asset_name, task.next_due_date)
+                asset_display, task.next_due_date)
 
         _create_notification(subject, content, "Asset Maintenance Task", task.task_name, manager_users)
+
+        if days <= 0:
+            _auto_create_work_order_from_task(task)
+
+
+def _auto_create_work_order_from_task(task):
+    """
+    ينشئ Asset Work Order تلقائياً (كمسودة، لم يُسلَّم بعد) من بند صيانة
+    وقائية مُستحَق — بدل الاكتفاء بتنبيه لا يُنتج عنه أي مستند فعلي. يتحقق
+    أولاً من عدم وجود أمر عمل سابق لنفس البند (idempotent) عبر
+    source_maintenance_task.
+    """
+    existing = frappe.db.exists(
+        "Asset Work Order",
+        {"source_maintenance_task": task.task_name, "docstatus": ["<", 2]},
+    )
+    if existing:
+        return
+
+    if not task.asset:
+        return
+
+    branch = frappe.db.get_value("Asset", task.asset, "custom_branch")
+
+    wo = frappe.new_doc("Asset Work Order")
+    wo.title = _("Preventive Maintenance – {0}").format(
+        frappe.db.get_value("Asset", task.asset, "asset_name") or task.asset
+    )
+    wo.asset = task.asset
+    wo.branch = branch
+    wo.work_type = "صيانة وقائية"
+    wo.priority = "عادي"
+    wo.request_date = today()
+    if task.assign_to:
+        wo.assigned_technician = task.assign_to
+    wo.maintenance_schedule = task.maintenance_schedule
+    wo.source_maintenance_task = task.task_name
+    wo.problem_description = _(
+        "Auto-generated from a due preventive maintenance task (next due date: {0})."
+    ).format(task.next_due_date)
+
+    try:
+        wo.insert(ignore_permissions=True)
+    except Exception:
+        frappe.log_error(
+            title="Auto Work Order creation failed",
+            message=frappe.get_traceback(),
+        )
 
 
 # ---------------------------------------------------------------------------

@@ -235,6 +235,13 @@
    "description": "إذا صدر أمر العمل من خطة صيانة وقائية (Asset Maintenance)"
   },
   {
+   "fieldname": "source_maintenance_task",
+   "fieldtype": "Data",
+   "label": "معرّف بند الصيانة المصدر",
+   "read_only": 1,
+   "description": "المعرّف (name) الداخلي لبند الصيانة الوقائية (صف في جدول Asset Maintenance Task) الذي وَلَّد هذا الأمر تلقائياً عند استحقاقه — Asset Maintenance Task جدول فرعي وليس مستنداً مستقلاً، فلا يصلح كحقل Link"
+  },
+  {
    "fieldname": "incident_report",
    "fieldtype": "Link",
    "label": "تقرير الحادث",
