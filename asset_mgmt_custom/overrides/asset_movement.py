@@ -84,6 +84,7 @@ def on_submit(doc, method=None):
         return
 
     for item in doc.assets:
+        _log_relocation_history(doc, item)
         _update_cost_center(doc, item)
         _update_branch(item)
 
@@ -164,6 +165,39 @@ def _notify_target_location(doc, item):
         )
     except Exception:
         pass
+
+
+def _log_relocation_history(doc, item):
+    """
+    Asset Relocation History كان DocType موجوداً بحقول Dynamic Link
+    (reference_doctype/reference_document) مصمَّمة صراحة لتُملأ تلقائياً
+    من مستند مصدر — لكن لا شيء في التطبيق كان يُنشئ سطراً واحداً فيه
+    فعلياً؛ سجل تاريخ المواقع يبقى فارغاً دائماً بغض النظر عن عدد مرات
+    نقل الأصل. يُستدعى أولاً في حلقة on_submit، قبل _update_branch، ليقرأ
+    الفرع القديم من الأصل قبل أن يُستبدَل بالفرع الجديد.
+    """
+    if not item.target_location and not item.source_location:
+        return
+
+    from_branch = frappe.db.get_value("Asset", item.asset, "custom_branch")
+    to_branch = item.get("custom_target_branch") or from_branch
+
+    try:
+        frappe.get_doc({
+            "doctype": "Asset Relocation History",
+            "asset": item.asset,
+            "relocation_date": doc.transaction_date or nowdate(),
+            "moved_by": frappe.session.user,
+            "from_location": item.source_location,
+            "from_branch": from_branch,
+            "to_location": item.target_location,
+            "to_branch": to_branch,
+            "reference_doctype": "Asset Movement",
+            "reference_document": doc.name,
+            "reason": doc.purpose,
+        }).insert(ignore_permissions=True)
+    except Exception:
+        frappe.log_error(title="Asset Relocation History logging failed", message=frappe.get_traceback())
 
 
 def _update_cost_center(doc, item):
