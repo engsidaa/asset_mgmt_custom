@@ -42,6 +42,12 @@
    },
    {
     "number_card_name": "Critical Assets"
+   },
+   {
+    "number_card_name": "TCO Outlier Assets"
+   },
+   {
+    "number_card_name": "Low AHI Assets"
    }
   ],
   "shortcuts": [
@@ -1005,6 +1011,18 @@
    },
    {
     "number_card_name": "SLA Breached Work Orders"
+   },
+   {
+    "number_card_name": "Low AHI Assets"
+   },
+   {
+    "number_card_name": "SLA Penalty Proposals Pending Review"
+   },
+   {
+    "number_card_name": "Rotable Spares Pending Refurbishment"
+   },
+   {
+    "number_card_name": "LOTO Pending Sign-off"
    }
   ],
   "shortcuts": [
