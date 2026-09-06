@@ -90,14 +90,16 @@ def resolve_asset_identifier(identifier):
     """
     مطابقة كود ممسوح (QR/باركود) أو مُدخَل يدوياً إلى اسم أصل حقيقي —
     اسم الأصل نفسه، أو كود الملصق (Barcode/RFID)، أو كود النقش الحديدي
-    (Iron Code)، أيهما وُجد أولاً. نقطة المطابقة الوحيدة في هذا التطبيق —
-    يُستدعى من scan_asset هنا ومن أدوات المسح الجماعي (Asset Physical
-    Audit) بلا تكرار المنطق.
+    (Iron Code)، أو الرقم التسلسلي المطبوع من المصنّع (يُقرأ عادة عبر OCR
+    من تطبيق الموبايل للأصول التي لم تُلصَق بملصق داخلي بعد)، أيّها وُجد
+    أولاً. نقطة المطابقة الوحيدة في هذا التطبيق — يُستدعى من scan_asset
+    هنا ومن أدوات المسح الجماعي (Asset Physical Audit) بلا تكرار المنطق.
     """
     return (
         frappe.db.get_value("Asset", identifier)
         or frappe.db.get_value("Asset", {"custom_sticker_code": identifier})
         or frappe.db.get_value("Asset", {"custom_iron_code": identifier})
+        or frappe.db.get_value("Asset", {"custom_manufacturer_serial": identifier})
     )
 
 

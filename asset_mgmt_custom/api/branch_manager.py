@@ -145,7 +145,7 @@ def get_asset_detail(asset):
             "value_after_depreciation", "custom_under_warranty", "custom_warranty_expiry",
             "custom_activation_date", "custom_total_maintenance_cost",
             "custom_last_maintenance_date", "custom_next_maintenance_date",
-            "custom_sticker_code", "custom_iron_code",
+            "custom_sticker_code", "custom_iron_code", "custom_manufacturer_serial",
             # مؤشرات Phase 6/7 (أُضيفت لاحقاً — لم تكن موجودة عند كتابة
             # هذه الدالة أول مرة): تُستخدَم من "لوحة أصل 360" الجديدة،
             # بلا تكرار هذا الاستعلام في دالة منفصلة.
