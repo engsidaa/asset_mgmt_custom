@@ -146,11 +146,27 @@ def get_asset_detail(asset):
             "custom_activation_date", "custom_total_maintenance_cost",
             "custom_last_maintenance_date", "custom_next_maintenance_date",
             "custom_sticker_code", "custom_iron_code",
+            # مؤشرات Phase 6/7 (أُضيفت لاحقاً — لم تكن موجودة عند كتابة
+            # هذه الدالة أول مرة): تُستخدَم من "لوحة أصل 360" الجديدة،
+            # بلا تكرار هذا الاستعلام في دالة منفصلة.
+            "custom_ahi_score", "custom_rul_months", "custom_tco",
+            "custom_annual_tco", "custom_tco_recommendation", "custom_tco_is_outlier",
         ],
         as_dict=True,
     )
     if not asset_doc:
         frappe.throw(_("Asset {0} not found.").format(asset))
+
+    asset_doc["criticality_level"] = frappe.db.get_value(
+        "Asset Criticality Matrix", {"asset": asset}, "criticality_level"
+    )
+
+    latest_inspection = frappe.db.get_value(
+        "Asset Safety Inspection", {"asset": asset},
+        ["name", "inspection_date", "overall_result", "next_inspection_date"],
+        order_by="inspection_date desc", as_dict=True,
+    )
+    asset_doc["last_safety_inspection"] = latest_inspection
 
     open_work_orders = frappe.get_list(
         "Asset Work Order",

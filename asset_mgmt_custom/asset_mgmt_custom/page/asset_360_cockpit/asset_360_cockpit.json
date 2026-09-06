@@ -1,0 +1,27 @@
+{
+ "content": null,
+ "docstatus": 0,
+ "doctype": "Page",
+ "module": "Asset Mgmt Custom",
+ "name": "asset-360-cockpit",
+ "owner": "Administrator",
+ "page_name": "asset-360-cockpit",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Asset Manager"
+  },
+  {
+   "role": "Branch Manager"
+  },
+  {
+   "role": "Asset Technician"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "title": "لوحة أصل 360°"
+}
