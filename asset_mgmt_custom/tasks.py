@@ -800,29 +800,75 @@ def check_missed_cleaning():
 # Daily: spare parts below minimum quantity
 # ---------------------------------------------------------------------------
 
+SPARE_PART_LEAD_TIME_DAYS = 14
+SPARE_PART_SAFETY_BUFFER_DAYS = 7
+SPARE_PART_CONSUMPTION_WINDOW_DAYS = 180
+
+
+def _dynamic_reorder_point(item_code):
+    """
+    نقطة إعادة الطلب الديناميكية = معدل الاستهلاك الفعلي اليومي × (مهلة
+    التوريد + مخزون أمان) — بدل رقم minimum_qty ثابت يُدخَل يدوياً مرة
+    واحدة ولا يتغيّر أبداً مع تغيّر معدل الاستهلاك الفعلي. تُحسَب من
+    Asset Spare Part Request.quantity_issued الفعلية (status='Issued')
+    خلال آخر 180 يوماً. تُعيد None لو البيانات غير كافية (أقل من قراءتين
+    فعليتين) — عندها يبقى minimum_qty اليدوي هو المرجع الوحيد.
+    """
+    if not item_code:
+        return None
+
+    window_start = add_days(today(), -SPARE_PART_CONSUMPTION_WINDOW_DAYS)
+    row = frappe.db.sql("""
+        SELECT SUM(sr.quantity_issued) AS total_issued, MIN(sr.creation) AS first_issue, COUNT(*) AS n
+        FROM `tabAsset Spare Part Request` sr
+        JOIN `tabAsset Spare Part` sp ON sp.name = sr.spare_part
+        WHERE sp.item_code = %(item_code)s AND sr.status = 'Issued'
+          AND sr.creation >= %(window_start)s
+    """, {"item_code": item_code, "window_start": window_start}, as_dict=True)
+
+    if not row or not row[0].total_issued or row[0].n < 2:
+        return None
+
+    r = row[0]
+    days_span = min(SPARE_PART_CONSUMPTION_WINDOW_DAYS, max(date_diff(today(), str(r.first_issue)[:10]), 1))
+    daily_rate = flt(r.total_issued) / days_span
+
+    return daily_rate * (SPARE_PART_LEAD_TIME_DAYS + SPARE_PART_SAFETY_BUFFER_DAYS)
+
+
 def check_spare_parts_low():
     """
-    Daily: notify when Asset Spare Part quantity is below minimum_qty, and
-    auto-create a draft restocking Material Request when neither is
-    already true (Asset Category BOM feature closed the loop on knowing
-    what parts an asset needs — this closes the loop on actually
-    reordering them instead of relying on someone noticing the alert).
+    Daily: notify when Asset Spare Part quantity falls below the
+    effective reorder threshold — max(minimum_qty اليدوي, نقطة إعادة
+    الطلب الديناميكية المحسوبة من معدل الاستهلاك الفعلي) — ثم يُنشئ
+    مسودة طلب شراء تلقائياً (Asset Category BOM feature closed the loop
+    on knowing what parts an asset needs — this closes the loop on
+    actually reordering them instead of relying on someone noticing the
+    alert). minimum_qty اليدوي يبقى أرضية دنيا لا تُخفَّض أبداً — الحساب
+    الديناميكي يرفعها فقط عند استهلاك أسرع من المتوقَّع، ولا يُنزلها أبداً
+    عند تباطؤ الاستهلاك (احتياطي أمان متعمَّد ضد نفاد غير متوقع).
     """
-    low_parts = frappe.db.sql("""
+    parts = frappe.db.sql("""
         SELECT name, item_name, quantity, minimum_qty, location, item_code
         FROM `tabAsset Spare Part`
-        WHERE minimum_qty > 0 AND quantity < minimum_qty
+        WHERE IFNULL(minimum_qty, 0) > 0 OR item_code IS NOT NULL
     """, as_dict=True)
-
-    if not low_parts:
+    if not parts:
         return
 
     manager_users = _get_manager_users()
-    for part in low_parts:
+    for part in parts:
+        dynamic_point = _dynamic_reorder_point(part.item_code)
+        effective_threshold = max(flt(part.minimum_qty), flt(dynamic_point))
+        if effective_threshold <= 0 or flt(part.quantity) >= effective_threshold:
+            continue
+
+        part.effective_threshold = effective_threshold
         subject = _("Low Spare Part Stock: {0}").format(part.item_name)
         content = _("Spare part <b>{0}</b> has only <b>{1}</b> units "
-                    "(minimum required: {2}). Location: {3}.").format(
-            part.item_name, part.quantity, part.minimum_qty,
+                    "(effective reorder threshold: {2}{3}). Location: {4}.").format(
+            part.item_name, part.quantity, round(effective_threshold, 1),
+            _(" — includes dynamic consumption-based point") if dynamic_point else "",
             part.location or "N/A")
         _create_notification(subject, content, "Asset Spare Part", part.name, manager_users)
         _auto_reorder_spare_part(part)
@@ -850,10 +896,13 @@ def _auto_reorder_spare_part(part):
     if existing:
         return
 
-    # هدف إعادة التخزين: ضعف الحد الأدنى — رصيد احتياطي بدل الاكتفاء
-    # بالوصول للحد الأدنى بالظبط، فيُعاد الطلب فوراً تاني.
-    target_stock = flt(part.minimum_qty) * 2
-    reorder_qty = max(target_stock - flt(part.quantity), flt(part.minimum_qty))
+    # هدف إعادة التخزين: ضعف العتبة الفعّالة (minimum_qty اليدوي، أو نقطة
+    # إعادة الطلب الديناميكية المحسوبة من الاستهلاك الفعلي — أيهما أعلى)
+    # — رصيد احتياطي بدل الاكتفاء بالوصول للعتبة بالظبط، فيُعاد الطلب
+    # فوراً تاني.
+    threshold = flt(part.get("effective_threshold") or part.minimum_qty)
+    target_stock = threshold * 2
+    reorder_qty = max(target_stock - flt(part.quantity), threshold)
 
     mr = frappe.new_doc("Material Request")
     mr.material_request_type = "Purchase"
