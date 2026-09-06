@@ -60,6 +60,41 @@
    "description": "الموظف المسؤول عن إجراء تقييم المورد"
   },
   {
+   "fieldname": "sec_break_computed",
+   "fieldtype": "Section Break",
+   "label": "حساب تلقائي من بيانات أوامر العمل الفعلية (اختياري)",
+   "collapsible": 1,
+   "description": "يملأ 'سرعة الاستجابة' و'الالتزام بالمواعيد' أدناه تلقائياً من أوامر العمل الفعلية المُسندة لهذا المورد عبر عقوده — بدل تقييم ذاتي بحت. باقي المعايير (الجودة/التسعير/التواصل) لا يوجد لها مقياس بيانات فعلي، وتبقى تقييماً يدوياً."
+  },
+  {
+   "fieldname": "computed_work_order_count",
+   "fieldtype": "Int",
+   "label": "عدد أوامر العمل المُحتسَبة",
+   "read_only": 1
+  },
+  {
+   "fieldname": "computed_sla_breach_rate",
+   "fieldtype": "Percent",
+   "label": "نسبة خرق SLA الفعلية",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_computed",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "computed_avg_response_hours",
+   "fieldtype": "Float",
+   "label": "متوسط وقت الاستجابة الفعلي (ساعة)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "computed_on",
+   "fieldtype": "Datetime",
+   "label": "آخر تحديث للحساب التلقائي",
+   "read_only": 1
+  },
+  {
    "fieldname": "sec_break_scores",
    "fieldtype": "Section Break",
    "label": "معايير التقييم (1 = ضعيف، 5 = ممتاز)"
@@ -69,7 +104,7 @@
    "fieldtype": "Int",
    "label": "سرعة الاستجابة",
    "reqd": 1,
-   "description": "مدى سرعة المورد في الاستجابة للطلبات والطوارئ"
+   "description": "مدى سرعة المورد في الاستجابة للطلبات والطوارئ — يمكن ملؤه تلقائياً من متوسط وقت الاستجابة الفعلي (زر الحساب التلقائي أعلاه)"
   },
   {
    "fieldname": "quality_score",
@@ -87,7 +122,7 @@
    "fieldtype": "Int",
    "label": "الالتزام بالمواعيد",
    "reqd": 1,
-   "description": "مدى التزام المورد بالجداول الزمنية المتفق عليها"
+   "description": "مدى التزام المورد بالجداول الزمنية المتفق عليها — يمكن ملؤه تلقائياً من نسبة خرق SLA الفعلية (زر الحساب التلقائي أعلاه)"
   },
   {
    "fieldname": "pricing_score",

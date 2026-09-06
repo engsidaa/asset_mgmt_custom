@@ -125,6 +125,7 @@ doctype_js = {
     "Asset Physical Audit": "asset_mgmt_custom/doctype/asset_physical_audit/asset_physical_audit.js",
     "Asset Handover": "asset_mgmt_custom/doctype/asset_handover/asset_handover.js",
     "Asset Write Off Request": "asset_mgmt_custom/doctype/asset_write_off_request/asset_write_off_request.js",
+    "Asset Vendor Performance Rating": "asset_mgmt_custom/doctype/asset_vendor_performance_rating/asset_vendor_performance_rating.js",
 }
 
 # ---------------------------------------------------------------------------
