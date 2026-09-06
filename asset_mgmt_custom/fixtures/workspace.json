@@ -1470,6 +1470,15 @@
    },
    {
     "type": "Link",
+    "label": "مؤشرات الأداء الفعلية مقابل المستهدفة",
+    "link_to": "Asset KPI Actual vs Target",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
     "label": "بصمة الكربون حسب الفرع",
     "link_to": "Carbon Footprint by Branch",
     "link_type": "Report",
