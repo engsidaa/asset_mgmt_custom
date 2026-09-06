@@ -693,6 +693,76 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset-custom_tco_section",
+  "dt": "Asset",
+  "fieldname": "custom_tco_section",
+  "fieldtype": "Section Break",
+  "label": "Total Cost of Ownership (محسوبة أسبوعياً)",
+  "insert_after": "custom_qr_code",
+  "collapsible": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_tco",
+  "dt": "Asset",
+  "fieldname": "custom_tco",
+  "fieldtype": "Currency",
+  "label": "إجمالي تكلفة الملكية (TCO)",
+  "insert_after": "custom_tco_section",
+  "read_only": 1,
+  "description": "مُحدَّثة تلقائياً عبر مهمة أسبوعية (asset_mgmt_custom.tasks.refresh_tco_cache) من تقرير Asset Total Cost of Ownership — راجع التقرير نفسه للتفصيل الكامل"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_annual_tco",
+  "dt": "Asset",
+  "fieldname": "custom_annual_tco",
+  "fieldtype": "Currency",
+  "label": "تكلفة الملكية السنوية",
+  "insert_after": "custom_tco",
+  "read_only": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_tco_col",
+  "dt": "Asset",
+  "fieldname": "custom_tco_col",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_annual_tco"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_tco_recommendation",
+  "dt": "Asset",
+  "fieldname": "custom_tco_recommendation",
+  "fieldtype": "Data",
+  "label": "التوصية (إصلاح/استبدال)",
+  "insert_after": "custom_tco_col",
+  "read_only": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_tco_is_outlier",
+  "dt": "Asset",
+  "fieldname": "custom_tco_is_outlier",
+  "fieldtype": "Check",
+  "label": "أعلى تكلفة من نظرائه (Outlier)",
+  "insert_after": "custom_tco_recommendation",
+  "read_only": 1,
+  "description": "تكلفة الملكية السنوية لهذا الأصل تتجاوز 150% من متوسط أصول نفس الفئة (بشرط 3 أصول على الأقل في العينة)"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_tco_last_computed",
+  "dt": "Asset",
+  "fieldname": "custom_tco_last_computed",
+  "fieldtype": "Datetime",
+  "label": "آخر تحديث لحساب التكلفة",
+  "insert_after": "custom_tco_is_outlier",
+  "read_only": 1
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Maintenance-custom_branch",
   "dt": "Asset Maintenance",
   "fieldname": "custom_branch",

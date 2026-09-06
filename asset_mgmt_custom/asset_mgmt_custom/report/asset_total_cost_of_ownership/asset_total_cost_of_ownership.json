@@ -21,6 +21,12 @@
    "options": "Asset Category"
   },
   {
+   "fieldname": "branch",
+   "label": "Branch",
+   "fieldtype": "Link",
+   "options": "Branch"
+  },
+  {
    "fieldname": "from_date",
    "label": "From Date",
    "fieldtype": "Date"

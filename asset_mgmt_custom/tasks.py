@@ -996,3 +996,41 @@ def check_overdue_work_orders():
                 reference_doctype="Asset Work Order",
                 reference_name=wo.name,
             )
+
+
+# ---------------------------------------------------------------------------
+# Weekly: cache Total Cost of Ownership onto each Asset + flag peer outliers
+# ---------------------------------------------------------------------------
+
+def refresh_tco_cache():
+    """
+    تقرير "Asset Total Cost of Ownership" شامل وصحيح بالفعل، لكنه يُعاد
+    حسابه بالكامل (عشرات الـ JOINs عبر 8 مصادر تكلفة) في كل مرة يُفتح
+    فيها التقرير مباشرة (Script Report متزامن) — غير مناسب لعرضه في لوحات
+    تحكم/فلاتر/واجهة API الموبايل بشكل متكرر لأسطول أصول كبير. يُرحَّل هذا
+    الحساب هنا للخلفية (مطابقةً لسياسة frappe.enqueue للحسابات التراكمية
+    المكلفة) ويُخزَّن ناتجه على حقول مخصصة في Asset نفسه، بدل إعادة حساب
+    مباشر عند كل عرض.
+
+    يُعيد استخدام get_data() من التقرير مباشرة (بما فيها منطق مقارنة
+    الأصول المتماثلة is_tco_outlier) بدل تكرار نفس استعلامات الـ SQL هنا
+    من جديد.
+    """
+    from asset_mgmt_custom.asset_mgmt_custom.report.asset_total_cost_of_ownership.asset_total_cost_of_ownership import get_data
+
+    rows = get_data({})
+    now = now_datetime()
+
+    for row in rows:
+        frappe.db.set_value(
+            "Asset",
+            row.asset,
+            {
+                "custom_tco": row.tco,
+                "custom_annual_tco": row.annual_tco,
+                "custom_tco_recommendation": row.recommendation,
+                "custom_tco_is_outlier": 1 if row.get("is_tco_outlier") else 0,
+                "custom_tco_last_computed": now,
+            },
+            update_modified=False,
+        )

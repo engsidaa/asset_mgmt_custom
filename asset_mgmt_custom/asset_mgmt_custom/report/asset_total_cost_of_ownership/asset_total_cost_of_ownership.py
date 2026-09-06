@@ -14,6 +14,7 @@ def get_columns():
         {"fieldname": "asset", "label": "Asset", "fieldtype": "Link", "options": "Asset", "width": 150},
         {"fieldname": "asset_name", "label": "Asset Name", "fieldtype": "Data", "width": 170},
         {"fieldname": "asset_category", "label": "Asset Category", "fieldtype": "Link", "options": "Asset Category", "width": 130},
+        {"fieldname": "branch", "label": "Branch", "fieldtype": "Link", "options": "Branch", "width": 120},
         {"fieldname": "purchase_value", "label": "Purchase Value", "fieldtype": "Currency", "width": 120},
         {"fieldname": "book_value", "label": "Current Book Value", "fieldtype": "Currency", "width": 130},
         {"fieldname": "total_maintenance_cost", "label": "Maintenance & Repair", "fieldtype": "Currency", "width": 140},
@@ -30,6 +31,8 @@ def get_columns():
         {"fieldname": "annual_tco", "label": "Annual TCO", "fieldtype": "Currency", "width": 120},
         {"fieldname": "repair_to_value_pct", "label": "Maintenance / Book Value %", "fieldtype": "Percent", "width": 150},
         {"fieldname": "recommendation", "label": "Repair vs Replace", "fieldtype": "Data", "width": 140},
+        {"fieldname": "category_avg_annual_tco", "label": "Category Avg Annual TCO", "fieldtype": "Currency", "width": 150},
+        {"fieldname": "is_tco_outlier", "label": "أعلى من نظرائه (Outlier)", "fieldtype": "Check", "width": 130},
     ]
 
 
@@ -49,12 +52,17 @@ def get_data(filters):
         asset_cond += " AND a.company = %(company)s"
         params["company"] = filters["company"]
 
+    if filters.get("branch"):
+        asset_cond += " AND a.custom_branch = %(branch)s"
+        params["branch"] = filters["branch"]
+
     assets = frappe.db.sql(
         """
         SELECT
             a.name AS asset,
             a.asset_name,
             a.asset_category,
+            a.custom_branch AS branch,
             a.gross_purchase_amount AS purchase_value,
             IFNULL(a.value_after_depreciation, a.gross_purchase_amount) AS book_value,
             IFNULL(a.custom_total_maintenance_cost, 0) AS total_maintenance_cost,
@@ -212,4 +220,34 @@ def get_data(filters):
 
         data.append(row)
 
+    _flag_tco_outliers(data)
+
     return sorted(data, key=lambda x: x.tco, reverse=True)
+
+
+# نسبة تجاوز متوسط تكلفة الملكية السنوية لنفس فئة الأصل التي تُصنَّف
+# عندها المعدة "أعلى من نظرائه" (Outlier) — تحديد الأصول المتهالكة التي
+# تستنزف الأرباح مقارنةً بمعدات مشابهة، بدل مقارنتها بنفسها فقط عبر الزمن.
+TCO_OUTLIER_THRESHOLD_MULTIPLIER = 1.5
+TCO_OUTLIER_MIN_CATEGORY_SAMPLE = 3
+
+
+def _flag_tco_outliers(data):
+    """يُقارَن annual_tco لكل أصل بمتوسط فئته (بشرط 3 أصول على الأقل في
+    نفس الفئة، وإلا فالمقارنة غير ذات دلالة إحصائياً) — أي أصل تتجاوز
+    تكلفته السنوية 150% من متوسط نظرائه يُعلَّم كـ outlier."""
+    by_category = {}
+    for row in data:
+        by_category.setdefault(row.asset_category, []).append(row)
+
+    for category, rows in by_category.items():
+        if len(rows) < TCO_OUTLIER_MIN_CATEGORY_SAMPLE:
+            for row in rows:
+                row.category_avg_annual_tco = None
+                row.is_tco_outlier = 0
+            continue
+
+        avg_annual_tco = sum(flt(r.annual_tco) for r in rows) / len(rows)
+        for row in rows:
+            row.category_avg_annual_tco = round(avg_annual_tco, 2)
+            row.is_tco_outlier = 1 if flt(row.annual_tco) > avg_annual_tco * TCO_OUTLIER_THRESHOLD_MULTIPLIER else 0
