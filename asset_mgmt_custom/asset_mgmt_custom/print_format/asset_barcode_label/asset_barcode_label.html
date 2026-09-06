@@ -4,7 +4,13 @@
     <div style="font-size: 10px; color: #555;">أصول ثابتة / Fixed Assets</div>
   </div>
   <div style="text-align: center; margin: 4px 0;">
-    <img src="{{ frappe.utils.get_url() }}/api/method/frappe.utils.weasyprint.get_barcode?value={{ doc.name }}&type=qr&options=%7B%22width%22%3A80%2C%22height%22%3A80%7D" style="width:80px; height:80px;" />
+    {%- if doc.custom_qr_code %}
+    <img src="{{ frappe.utils.get_url() }}{{ doc.custom_qr_code }}" style="width:80px; height:80px;" />
+    {%- else %}
+    <div style="font-size:8px; color:#999; width:80px; height:80px; display:flex; align-items:center; justify-content:center; border:1px dashed #ccc;">
+      اضغط "Generate QR Code" أولاً
+    </div>
+    {%- endif %}
   </div>
   <div style="font-size: 10px;">
     <div><b>{{ doc.name }}</b></div>

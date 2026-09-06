@@ -223,6 +223,61 @@ def set_operational(asset_name):
     return "Operational"
 
 
+# ---------------------------------------------------------------------------
+# QR Code (deep-link to a pre-filled maintenance request)
+# ---------------------------------------------------------------------------
+
+@frappe.whitelist()
+def generate_qr_code(asset_name):
+    """
+    يُنشئ QR Code يشفّر رابطاً يفتح مباشرة نموذج "أمر عمل" جديد مُعبّأ
+    مسبقاً بهذا الأصل (Frappe يقرأ query parameters على مسار /new تلقائياً
+    ويملأ بيها الحقول المطابقة — آلية موثّقة، وليست افتراضاً). المستخدم
+    (موظف مطبخ مثلاً) يمسح الكود من على الجهاز، فيفتح طلب صيانة جاهز
+    بدل ما يدوّر على الأصل يدوياً في القائمة.
+
+    ملاحظة: قالب الطباعة "Asset Barcode Label" كان يشير سابقاً إلى
+    frappe.utils.weasyprint.get_barcode — دالة غير موجودة إطلاقاً في هذا
+    الإصدار من Frappe (تم التحقق من الكود المصدري)، أي أن صورة الـ QR في
+    الملصق كانت معطوبة (رابط صورة 404) بغض النظر عن هذا التعديل. تم
+    استبدالها بالملف الفعلي المُنشأ هنا.
+    """
+    from io import BytesIO
+    from pyqrcode import create as qrcreate
+
+    if not frappe.db.exists("Asset", asset_name):
+        frappe.throw(_("Asset {0} not found.").format(asset_name))
+
+    url = f"{frappe.utils.get_url()}/app/asset-work-order/new?asset={asset_name}"
+
+    stream = BytesIO()
+    try:
+        qrcreate(url).svg(stream, scale=6, background="#ffffff", module_color="#000000")
+        svg_content = stream.getvalue()
+    finally:
+        stream.close()
+
+    existing = frappe.db.get_value("Asset", asset_name, "custom_qr_code")
+    if existing:
+        old_file = frappe.db.get_value("File", {"file_url": existing}, "name")
+        if old_file:
+            frappe.delete_doc("File", old_file, ignore_permissions=True, force=True)
+
+    file_doc = frappe.get_doc({
+        "doctype": "File",
+        "file_name": f"{asset_name}-qr.svg",
+        "attached_to_doctype": "Asset",
+        "attached_to_name": asset_name,
+        "attached_to_field": "custom_qr_code",
+        "content": svg_content,
+        "is_private": 0,
+    })
+    file_doc.save(ignore_permissions=True)
+
+    frappe.db.set_value("Asset", asset_name, "custom_qr_code", file_doc.file_url, update_modified=False)
+    return file_doc.file_url
+
+
 def _log_activity(asset_name, subject):
     try:
         frappe.get_doc({

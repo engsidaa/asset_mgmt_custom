@@ -18,6 +18,7 @@ frappe.ui.form.on("Asset", {
 		_render_maintenance_summary(frm);
 		_add_mark_coded_button(frm);
 		_add_set_operational_button(frm);
+		_add_generate_qr_button(frm);
 		_add_print_tag_button(frm);
 	},
 
@@ -190,6 +191,24 @@ function _add_set_operational_button(frm) {
 			}
 		);
 	}, __("Actions")).addClass("btn-primary");
+}
+
+function _add_generate_qr_button(frm) {
+	if (frm.doc.__islocal) return;
+	frm.add_custom_button(__("Generate QR Code (طلب صيانة)"), function () {
+		frappe.call({
+			method: "asset_mgmt_custom.overrides.asset.generate_qr_code",
+			args: { asset_name: frm.doc.name },
+			freeze: true,
+			freeze_message: __("جارٍ إنشاء رمز QR..."),
+			callback(r) {
+				if (r.message) {
+					frappe.show_alert({ message: __("تم إنشاء رمز QR"), indicator: "green" });
+					frm.reload_doc();
+				}
+			},
+		});
+	}, __("Actions"));
 }
 
 function _add_print_tag_button(frm) {

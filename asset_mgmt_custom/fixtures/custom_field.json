@@ -646,6 +646,18 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset-custom_qr_code",
+  "dt": "Asset",
+  "fieldname": "custom_qr_code",
+  "fieldtype": "Attach",
+  "label": "رمز QR لطلب الصيانة",
+  "insert_after": "custom_next_maintenance_date",
+  "read_only": 1,
+  "reqd": 0,
+  "description": "رمز QR يفتح نموذج طلب صيانة جاهز لهذا الأصل مباشرة عند مسحه بكاميرا الموبايل — يُنشأ بزر (Generate QR Code) ويُطبَع على ملصق الأصل"
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Maintenance-custom_branch",
   "dt": "Asset Maintenance",
   "fieldname": "custom_branch",
