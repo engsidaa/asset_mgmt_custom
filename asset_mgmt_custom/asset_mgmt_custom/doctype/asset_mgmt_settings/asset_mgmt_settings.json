@@ -32,7 +32,69 @@
    "fieldtype": "Small Text",
    "label": "أرقام المستلمين",
    "depends_on": "eval:doc.critical_alerts_enabled",
-   "description": "أرقام هواتف بصيغة دولية (مثال: 96550001234)، مفصولة بفاصلة — تُرسَل ضمن جسم الطلب لتحدد بوابتك من يستقبل التنبيه"
+   "description": "أرقام هواتف بصيغة دولية (مثال: 96550001234)، مفصولة بفاصلة — تُستخدَم لكل من Webhook وTwilio أدناه (نفس قائمة المستلمين)"
+  },
+  {
+   "fieldname": "sec_twilio",
+   "fieldtype": "Section Break",
+   "label": "إرسال مباشر عبر Twilio (اختياري، بالإضافة إلى/بدل الـ Webhook)",
+   "depends_on": "eval:doc.critical_alerts_enabled"
+  },
+  {
+   "fieldname": "twilio_enabled",
+   "fieldtype": "Check",
+   "label": "تفعيل الإرسال المباشر عبر Twilio",
+   "default": "0",
+   "description": "عند التفعيل، تُرسَل رسالة SMS/واتساب فعلية مباشرة عبر Twilio REST API لكل رقم في 'أرقام المستلمين' أعلاه — مستقل تماماً عن Webhook (يمكن تفعيل أحدهما أو كليهما معاً)"
+  },
+  {
+   "fieldname": "twilio_channel",
+   "fieldtype": "Select",
+   "label": "القناة",
+   "options": "WhatsApp\nSMS\nكلاهما",
+   "default": "WhatsApp",
+   "depends_on": "eval:doc.twilio_enabled"
+  },
+  {
+   "fieldname": "col_break_twilio_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "twilio_account_sid",
+   "fieldtype": "Data",
+   "label": "Twilio Account SID",
+   "depends_on": "eval:doc.twilio_enabled",
+   "mandatory_depends_on": "eval:doc.twilio_enabled"
+  },
+  {
+   "fieldname": "twilio_auth_token",
+   "fieldtype": "Password",
+   "label": "Twilio Auth Token",
+   "depends_on": "eval:doc.twilio_enabled",
+   "mandatory_depends_on": "eval:doc.twilio_enabled"
+  },
+  {
+   "fieldname": "sec_twilio_numbers",
+   "fieldtype": "Section Break",
+   "depends_on": "eval:doc.twilio_enabled"
+  },
+  {
+   "fieldname": "twilio_from_number",
+   "fieldtype": "Data",
+   "label": "رقم مرسل SMS (Twilio)",
+   "depends_on": "eval:doc.twilio_enabled && doc.twilio_channel != 'WhatsApp'",
+   "description": "بصيغة دولية، مثال: +14155238886"
+  },
+  {
+   "fieldname": "col_break_twilio_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "twilio_whatsapp_from_number",
+   "fieldtype": "Data",
+   "label": "رقم مرسل واتساب (Twilio Sandbox/Sender)",
+   "depends_on": "eval:doc.twilio_enabled && doc.twilio_channel != 'SMS'",
+   "description": "بصيغة دولية بدون بادئة whatsapp: — تُضاف تلقائياً، مثال: +14155238886"
   },
   {
    "fieldname": "sec_esg",
