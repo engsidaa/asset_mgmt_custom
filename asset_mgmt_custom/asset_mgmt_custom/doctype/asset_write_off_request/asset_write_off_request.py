@@ -23,6 +23,12 @@ class AssetWriteoffRequest(Document):
         asset = frappe.get_doc("Asset", self.asset)
         company = asset.company or frappe.defaults.get_user_default("Company")
 
+        if asset.status in ("Scrapped", "Sold"):
+            frappe.throw(_(
+                "Asset {0} is already disposed of (status: {1}). Cannot post a duplicate "
+                "write-off journal entry for it."
+            ).format(asset.name, asset.status))
+
         # estimated_loss_value هو الحقل الحقيقي في هذا المستند (اللي المستخدم
         # بيملاه فعلياً من الشاشة) — نسخة سابقة من هذا الكود كانت بتقرأ
         # book_value/amount بدل منه، وهما حقلان غير موجودين إطلاقاً في هذا
@@ -32,38 +38,46 @@ class AssetWriteoffRequest(Document):
 
         if not book_value:
             # لا توجد قيمة خسارة مُقدَّرة مُدخَلة يدوياً — نحسبها من قيمة
-            # الأصل بعد الإهلاك
-            # "Depreciation Schedule" جدول فرعي — الحقل parent بتاعه بيشاور
-            # على مستند "Asset Depreciation Schedule"، مش على الأصل نفسه
-            # مباشرة. نسخة سابقة كانت بتستعلم WHERE parent = <اسم الأصل>
-            # مباشرة، وده كان دايماً بيرجع 0 (مفيش صف واحد ليه parent بالشكل
-            # ده) — يعني القيمة الدفترية كانت دايماً = سعر الشراء الكامل بدون
-            # خصم أي إهلاك متراكم فعلي، لأي أصل قديم كان عمره ما يكن.
-            book_value = flt(asset.get("gross_purchase_amount", 0)) - flt(
-                frappe.db.sql("""
-                    SELECT COALESCE(SUM(ds.depreciation_amount), 0)
-                    FROM `tabDepreciation Schedule` ds
-                    JOIN `tabAsset Depreciation Schedule` ads ON ads.name = ds.parent
-                    WHERE ads.asset = %s AND ads.docstatus = 1
-                      AND ds.journal_entry IS NOT NULL AND ds.journal_entry != ''
-                """, self.asset)[0][0]
-            )
+            # الأصل بعد الإهلاك عبر Asset.get_value_after_depreciation()،
+            # نفس الدالة الأساسية (Core) التي يعتمد عليها Asset Value
+            # Adjustment وdepreciation.py لنفس الغرض — بدل استعلام SQL يدوي
+            # كان يُعيد 0 دائماً لأي أصل (كان يستعلم WHERE parent=<اسم
+            # الأصل> مباشرة على جدول Depreciation Schedule الفرعي، رغم أن
+            # حقل parent فيه يشاور على "Asset Depreciation Schedule" الأب،
+            # وليس على الأصل نفسه أبداً — فالقيمة الدفترية كانت دائماً =
+            # سعر الشراء الكامل بدون خصم أي إهلاك متراكم فعلي).
+            book_value = asset.get_value_after_depreciation()
 
         if not book_value:
             frappe.throw(_("لا يمكن تحديد القيمة الدفترية للأصل. يرجى تحديد المبلغ يدوياً."))
 
-        # Get fixed asset account from asset category
-        asset_account = frappe.db.sql("""
-            SELECT fixed_asset_account
-            FROM `tabAsset Category Account`
-            WHERE parent = %s AND company_name = %s
-            LIMIT 1
-        """, (asset.asset_category, company), as_dict=True)
-        asset_account = asset_account[0]["fixed_asset_account"] if asset_account else None
+        gross_amount = flt(asset.gross_purchase_amount)
+        # مجمع الإهلاك = سعر الشراء الكامل - القيمة الدفترية الحالية. لازم
+        # يُقفَل صراحة في هذا القيد أيضاً، وإلا يبقى حساب "الأصول الثابتة"
+        # (المُسجَّل بالسعر الإجمالي دائماً) يحمل رصيداً متبقياً = مجمع
+        # الإهلاك إلى الأبد لهذا الأصل تحديداً، حتى بعد شطبه بالكامل من
+        # السجلات — القيد القديم كان يُقيِّد فقط القيمة الدفترية على
+        # الطرفين (مدين الشطب / دائن الأصول الثابتة)، فلا يُقفل مجمع
+        # الإهلاك ولا يُقفل حساب الأصول الثابتة على قيمته الإجمالية الفعلية.
+        accumulated_depreciation = max(gross_amount - flt(book_value), 0)
+
+        category_account = frappe.db.get_value(
+            "Asset Category Account",
+            {"parent": asset.asset_category, "company_name": company},
+            ["fixed_asset_account", "accumulated_depreciation_account"],
+            as_dict=True,
+        )
+        asset_account = category_account and category_account.fixed_asset_account
+        accumulated_depreciation_account = category_account and category_account.accumulated_depreciation_account
 
         if not asset_account:
             frappe.throw(_(
                 "لا يوجد حساب أصول ثابتة مرتبط بفئة الأصل. "
+                "تأكد من إعداد Asset Category Accounts للشركة."
+            ))
+        if accumulated_depreciation > 0 and not accumulated_depreciation_account:
+            frappe.throw(_(
+                "لا يوجد حساب مجمع إهلاك مرتبط بفئة الأصل. "
                 "تأكد من إعداد Asset Category Accounts للشركة."
             ))
 
@@ -91,32 +105,43 @@ class AssetWriteoffRequest(Document):
 
         je = frappe.new_doc("Journal Entry")
         je.voucher_type = "Write Off Entry"
-        je.posting_date = today()
+        je.posting_date = self.write_off_date or today()
         je.company = company
         je.user_remark = f"شطب الأصل: {asset.asset_name} — {self.name}"
         if cost_center:
             je.cost_center = cost_center
 
-        # Debit: Write-off expense (loss)
         # ملاحظة: reference_type لازم يكون واحداً من القيم المسموحة في
         # Journal Entry Account (Sales/Purchase Invoice، Asset، إلخ) —
         # "Asset Write Off Request" (self.doctype) مش من ضمنها، وكانت
         # بتُفشل هذا القيد دايماً. نرجع للأصل نفسه كمرجع بدلاً منه.
+        asset_reference = {"reference_type": "Asset", "reference_name": self.asset}
+
+        if accumulated_depreciation > 0:
+            # Debit: يُقفل مجمع الإهلاك المتراكم على هذا الأصل بالكامل
+            je.append("accounts", {
+                "account": accumulated_depreciation_account,
+                "debit_in_account_currency": accumulated_depreciation,
+                "cost_center": cost_center,
+                **asset_reference,
+            })
+
+        # Debit: خسارة الشطب (القيمة الدفترية المتبقية فقط)
         je.append("accounts", {
             "account": writeoff_account,
             "debit_in_account_currency": book_value,
             "cost_center": cost_center,
-            "reference_type": "Asset",
-            "reference_name": self.asset,
+            **asset_reference,
         })
 
-        # Credit: Fixed asset account
+        # Credit: يُقفل حساب الأصول الثابتة على قيمته الإجمالية الكاملة
+        # (سعر الشراء)، وليس القيمة الدفترية فقط — وإلا يبقى فرق = مجمع
+        # الإهلاك عالقاً في الحساب إلى الأبد لهذا الأصل تحديداً.
         je.append("accounts", {
             "account": asset_account,
-            "credit_in_account_currency": book_value,
+            "credit_in_account_currency": gross_amount,
             "cost_center": cost_center,
-            "reference_type": "Asset",
-            "reference_name": self.asset,
+            **asset_reference,
         })
 
         je.insert(ignore_permissions=True)
@@ -124,6 +149,12 @@ class AssetWriteoffRequest(Document):
 
         self.db_set("journal_entry", je.name)
         self.db_set("status", "Executed")
+
+        frappe.db.set_value(
+            "Asset", asset.name,
+            {"status": "Scrapped", "disposal_date": self.write_off_date or today()},
+            update_modified=False,
+        )
 
         frappe.msgprint(
             f"تم إنشاء قيد اليومية: <a href='/app/journal-entry/{je.name}'>{je.name}</a>",
