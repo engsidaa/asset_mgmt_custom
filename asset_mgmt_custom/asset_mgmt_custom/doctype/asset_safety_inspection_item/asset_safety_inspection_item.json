@@ -27,6 +27,20 @@
    "fieldtype": "Data",
    "label": "ملاحظات",
    "in_list_view": 1
+  },
+  {
+   "fieldname": "photo",
+   "fieldtype": "Attach Image",
+   "label": "صورة توثيقية",
+   "description": "إلزامية عند تسجيل نتيجة 'Fail' — دليل توثيقي حي على المخالفة"
+  },
+  {
+   "fieldname": "corrective_work_order",
+   "fieldtype": "Link",
+   "options": "Asset Work Order",
+   "label": "أمر العمل التصحيحي",
+   "read_only": 1,
+   "description": "يُنشأ تلقائياً (أولوية حرجة) عند تسجيل 'Fail' على هذا البند"
   }
  ],
  "permissions": [
