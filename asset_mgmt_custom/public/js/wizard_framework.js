@@ -166,7 +166,7 @@ asset_mgmt_custom.Wizard.upload_file = function (file, { doctype, docname, field
 	form_data.append("file", file, file.name);
 	form_data.append("doctype", doctype);
 	form_data.append("docname", docname);
-	form_data.append("fieldname", fieldname);
+	if (fieldname) form_data.append("fieldname", fieldname);
 	form_data.append("is_private", is_private);
 
 	return fetch("/api/method/upload_file", {
