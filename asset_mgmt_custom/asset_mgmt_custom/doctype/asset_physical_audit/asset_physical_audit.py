@@ -2,6 +2,8 @@ import frappe
 from frappe import _
 from frappe.utils import now_datetime
 
+from asset_mgmt_custom.api.v1.mobile import resolve_asset_identifier
+
 
 class AssetPhysicalAudit(frappe.model.document.Document):
     def validate(self):
@@ -89,3 +91,47 @@ class AssetPhysicalAudit(frappe.model.document.Document):
             })
 
         return len(assets)
+
+    @frappe.whitelist()
+    def scan_mark_found(self, identifier):
+        """
+        مسح جماعي سريع (باركود/QR/كود مكتوب يدوياً): يطابق الكود لأصل
+        حقيقي (نفس منطق scan_asset في api/v1/mobile.py، بلا تكرار)، ثم
+        يُعلِّمه "موجود" في هذا الجرد فوراً — إن كان مُدرَجاً أصلاً ضمن
+        القائمة المتوقعة (fetch_assets)، أو يُضاف كسطر جديد إن كان أصلاً
+        غير متوقَّع في هذا الموقع (اكتشاف ميداني حقيقي يستحق التوثيق، لا
+        رفضاً صامتاً).
+        """
+        if self.docstatus != 0:
+            frappe.throw(_("This audit is not in draft status."))
+
+        asset_name = resolve_asset_identifier(identifier)
+        if not asset_name:
+            frappe.throw(_("No asset found matching '{0}'.").format(identifier))
+
+        row = next((r for r in self.items if r.asset == asset_name), None)
+        is_new = row is None
+        if is_new:
+            row = self.append("items", {"asset": asset_name})
+
+        row.audit_result = "Found"
+        if not row.actual_location:
+            row.actual_location = frappe.db.get_value("Asset", asset_name, "location")
+
+        self.save()
+
+        return {
+            "asset": asset_name,
+            "asset_name": row.asset_name,
+            "was_unexpected": is_new,
+            "found_count": self.found_count,
+            "total_assets": self.total_assets,
+        }
+
+
+@frappe.whitelist()
+def submit_audit(audit_name):
+    """تسليم الجرد بعد انتهاء المسح — تُستخدم من صفحة المسح الجماعي بالباركود."""
+    doc = frappe.get_doc("Asset Physical Audit", audit_name)
+    doc.submit()
+    return doc.audit_status

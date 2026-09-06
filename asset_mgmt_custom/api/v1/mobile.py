@@ -45,19 +45,29 @@ def get_branch_assets(branch):
     )
 
 
-@frappe.whitelist()
-def scan_asset(identifier):
+def resolve_asset_identifier(identifier):
     """
-    استعلام فوري بمسح كود QR/باركود أو إدخال الكود يدوياً — يطابق اسم
-    الأصل نفسه، أو كود الملصق (Barcode/RFID)، أو كود النقش الحديدي
-    (Iron Code)، أيهما وُجد أولاً، ثم يُعيد نفس تفاصيل الأصل الكاملة
-    المُستخدَمة أصلاً في بوابة مدير الفرع (get_asset_detail) — بلا تكرار.
+    مطابقة كود ممسوح (QR/باركود) أو مُدخَل يدوياً إلى اسم أصل حقيقي —
+    اسم الأصل نفسه، أو كود الملصق (Barcode/RFID)، أو كود النقش الحديدي
+    (Iron Code)، أيهما وُجد أولاً. نقطة المطابقة الوحيدة في هذا التطبيق —
+    يُستدعى من scan_asset هنا ومن أدوات المسح الجماعي (Asset Physical
+    Audit) بلا تكرار المنطق.
     """
-    asset_name = (
+    return (
         frappe.db.get_value("Asset", identifier)
         or frappe.db.get_value("Asset", {"custom_sticker_code": identifier})
         or frappe.db.get_value("Asset", {"custom_iron_code": identifier})
     )
+
+
+@frappe.whitelist()
+def scan_asset(identifier):
+    """
+    استعلام فوري بمسح كود QR/باركود أو إدخال الكود يدوياً، ثم يُعيد نفس
+    تفاصيل الأصل الكاملة المُستخدَمة أصلاً في بوابة مدير الفرع
+    (get_asset_detail) — بلا تكرار.
+    """
+    asset_name = resolve_asset_identifier(identifier)
     if not asset_name:
         frappe.throw(_("No asset found matching '{0}'.").format(identifier))
 
