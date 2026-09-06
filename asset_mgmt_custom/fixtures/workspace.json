@@ -1024,7 +1024,7 @@
     "type": "Card Break",
     "label": "عمليات الصيانة",
     "hidden": 0,
-    "link_count": 6,
+    "link_count": 7,
     "onboard": 0
    },
    {
@@ -1080,6 +1080,15 @@
     "is_query_report": 0,
     "hidden": 0,
     "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "سياسات SLA للصيانة",
+    "link_to": "Asset Maintenance SLA Policy",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
    },
    {
     "type": "Card Break",
