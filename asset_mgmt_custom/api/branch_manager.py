@@ -346,13 +346,22 @@ def get_new_requisition_context(asset_category=None):
 
 
 @frappe.whitelist()
-def create_maintenance_request(asset, problem_description, work_type=None, priority=None):
+def create_maintenance_request(asset, problem_description, work_type=None, priority=None, requires_permit=False):
     """
     يُنشئ ويُسلِّم (Submit) Asset Work Order في استدعاء واحد — أنسب
     لتطبيق موبايل من مسار إنشاء-ثم-تسليم منفصل. صورة العطل تُرفَع بعد
     هذا الاستدعاء عبر واجهة رفع الملفات القياسية في Frappe
     (`/api/method/upload_file` مع doctype="Asset Work Order" وdocname
     الناتج هنا وfieldname="fault_photo") — لا حاجة لمعالجة ملفات هنا.
+
+    requires_permit: العطل يُصنَّف خطراً (يتطلب تصريح عمل/عزل طاقة) —
+    نتوقف عند insert() فقط (يبقى docstatus=0، الحالة "مفتوح") بدل
+    submit() الفوري، لأن before_submit._enforce_loto_gate يمنع أصلاً
+    الانتقال لحالة "قيد التنفيذ" لو كان هناك تصريح عمل مرتبط يتطلب LOTO
+    ولم يُوقَّع بعد — لكن هذا الفحص عديم الفائدة لو استُدعي submit() هنا
+    قبل أن تُتاح للمستخدم فرصة إنشاء وربط التصريح أصلاً. تطبيق الموبايل
+    يستدعي submit لاحقاً بنفسه (بعد اكتمال التصريح إن لزم) عبر
+    frappe.client.submit القياسي.
     """
     _check_read("Asset", asset)
 
@@ -368,9 +377,10 @@ def create_maintenance_request(asset, problem_description, work_type=None, prior
     doc.requested_by = frappe.session.user
 
     doc.insert()
-    doc.submit()
+    if not frappe.utils.cint(requires_permit):
+        doc.submit()
 
-    return {"name": doc.name, "status": doc.status}
+    return {"name": doc.name, "status": doc.status, "docstatus": doc.docstatus}
 
 
 @frappe.whitelist()
@@ -394,6 +404,7 @@ def list_my_work_orders(status=None, branch=None):
             "name", "title", "asset", "asset_name", "asset_category", "branch", "status", "priority",
             "work_type", "request_date", "completion_date", "actual_cost",
             "assigned_technician", "fault_photo", "branch_confirmation_status",
+            "docstatus", "work_permit",
         ],
         order_by="creation desc",
         limit_page_length=0,

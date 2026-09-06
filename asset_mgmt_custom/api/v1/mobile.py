@@ -118,7 +118,7 @@ def scan_asset(identifier):
 
 
 @frappe.whitelist()
-def create_complaint(asset, problem_description, work_type=None, priority=None, photo_file_url=None):
+def create_complaint(asset, problem_description, work_type=None, priority=None, photo_file_url=None, requires_permit=False):
     """
     بلاغ عطل فوري — يفوِّض بالكامل لنفس create_maintenance_request
     المُستخدَمة في بوابة مدير الفرع (إنشاء + تسليم أمر عمل في استدعاء
@@ -127,7 +127,7 @@ def create_complaint(asset, problem_description, work_type=None, priority=None, 
     نفسه)، يُربَط بحقل fault_photo بعد الإنشاء مباشرة.
     """
     result = create_maintenance_request(
-        asset, problem_description, work_type=work_type, priority=priority
+        asset, problem_description, work_type=work_type, priority=priority, requires_permit=requires_permit
     )
     if photo_file_url:
         frappe.db.set_value(
@@ -143,8 +143,14 @@ def get_technician_jobs(status=None):
     مورِّد صيانة خارجي)، مرتبة حسب درجة خطورة الأولوية ثم موعد الاستحقاق
     — تُطبَّق طبقة الصلاحيات القياسية لـ Asset Work Order تلقائياً
     (get_list)، بالإضافة لفلتر assigned_technician الصريح هنا.
+
+    docstatus < 2 (وليس =1 فقط) عمداً: أوامر العمل الخطرة (requires_permit
+    عند الإنشاء) تبقى Draft (docstatus=0) حتى يُوقَّع تصريح عزل الطاقة —
+    لو اقتصر الفلتر على docstatus=1، لن يرى الفني مهمته الخطرة المُسنَدة
+    له إطلاقاً طالما هي بانتظار التوقيع، رغم أنه هو من يحتاج متابعة حالة
+    التصريح والضغط على "بدء العمل" بمجرد اكتماله.
     """
-    filters = {"assigned_technician": frappe.session.user, "docstatus": 1}
+    filters = {"assigned_technician": frappe.session.user, "docstatus": ["<", 2]}
     filters["status"] = status or ["not in", ["مكتمل", "ملغي", "مرفوض"]]
 
     return frappe.get_list(
@@ -153,6 +159,7 @@ def get_technician_jobs(status=None):
         fields=[
             "name", "title", "asset", "asset_name", "status", "priority", "work_type",
             "request_date", "resolution_due_by", "sla_breached", "problem_description", "fault_photo",
+            "docstatus", "work_permit",
         ],
         order_by="field(priority, 'حرج', 'عاجل', 'متوسط', 'عادي'), resolution_due_by asc",
         limit_page_length=0,
