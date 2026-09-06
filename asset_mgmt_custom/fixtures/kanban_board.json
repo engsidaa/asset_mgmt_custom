@@ -1,6 +1,7 @@
 [
  {
   "doctype": "Kanban Board",
+  "name": "متابعة أوامر العمل",
   "kanban_board_name": "متابعة أوامر العمل",
   "reference_doctype": "Asset Work Order",
   "field_name": "status",
