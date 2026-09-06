@@ -359,6 +359,14 @@
    "label": "تصريح العمل",
    "options": "Asset Work Permit",
    "description": "تصريح السلامة المرتبط بهذا الأمر"
+  },
+  {
+   "fieldname": "failure_analysis",
+   "fieldtype": "Link",
+   "label": "تحليل سبب العطل (ISO 14224)",
+   "options": "Asset Failure Analysis",
+   "allow_on_submit": 1,
+   "description": "اربط تحليل سبب العطل (رموز المشكلة/السبب/الإجراء التصحيحي) بهذا الأمر عند إتمامه لتغذية مصفوفة FMEA ومحرك التوصيات — اختياري، لكن موصى به لأي عطل غير روتيني"
   }
  ],
  "permissions": [

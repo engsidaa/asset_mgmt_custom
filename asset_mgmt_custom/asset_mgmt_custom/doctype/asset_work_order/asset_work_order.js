@@ -79,5 +79,18 @@ frappe.ui.form.on("Asset Work Order", {
 				});
 			}, __("المخزون"));
 		}
+
+		if (!frm.doc.failure_analysis) {
+			frm.add_custom_button(__("تحليل سبب العطل (ISO 14224)"), () => {
+				frappe.new_doc("Asset Failure Analysis", {
+					asset: frm.doc.asset,
+					work_order: frm.doc.name,
+				});
+			}, __("الموثوقية"));
+		} else {
+			frm.add_custom_button(__("عرض تحليل سبب العطل"), () => {
+				frappe.set_route("Form", "Asset Failure Analysis", frm.doc.failure_analysis);
+			}, __("الموثوقية"));
+		}
 	},
 });
