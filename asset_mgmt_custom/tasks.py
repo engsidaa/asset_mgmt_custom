@@ -110,6 +110,7 @@ def send_maintenance_due_alerts():
             am.asset_name  AS asset,
             mt.next_due_date,
             mt.maintenance_type,
+            mt.periodicity,
             mt.assign_to,
             mt.assign_to_name,
             DATEDIFF(mt.next_due_date, CURDATE()) AS days_left
@@ -145,12 +146,43 @@ def send_maintenance_due_alerts():
             _auto_create_work_order_from_task(task)
 
 
+# الصيانة المتداخلة (Nested PM Levels): ترتيب الدورية من الأقصر للأطول —
+# لو استحقت مهمة أعلى مستوى (مثلاً ربع سنوي) لنفس الأصل في نفس اليوم،
+# نتجاهل إنشاء أمر عمل لمهمة أدنى مستوى (مثلاً شهري)، لأن الزيارة
+# الأشمل (الأعلى مستوى) تُغطي عملياً فحوصات المستوى الأدنى، ولا داعي
+# لفتح أمرين منفصلين لنفس الأصل في نفس اليوم.
+PM_PERIODICITY_RANK = {
+    "Daily": 1, "Weekly": 2, "Monthly": 3, "Quarterly": 4,
+    "Half-yearly": 5, "Yearly": 6, "2 Yearly": 7, "3 Yearly": 8,
+}
+
+
+def _higher_level_pm_due_same_day(asset, periodicity, exclude_task, target_date):
+    my_rank = PM_PERIODICITY_RANK.get(periodicity, 0)
+    if not my_rank:
+        return False
+
+    siblings = frappe.db.sql("""
+        SELECT mt.periodicity
+        FROM `tabAsset Maintenance Task` mt
+        JOIN `tabAsset Maintenance` am ON am.name = mt.parent
+        WHERE am.asset_name = %(asset)s
+          AND am.docstatus = 1
+          AND mt.name != %(exclude_task)s
+          AND mt.next_due_date <= %(target_date)s
+          AND mt.maintenance_status != 'Completed'
+    """, {"asset": asset, "exclude_task": exclude_task, "target_date": target_date}, as_dict=True)
+
+    return any(PM_PERIODICITY_RANK.get(s.periodicity, 0) > my_rank for s in siblings)
+
+
 def _auto_create_work_order_from_task(task):
     """
     ينشئ Asset Work Order تلقائياً (كمسودة، لم يُسلَّم بعد) من بند صيانة
     وقائية مُستحَق — بدل الاكتفاء بتنبيه لا يُنتج عنه أي مستند فعلي. يتحقق
     أولاً من عدم وجود أمر عمل سابق لنفس البند (idempotent) عبر
-    source_maintenance_task.
+    source_maintenance_task، ثم من عدم وجود مهمة صيانة أعلى مستوى مُستحَقة
+    لنفس الأصل في نفس اليوم (انظر _higher_level_pm_due_same_day أعلاه).
     """
     existing = frappe.db.exists(
         "Asset Work Order",
@@ -160,6 +192,11 @@ def _auto_create_work_order_from_task(task):
         return
 
     if not task.asset:
+        return
+
+    if task.get("periodicity") and _higher_level_pm_due_same_day(
+        task.asset, task.periodicity, task.task_name, today()
+    ):
         return
 
     branch = frappe.db.get_value("Asset", task.asset, "custom_branch")
@@ -177,7 +214,7 @@ def _auto_create_work_order_from_task(task):
         wo.assigned_technician = task.assign_to
     wo.maintenance_schedule = task.maintenance_schedule
     wo.source_maintenance_task = task.task_name
-    wo.problem_description = _(
+    wo.problem_description = task.get("trigger_reason") or _(
         "Auto-generated from a due preventive maintenance task (next due date: {0})."
     ).format(task.next_due_date)
 
@@ -188,6 +225,79 @@ def _auto_create_work_order_from_task(task):
             title="Auto Work Order creation failed",
             message=frappe.get_traceback(),
         )
+
+
+# ---------------------------------------------------------------------------
+# Daily: meter-reading-triggered PM (dual-trigger scheduling, second half)
+# ---------------------------------------------------------------------------
+
+def check_meter_triggered_pm():
+    """
+    النصف الثاني من "الجدولة مزدوجة المحفز": send_maintenance_due_alerts()
+    أعلاه يغطي المحفز الزمني (next_due_date) فقط. هنا: أي Asset
+    Maintenance Task حُدِّد له نوع عداد وحد استحقاق (custom_meter_trigger_
+    type/value) يُفحَص مقابل آخر قراءة عداد فعلية مسجَّلة لنفس الأصل من
+    نفس النوع — لو تجاوز الفرق التراكمي منذ آخر استحقاق (custom_last_
+    triggered_meter_value) الحدَّ المحدد، يُنشأ أمر عمل تلقائياً بالضبط
+    كما لو استحق بالتاريخ (نفس منطق idempotent/nested-level عبر
+    _auto_create_work_order_from_task)، أيهما يسبق الآخر فعلياً.
+    """
+    tasks = frappe.db.sql("""
+        SELECT
+            mt.name AS task_name,
+            am.name AS maintenance_schedule,
+            am.asset_name AS asset,
+            mt.periodicity,
+            mt.assign_to,
+            mt.custom_meter_trigger_type AS meter_type,
+            mt.custom_meter_trigger_value AS trigger_value,
+            IFNULL(mt.custom_last_triggered_meter_value, 0) AS last_triggered_value
+        FROM `tabAsset Maintenance Task` mt
+        JOIN `tabAsset Maintenance` am ON am.name = mt.parent
+        WHERE am.docstatus = 1
+          AND mt.maintenance_status != 'Completed'
+          AND mt.custom_meter_trigger_type IS NOT NULL
+          AND mt.custom_meter_trigger_type != ''
+          AND IFNULL(mt.custom_meter_trigger_value, 0) > 0
+    """, as_dict=True)
+
+    for task in tasks:
+        latest_reading = frappe.db.get_value(
+            "Asset Meter Reading",
+            {"asset": task.asset, "meter_type": task.meter_type},
+            "current_reading",
+            order_by="reading_date desc",
+        )
+        if latest_reading is None:
+            continue
+
+        delta = flt(latest_reading) - flt(task.last_triggered_value)
+        if delta < flt(task.trigger_value):
+            continue
+
+        task["next_due_date"] = today()
+        task["trigger_reason"] = _(
+            "Auto-generated: meter reading trigger reached ({0} {1}, threshold {2})."
+        ).format(latest_reading, task.meter_type, task.trigger_value)
+
+        existing_before = frappe.db.exists(
+            "Asset Work Order",
+            {"source_maintenance_task": task.task_name, "docstatus": ["<", 2]},
+        )
+        _auto_create_work_order_from_task(task)
+
+        # لا نُقدِّم القراءة المرجعية إلا لو أُنشئ أمر فعلاً هذه المرة (وليس
+        # idempotent-skipped بسبب أمر سابق لم يُغلَق بعد) أو تخطياً بسبب
+        # مستوى صيانة أعلى — في الحالتين المهمة تبقى "مستحقة" فعلياً حتى
+        # تُعالَج، فلا داعي لتصفير عدادها الآن.
+        if not existing_before and frappe.db.exists(
+            "Asset Work Order", {"source_maintenance_task": task.task_name, "docstatus": ["<", 2]}
+        ):
+            frappe.db.set_value(
+                "Asset Maintenance Task", task.task_name,
+                "custom_last_triggered_meter_value", latest_reading,
+                update_modified=False,
+            )
 
 
 # ---------------------------------------------------------------------------

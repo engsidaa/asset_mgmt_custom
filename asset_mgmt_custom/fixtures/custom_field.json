@@ -930,5 +930,45 @@
   "label": "طلب الأصل المصدر (Asset Requisition)",
   "insert_after": "schedule_date",
   "read_only": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Maintenance Task-custom_meter_trigger_section",
+  "dt": "Asset Maintenance Task",
+  "fieldname": "custom_meter_trigger_section",
+  "fieldtype": "Section Break",
+  "label": "محفز إضافي بقراءة العداد (اختياري)",
+  "insert_after": "last_completion_date",
+  "collapsible": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Maintenance Task-custom_meter_trigger_type",
+  "dt": "Asset Maintenance Task",
+  "fieldname": "custom_meter_trigger_type",
+  "fieldtype": "Select",
+  "label": "نوع العداد المُحفِّز",
+  "options": "\nكيلومترات\nساعات تشغيل\nوحدات إنتاج\nلتر وقود",
+  "insert_after": "custom_meter_trigger_section",
+  "description": "إن حُدِّد، تُستحَق هذه المهمة أيضاً عند تجاوز قراءة العداد التراكمية للحد أدناه منذ آخر استحقاق — أيهما أسبق (التاريخ الدوري أو قراءة العداد)"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Maintenance Task-custom_meter_trigger_value",
+  "dt": "Asset Maintenance Task",
+  "fieldname": "custom_meter_trigger_value",
+  "fieldtype": "Float",
+  "label": "حد الاستحقاق (فرق القراءة)",
+  "insert_after": "custom_meter_trigger_type"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Maintenance Task-custom_last_triggered_meter_value",
+  "dt": "Asset Maintenance Task",
+  "fieldname": "custom_last_triggered_meter_value",
+  "fieldtype": "Float",
+  "label": "قراءة العداد عند آخر استحقاق",
+  "read_only": 1,
+  "insert_after": "custom_meter_trigger_value"
  }
 ]
