@@ -534,6 +534,28 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset Category-custom_min_safe_temperature",
+  "dt": "Asset Category",
+  "fieldname": "custom_min_safe_temperature",
+  "fieldtype": "Float",
+  "label": "الحد الأدنى الآمن لدرجة الحرارة (°م)",
+  "insert_after": "custom_repair_replace_threshold_pct",
+  "description": "لفئات أصول التبريد/التجميد فقط — أي قراءة عداد حرارة أقل من هذا الحد تُنشئ أمر عمل طارئ تلقائياً. اتركه فارغاً للفئات غير المتعلقة بالتبريد",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Category-custom_max_safe_temperature",
+  "dt": "Asset Category",
+  "fieldname": "custom_max_safe_temperature",
+  "fieldtype": "Float",
+  "label": "الحد الأقصى الآمن لدرجة الحرارة (°م)",
+  "insert_after": "custom_min_safe_temperature",
+  "description": "لفئات أصول التبريد/التجميد فقط — أي قراءة عداد حرارة أعلى من هذا الحد تُنشئ أمر عمل طارئ تلقائياً",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Category-custom_spare_parts_section",
   "dt": "Asset Category",
   "fieldname": "custom_spare_parts_section",

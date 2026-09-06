@@ -51,13 +51,21 @@
    "fieldtype": "Select",
    "label": "نوع العداد",
    "reqd": 1,
-   "options": "كيلومترات\nساعات تشغيل\nوحدات إنتاج\nلتر وقود",
+   "options": "كيلومترات\nساعات تشغيل\nوحدات إنتاج\nلتر وقود\nدرجة الحرارة",
    "description": "وحدة قياس عداد الأصل"
+  },
+  {
+   "fieldname": "temperature_celsius",
+   "fieldtype": "Float",
+   "label": "درجة الحرارة (°م)",
+   "depends_on": "eval:doc.meter_type=='درجة الحرارة'",
+   "description": "لقراءات التبريد/التجميد فقط — يُقارَن تلقائياً بالنطاق الآمن المحدَّد على فئة الأصل"
   },
   {
    "fieldname": "sec_break_readings",
    "fieldtype": "Section Break",
-   "label": "القراءات"
+   "label": "القراءات",
+   "depends_on": "eval:doc.meter_type!='درجة الحرارة'"
   },
   {
    "fieldname": "previous_reading",
