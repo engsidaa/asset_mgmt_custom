@@ -1144,3 +1144,163 @@ def refresh_tco_cache():
             },
             update_modified=False,
         )
+
+
+# ---------------------------------------------------------------------------
+# Weekly: Asset Health Index (AHI) + auto-draft replacement plan
+# ---------------------------------------------------------------------------
+
+CONDITION_SCORE_MAP = {"Excellent": 100, "Good": 75, "Fair": 50, "Poor": 25, "Critical": 0}
+AHI_REPLACEMENT_THRESHOLD = 40
+
+
+def refresh_asset_health_index():
+    """
+    مؤشر مركَّب لكل أصل (0-100، كلما زاد كان أفضل) — بنفس أسلوب الخصم
+    الشفاف المُستخدَم فعلياً في تقرير Branch Health Score (سقف أقصى منفصل
+    لكل عامل)، بدل معادلة مغلقة:
+
+      AHI = 100
+        − min((100 − نسبة العمر المتبقي) × 0.30, 30)   (سقف 30: العمر المتبقي)
+        − min((100 − نتيجة آخر تقييم حالة) × 0.30, 30) (سقف 30: آخر تقييم)
+        − min(عدد الأعطال آخر 12 شهراً × 10, 25)        (سقف 25: تكرار الأعطال)
+        − min(انحراف درجة حرارة حالي × 15, 15)          (سقف 15: انحراف العداد)
+
+    كل عامل يُعاد استخدامه من بيانات موجودة بالفعل (Finance Book لحساب
+    العمر المتبقي، Asset Condition Assessment، Asset Failure Analysis،
+    Asset Meter Reading + حدود Asset Category الحرارية من ميزة سلسلة
+    التبريد في Phase 4) — لا حسابات مكرَّرة.
+
+    إن انخفض المؤشر عن AHI_REPLACEMENT_THRESHOLD، تُنشأ تلقائياً مسودة
+    Asset Replacement Plan (بحالة اعتماد "مسودة" فقط — تتطلب مراجعة
+    واعتماد بشرياً، وليست نهائية) إن لم توجد بالفعل مسودة/معتمدة سابقة.
+    """
+    assets = frappe.get_all(
+        "Asset",
+        filters={"docstatus": 1, "status": ["not in", ["Scrapped", "Sold"]]},
+        fields=["name", "asset_name", "asset_category", "purchase_date", "calculate_depreciation"],
+    )
+    now = now_datetime()
+
+    for asset in assets:
+        remaining_life_pct, rul_months = _asset_remaining_life(asset.name, asset.calculate_depreciation)
+        condition_score = _asset_last_condition_score(asset.name)
+        failure_count = _asset_failure_count_last_12m(asset.name)
+        temp_deviation = _asset_temperature_deviation(asset.name, asset.asset_category)
+
+        deduction = (
+            min((100 - remaining_life_pct) * 0.30, 30)
+            + min((100 - condition_score) * 0.30, 30)
+            + min(failure_count * 10, 25)
+            + min(temp_deviation * 15, 15)
+        )
+        ahi = round(max(100 - deduction, 0), 1)
+
+        frappe.db.set_value(
+            "Asset", asset.name,
+            {
+                "custom_ahi_score": ahi,
+                "custom_rul_months": rul_months,
+                "custom_ahi_last_computed": now,
+            },
+            update_modified=False,
+        )
+
+        if ahi < AHI_REPLACEMENT_THRESHOLD:
+            _ensure_draft_replacement_plan(asset, ahi, rul_months)
+
+
+def _asset_remaining_life(asset_name, calculate_depreciation):
+    """نسبة العمر المتبقي % + العمر المتبقي بالأشهر، من Finance Book
+    الأول فقط (نفس ما يعتمده Asset.get_value_after_depreciation() بلا
+    تحديد finance_book) — بدل حساب تاريخ يدوي مكرَّر."""
+    if not calculate_depreciation:
+        return 100, None
+
+    fb = frappe.db.sql("""
+        SELECT total_number_of_depreciations, total_number_of_booked_depreciations, frequency_of_depreciation
+        FROM `tabAsset Finance Book`
+        WHERE parent = %s AND parenttype = 'Asset'
+        ORDER BY idx ASC LIMIT 1
+    """, asset_name, as_dict=True)
+    if not fb or not fb[0].total_number_of_depreciations:
+        return 100, None
+
+    total = fb[0].total_number_of_depreciations
+    booked = fb[0].total_number_of_booked_depreciations or 0
+    remaining = max(total - booked, 0)
+    pct = round((remaining / total) * 100, 1)
+    rul_months = remaining * (fb[0].frequency_of_depreciation or 1)
+    return pct, rul_months
+
+
+def _asset_last_condition_score(asset_name):
+    condition = frappe.db.get_value(
+        "Asset Condition Assessment", {"asset": asset_name},
+        "overall_condition", order_by="assessment_date desc",
+    )
+    if not condition:
+        return 70  # لا يوجد تقييم مسجَّل بعد — قيمة محايدة، لا تُعاقِب أصلاً لم يُقيَّم أصلاً
+    return CONDITION_SCORE_MAP.get(condition, 70)
+
+
+def _asset_failure_count_last_12m(asset_name):
+    return frappe.db.count(
+        "Asset Failure Analysis",
+        filters={"asset": asset_name, "failure_date": [">=", add_days(today(), -365)]},
+    )
+
+
+def _asset_temperature_deviation(asset_name, asset_category):
+    if not asset_category:
+        return 0
+    limits = frappe.db.get_value(
+        "Asset Category", asset_category,
+        ["custom_min_safe_temperature", "custom_max_safe_temperature"], as_dict=True,
+    )
+    if not limits or (not limits.custom_min_safe_temperature and not limits.custom_max_safe_temperature):
+        return 0
+
+    latest = frappe.db.get_value(
+        "Asset Meter Reading", {"asset": asset_name, "meter_type": "درجة الحرارة"},
+        "temperature_celsius", order_by="reading_date desc",
+    )
+    if latest is None:
+        return 0
+
+    if (limits.custom_min_safe_temperature and latest < limits.custom_min_safe_temperature) or \
+       (limits.custom_max_safe_temperature and latest > limits.custom_max_safe_temperature):
+        return 1
+    return 0
+
+
+def _ensure_draft_replacement_plan(asset, ahi, rul_months):
+    existing = frappe.db.exists(
+        "Asset Replacement Plan",
+        {"asset": asset.name, "approval_status": ["in", ["مسودة", "معتمد", "معلق"]]},
+    )
+    if existing:
+        return
+
+    age_years = None
+    if asset.purchase_date:
+        age_years = round(date_diff(today(), asset.purchase_date) / 365.25, 1)
+
+    plan = frappe.new_doc("Asset Replacement Plan")
+    plan.asset = asset.name
+    plan.plan_date = today()
+    plan.priority = "حرج" if ahi < 20 else "عالٍ"
+    plan.replacement_reason = "تكاليف صيانة مرتفعة"
+    plan.current_age_years = age_years
+    plan.remaining_life_years = round(rul_months / 12, 1) if rul_months else None
+    plan.planned_replacement_date = add_days(today(), 90)
+    plan.notes = _(
+        "مُنشأ تلقائياً: مؤشر صحة الأصل (AHI) وصل إلى {0}% (أقل من حد {1}%). "
+        "راجع البيانات وحدِّد ميزانية رأسمالية (CapEx) قبل الاعتماد."
+    ).format(ahi, AHI_REPLACEMENT_THRESHOLD)
+
+    try:
+        plan.insert(ignore_permissions=True)
+        frappe.db.set_value("Asset", asset.name, "custom_replacement_plan", plan.name, update_modified=False)
+    except Exception:
+        frappe.log_error(title="Auto Replacement Plan creation failed", message=frappe.get_traceback())

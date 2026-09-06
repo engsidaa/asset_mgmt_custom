@@ -155,6 +155,7 @@ scheduler_events = {
     "weekly": [
         "asset_mgmt_custom.tasks.send_warranty_digest_email",
         "asset_mgmt_custom.tasks.refresh_tco_cache",
+        "asset_mgmt_custom.tasks.refresh_asset_health_index",
     ],
 }
 

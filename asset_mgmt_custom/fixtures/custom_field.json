@@ -763,6 +763,67 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset-custom_ahi_section",
+  "dt": "Asset",
+  "fieldname": "custom_ahi_section",
+  "fieldtype": "Section Break",
+  "label": "مؤشر صحة الأصل (AHI) — محسوب أسبوعياً",
+  "insert_after": "custom_tco_last_computed",
+  "collapsible": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_ahi_score",
+  "dt": "Asset",
+  "fieldname": "custom_ahi_score",
+  "fieldtype": "Percent",
+  "label": "مؤشر صحة الأصل (AHI %)",
+  "insert_after": "custom_ahi_section",
+  "read_only": 1,
+  "description": "0-100 (كلما زاد كان أفضل) — يجمع العمر المتبقي، آخر تقييم حالة، تكرار الأعطال، وانحراف قراءات العداد/الحرارة. راجع asset_mgmt_custom.tasks.refresh_asset_health_index"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_rul_months",
+  "dt": "Asset",
+  "fieldname": "custom_rul_months",
+  "fieldtype": "Int",
+  "label": "العمر الإنتاجي المتبقي (أشهر)",
+  "insert_after": "custom_ahi_score",
+  "read_only": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_ahi_col",
+  "dt": "Asset",
+  "fieldname": "custom_ahi_col",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_rul_months"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_ahi_last_computed",
+  "dt": "Asset",
+  "fieldname": "custom_ahi_last_computed",
+  "fieldtype": "Datetime",
+  "label": "آخر تحديث لمؤشر الصحة",
+  "insert_after": "custom_ahi_col",
+  "read_only": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset-custom_replacement_plan",
+  "dt": "Asset",
+  "fieldname": "custom_replacement_plan",
+  "fieldtype": "Link",
+  "options": "Asset Replacement Plan",
+  "label": "مقترح استبدال (مسودة تلقائية)",
+  "insert_after": "custom_ahi_last_computed",
+  "read_only": 1,
+  "description": "يُنشأ تلقائياً كمسودة عندما ينخفض مؤشر صحة الأصل عن 40% — يتطلب مراجعة واعتماد بشرياً، ليس نهائياً"
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Maintenance-custom_branch",
   "dt": "Asset Maintenance",
   "fieldname": "custom_branch",
