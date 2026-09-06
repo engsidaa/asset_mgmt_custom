@@ -22,6 +22,47 @@ from asset_mgmt_custom.api.branch_manager import create_maintenance_request, get
 
 
 @frappe.whitelist()
+def get_app_context():
+    """
+    استدعاء واحد عند فتح تطبيق الموبايل (بعد المصادقة بـ API Key/Secret
+    مباشرة — لا يوجد استدعاء "تسجيل دخول" منفصل) يُعيد كل ما يحتاجه
+    العميل ليقرر أي شاشات/أزرار يعرضها لهذا المستخدم تحديداً: الاسم،
+    الصورة، الأدوار الفعلية (frappe.get_roles — تشمل الأدوار عبر
+    المجموعات)، سجل الموظف المرتبط إن وُجد، والفروع التي يديرها هذا
+    المستخدم فعلياً (Branch.custom_branch_manager) ليُميَّز بصرياً بين
+    "مستخدم فرع" و"فني/مورِّد صيانة ميداني" و"مسؤول صيانة" بلا تخمين في
+    العميل نفسه.
+    """
+    user = frappe.session.user
+    if user == "Guest":
+        frappe.throw(_("Invalid or missing API credentials."), frappe.AuthenticationError)
+
+    employee = frappe.db.get_value(
+        "Employee", {"user_id": user},
+        ["name", "employee_name", "department", "branch"],
+        as_dict=True,
+    )
+
+    managed_branches = frappe.get_all(
+        "Branch", filters={"custom_branch_manager": user}, pluck="name"
+    )
+
+    default_branch = frappe.db.get_value(
+        "User Permission", {"user": user, "allow": "Branch"}, "for_value"
+    )
+
+    return {
+        "user": user,
+        "full_name": frappe.db.get_value("User", user, "full_name"),
+        "user_image": frappe.db.get_value("User", user, "user_image"),
+        "roles": frappe.get_roles(user),
+        "employee": employee,
+        "managed_branches": managed_branches,
+        "default_branch": default_branch,
+    }
+
+
+@frappe.whitelist()
 def get_branch_assets(branch):
     """
     قائمة أصول فرع معيّن — للفني المُوفَد لفرع لفحص/صيانة أصوله. يعتمد
