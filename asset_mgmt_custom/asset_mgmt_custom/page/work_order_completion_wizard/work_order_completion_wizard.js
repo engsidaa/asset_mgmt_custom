@@ -124,6 +124,24 @@ function build_wizard(page) {
 						const notes = wizard.make_field($body, { fieldtype: 'Small Text', fieldname: 'completion_notes' }, 'completion_notes');
 						if (wizard.state.completion_notes) notes.set_value(wizard.state.completion_notes);
 
+						$body.append(`<label class="control-label" style="margin-top:15px;">${__('تصنيف التكلفة')}</label>`);
+						const classification = wizard.make_field($body, {
+							fieldtype: 'Select', fieldname: 'cost_classification',
+							options: 'Revenue Expense\nCapitalized Overhaul',
+						}, 'cost_classification');
+						classification.set_value(wizard.state.cost_classification || 'Revenue Expense');
+
+						const $life_wrap = $(`<div style="margin-top:15px; display:none;"></div>`).appendTo($body);
+						$life_wrap.append(`<label class="control-label">${__('الزيادة في العمر الإنتاجي (بالأشهر)')} *</label>`);
+						const life_months = wizard.make_field($life_wrap, { fieldtype: 'Int', fieldname: 'increase_in_asset_life_months' }, 'increase_in_asset_life_months');
+						if (wizard.state.increase_in_asset_life_months) life_months.set_value(wizard.state.increase_in_asset_life_months);
+
+						function toggle_life_field() {
+							$life_wrap.toggle(classification.get_value() === 'Capitalized Overhaul');
+						}
+						toggle_life_field();
+						classification.df.onchange = toggle_life_field;
+
 						$body.append(`<label class="control-label" style="margin-top:15px;">${__('صورة الإتمام (اختياري)')}</label>`);
 						const $input = $(`<input type="file" accept="image/*" class="form-control">`).appendTo($body);
 						const $preview = $(`<div style="margin-top:8px;"></div>`).appendTo($body);
@@ -145,6 +163,14 @@ function build_wizard(page) {
 					if (wizard.state.action === 'complete') {
 						wizard.state.actual_cost = wizard.controls.actual_cost.get_value();
 						wizard.state.completion_notes = wizard.controls.completion_notes.get_value();
+						wizard.state.cost_classification = wizard.controls.cost_classification.get_value() || 'Revenue Expense';
+						if (wizard.state.cost_classification === 'Capitalized Overhaul') {
+							wizard.state.increase_in_asset_life_months = wizard.controls.increase_in_asset_life_months.get_value();
+							if (!wizard.state.increase_in_asset_life_months) {
+								wizard.show_error(__('يرجى إدخال الزيادة في العمر الإنتاجي (بالأشهر) لعمرة مُرسملة.'));
+								return false;
+							}
+						}
 					} else {
 						wizard.state.rejection_reason = wizard.controls.rejection_reason.get_value();
 						if (!wizard.state.rejection_reason || !wizard.state.rejection_reason.trim()) {
@@ -160,6 +186,7 @@ function build_wizard(page) {
 				label: __('التأكيد'),
 				render($body, wizard) {
 					if (wizard.state.action === 'complete') {
+						const is_capex = wizard.state.cost_classification === 'Capitalized Overhaul';
 						$body.append(`
 							<div class="amc-wizard-summary-card">
 								<span class="label">${__('التكلفة الفعلية')}</span><br>
@@ -167,8 +194,14 @@ function build_wizard(page) {
 								<hr>
 								<span class="label">${__('ملاحظات الإتمام')}</span><br>
 								<span class="value">${frappe.utils.escape_html(wizard.state.completion_notes || '—')}</span>
+								<hr>
+								<span class="label">${__('تصنيف التكلفة')}</span><br>
+								<span class="value">${is_capex ? __('عمرة مُرسملة (Capitalized Overhaul)') : __('مصروف تشغيلي (Revenue Expense)')}</span>
+								${is_capex ? `<br><span class="value">${__('زيادة العمر الإنتاجي')}: ${wizard.state.increase_in_asset_life_months} ${__('شهر')}</span>` : ''}
 							</div>
-							<p class="text-muted">${__('سيتم تحديد الحالة كـ "مكتمل" وترحيل تكلفته الفعلية محاسبياً (إن وُجدت).')}</p>
+							<p class="text-muted">${is_capex
+								? __('سيتم تحديد الحالة كـ "مكتمل"، وإنشاء سجل Asset Repair مُرسمَل تلقائياً يرفع القيمة الدفترية للأصل ويمدد عمره الإنتاجي.')
+								: __('سيتم تحديد الحالة كـ "مكتمل" وترحيل تكلفته الفعلية محاسبياً (إن وُجدت).')}</p>
 						`);
 					} else {
 						$body.append(`
@@ -184,22 +217,17 @@ function build_wizard(page) {
 		],
 		async finish(wizard) {
 			if (wizard.state.action === 'complete') {
-				if (wizard.state.actual_cost) {
-					await frappe.xcall('frappe.client.set_value', {
-						doctype: 'Asset Work Order',
-						name: wizard.state.work_order,
-						fieldname: 'actual_cost',
-						value: wizard.state.actual_cost,
-					});
+				const values = { cost_classification: wizard.state.cost_classification || 'Revenue Expense' };
+				if (wizard.state.actual_cost) values.actual_cost = wizard.state.actual_cost;
+				if (wizard.state.completion_notes) values.completion_notes = wizard.state.completion_notes;
+				if (wizard.state.cost_classification === 'Capitalized Overhaul') {
+					values.increase_in_asset_life_months = wizard.state.increase_in_asset_life_months;
 				}
-				if (wizard.state.completion_notes) {
-					await frappe.xcall('frappe.client.set_value', {
-						doctype: 'Asset Work Order',
-						name: wizard.state.work_order,
-						fieldname: 'completion_notes',
-						value: wizard.state.completion_notes,
-					});
-				}
+				await frappe.xcall('frappe.client.set_value', {
+					doctype: 'Asset Work Order',
+					name: wizard.state.work_order,
+					fieldname: values,
+				});
 				if (wiz_state.photo_file) {
 					await asset_mgmt_custom.Wizard.upload_file(wiz_state.photo_file, {
 						doctype: 'Asset Work Order',

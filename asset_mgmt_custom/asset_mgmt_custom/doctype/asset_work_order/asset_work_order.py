@@ -73,7 +73,16 @@ class AssetWorkOrder(Document):
         self.db_set("status", "ملغي")
         self._cancel_maintenance_cost_gl_entry()
         self._cancel_linked_spare_part_requests()
+        self._cancel_linked_asset_repair()
         _update_asset_maintenance_summary(self.asset)
+
+    def _cancel_linked_asset_repair(self):
+        repair_name = self.get("asset_repair")
+        if not repair_name or not frappe.db.exists("Asset Repair", repair_name):
+            return
+        repair = frappe.get_doc("Asset Repair", repair_name)
+        if repair.docstatus == 1:
+            repair.cancel()
 
     @frappe.whitelist()
     def complete_work_order(self):
@@ -97,8 +106,57 @@ class AssetWorkOrder(Document):
         self.status = "مكتمل"
         if not self.completion_date:
             self.completion_date = today()
+        if self.get("cost_classification") == "Capitalized Overhaul":
+            self._escalate_to_asset_repair()
         self.save()
         return self.status
+
+    def _escalate_to_asset_repair(self):
+        """
+        عمرة كبرى/استبدال جزء جوهري: أمر العمل نفسه دائماً مصروف تشغيلي
+        (انظر تعليق _post_maintenance_cost_gl_entry)، فمحاسبة الرسملة
+        الفعلية (رفع القيمة الدفترية، تمديد العمر الإنتاجي، القيد
+        المحاسبي الصحيح CapEx) موجودة بالفعل وبشكل كامل وصحيح في Asset
+        Repair (انظر overrides/asset_repair.py) — بما فيها فرض إدخال
+        increase_in_asset_life قبل الإتمام، والتوجيه المحاسبي الصحيح إلى
+        Capital Maintenance WIP Account. بدل تكرار كل هذا المنطق هنا من
+        جديد (ومخاطرة تصادمه مع نسخة Asset Repair)، نُنشئ سجل Asset
+        Repair حقيقياً من بيانات أمر العمل ونُسلِّمه، فيتكفل هو بكل شيء.
+        """
+        if self.get("asset_repair"):
+            return
+        if not self.get("increase_in_asset_life_months"):
+            frappe.throw(
+                _("Please enter 'Increase In Asset Life (Months)' before completing a "
+                  "Capitalized Overhaul work order — otherwise the cost is capitalized but "
+                  "the asset's useful life and depreciation schedule are never extended."),
+                title=_("Missing Life Extension"),
+            )
+
+        asset = frappe.get_doc("Asset", self.asset)
+        total_cost = flt(self.actual_cost) or (flt(self.labor_cost) + flt(self.spare_parts_cost))
+
+        technician_name = None
+        if self.assigned_technician:
+            technician_name = frappe.db.get_value("User", self.assigned_technician, "full_name")
+
+        repair = frappe.new_doc("Asset Repair")
+        repair.asset = self.asset
+        repair.company = asset.company
+        repair.failure_date = self.creation
+        repair.completion_date = self.completion_date or today()
+        repair.repair_status = "Completed"
+        repair.description = self.problem_description
+        repair.custom_technician_name = technician_name or self.assigned_technician
+        repair.custom_repair_notes = self.completion_notes or self.problem_description
+        repair.repair_cost = total_cost
+        repair.capitalize_repair_cost = 1
+        repair.increase_in_asset_life = self.increase_in_asset_life_months
+        repair.cost_center = self.cost_center or asset.get("cost_center")
+        repair.insert(ignore_permissions=True)
+        repair.submit()
+
+        self.asset_repair = repair.name
 
     def _auto_issue_linked_spare_parts(self):
         """
@@ -216,7 +274,13 @@ class AssetWorkOrder(Document):
         مرتين. لذلك: total_cost = العمالة (labor_cost) فقط، إلا لو حُدِّد
         actual_cost يدوياً كتجاوز صريح — وفي هذه الحالة مسؤولية من يُدخله
         عدم تضمين تكلفة قطع غيار مصروفة فعلياً بالفعل عبر Stock Entry.
+
+        ولا تُنشئ هذه الدالة أي قيد إطلاقاً لو صُنِّف الأمر "Capitalized
+        Overhaul" (أي asset_repair مضبوط) — عندها Asset Repair المرتبط
+        هو من يتكفل بمحاسبة الرسملة الكاملة (انظر _escalate_to_asset_repair).
         """
+        if self.get("asset_repair"):
+            return
         if self.get("journal_entry"):
             return
 

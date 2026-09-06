@@ -298,7 +298,34 @@
    "label": "قيد اليومية",
    "options": "Journal Entry",
    "read_only": 1,
-   "description": "القيد المحاسبي الذي تم إنشاؤه تلقائياً عند إتمام أمر العمل بتكلفة"
+   "description": "القيد المحاسبي الذي تم إنشاؤه تلقائياً عند إتمام أمر العمل بتكلفة (لا يُنشأ لو صُنِّف الأمر كـ 'عمرة مُرسملة' — عندها ينشأ Asset Repair بدلاً منه ويتكفل هو بقيده الخاص)"
+  },
+  {
+   "fieldname": "cost_classification",
+   "fieldtype": "Select",
+   "label": "تصنيف التكلفة",
+   "options": "Revenue Expense\nCapitalized Overhaul",
+   "default": "Revenue Expense",
+   "allow_on_submit": 1,
+   "description": "Revenue Expense: مصروف صيانة تشغيلي عادي (الوضع الافتراضي). Capitalized Overhaul: عمرة كبرى/استبدال جزء جوهري يرفع القيمة الدفترية للأصل ويمدد عمره الإنتاجي — يُنشئ عند الإتمام سجل Asset Repair مُرسمَل بدلاً من قيد مصروف عادي"
+  },
+  {
+   "fieldname": "increase_in_asset_life_months",
+   "fieldtype": "Int",
+   "label": "الزيادة في العمر الإنتاجي (بالأشهر)",
+   "depends_on": "eval:doc.cost_classification=='Capitalized Overhaul'",
+   "mandatory_depends_on": "eval:doc.cost_classification=='Capitalized Overhaul'",
+   "allow_on_submit": 1,
+   "description": "إلزامي لأي عمرة مُرسملة — بدونها تُضاف التكلفة لقيمة الأصل لكن لا يُمدَّد عمره الإنتاجي ولا تُعاد جدولة الإهلاك (نفس الشرط المفروض فعلياً على Asset Repair)"
+  },
+  {
+   "fieldname": "asset_repair",
+   "fieldtype": "Link",
+   "label": "سجل الإصلاح المُرسمَل (Asset Repair)",
+   "options": "Asset Repair",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "description": "يُنشأ وُيسلَّم تلقائياً عند إتمام أمر مُصنَّف Capitalized Overhaul — كل محاسبة الرسملة (رفع قيمة الأصل، تمديد العمر الإنتاجي، القيد المحاسبي) تتم عبره، وليس عبر قيد أمر العمل العادي"
   },
   {
    "fieldname": "sec_break_refs",

@@ -62,6 +62,12 @@ frappe.ui.form.on("Asset Work Order", {
 			}, __("المحاسبة"));
 		}
 
+		if (frm.doc.asset_repair) {
+			frm.add_custom_button(__("عرض سجل الإصلاح المُرسمَل"), () => {
+				frappe.set_route("Form", "Asset Repair", frm.doc.asset_repair);
+			}, __("المحاسبة"));
+		}
+
 		if (frm.doc.docstatus === 1 && !FINAL_STATUSES.includes(frm.doc.status)) {
 			// يُصرَف تلقائياً (Stock Entry حقيقي) لحظة إتمام أمر العمل —
 			// انظر Asset Work Order.complete_work_order() ->
