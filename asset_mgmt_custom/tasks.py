@@ -1193,6 +1193,82 @@ def check_overdue_work_orders():
 
 
 # ---------------------------------------------------------------------------
+# Weekly: CapEx budget overrun alert
+# ---------------------------------------------------------------------------
+
+def check_capex_budget_overrun():
+    """
+    Weekly: تقرير "CapEx Budget vs Actual" موجود وصحيح، لكن بلا أي تنبيه
+    استباقي — أحد يجب أن يفتحه يدوياً ليكتشف أن ميزانية فرع اقتربت من أو
+    تجاوزت المعتمد. يُشغَّل أسبوعياً (وليس يومياً كباقي تنبيهات هذا
+    الملف) عمداً: نسبة الإنفاق كمّية مستمرة قد تبقى فوق الحد لأسابيع —
+    تنبيه يومي لنفس الحالة كان سيُغرق المستلمين، خلافاً لتنبيهات "قبل
+    N يوم من تاريخ محدد" التي تنتهي طبيعياً.
+
+    نفس منطق حساب "الفعلي" الموجود بالضبط في تقرير capex_budget_vs_actual
+    (إجمالي gross_purchase_amount لأصول الفرع المُشتراة خلال السنة
+    المالية) — بلا تكرار.
+    """
+    budgets = frappe.db.sql("""
+        SELECT name, branch, fiscal_year, total_capex_budget
+        FROM `tabAsset CapEx Budget`
+        WHERE docstatus = 1 AND status = 'Approved' AND IFNULL(total_capex_budget, 0) > 0
+    """, as_dict=True)
+    if not budgets:
+        return
+
+    finance_users = _get_finance_manager_users()
+    manager_users = _get_manager_users()
+    recipients = list(set(finance_users) | set(manager_users))
+    if not recipients:
+        return
+
+    for b in budgets:
+        fy_dates = frappe.db.get_value(
+            "Fiscal Year", b.fiscal_year, ["year_start_date", "year_end_date"], as_dict=True
+        )
+        if not fy_dates:
+            continue
+
+        actual = flt(frappe.db.sql("""
+            SELECT SUM(gross_purchase_amount)
+            FROM `tabAsset`
+            WHERE docstatus = 1
+              AND custom_branch = %(branch)s
+              AND purchase_date BETWEEN %(from_date)s AND %(to_date)s
+        """, {
+            "branch": b.branch,
+            "from_date": fy_dates.year_start_date,
+            "to_date": fy_dates.year_end_date,
+        })[0][0] or 0)
+
+        pct_used = round(actual * 100 / flt(b.total_capex_budget), 1)
+        if pct_used < 80:
+            continue
+
+        if pct_used >= 100:
+            subject = _("CapEx Budget Exceeded: {0}").format(b.branch)
+            indicator_text = _("تم تجاوز الميزانية الرأسمالية المعتمدة")
+        else:
+            subject = _("CapEx Budget Approaching Limit: {0}").format(b.branch)
+            indicator_text = _("الإنفاق الفعلي يقترب من الميزانية الرأسمالية المعتمدة")
+
+        content = _(
+            "{0} — فرع {1}، السنة المالية {2}: الإنفاق الفعلي {3} من أصل ميزانية معتمدة {4} ({5}%)."
+        ).format(indicator_text, b.branch, b.fiscal_year, actual, b.total_capex_budget, pct_used)
+        _create_notification(subject, content, "Asset CapEx Budget", b.name, recipients)
+
+
+def _get_finance_manager_users():
+    return [r[0] for r in frappe.db.sql("""
+        SELECT u.name
+        FROM `tabUser` u
+        JOIN `tabHas Role` hr ON hr.parent = u.name AND hr.parenttype = 'User'
+        WHERE hr.role = 'Asset Finance Manager' AND u.enabled = 1
+    """)]
+
+
+# ---------------------------------------------------------------------------
 # Weekly: cache Total Cost of Ownership onto each Asset + flag peer outliers
 # ---------------------------------------------------------------------------
 
