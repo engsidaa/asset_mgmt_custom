@@ -1,0 +1,94 @@
+{
+ "doctype": "DocType",
+ "name": "Asset Approval Delegate",
+ "module": "Asset Mgmt Custom",
+ "autoname": "hash",
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "delegate",
+   "fieldtype": "Link",
+   "label": "الشخص المُفوَّض إليه",
+   "options": "User",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "المستخدم الذي سيمارس صلاحية الاعتماد نيابةً عن الشخص الأصلي خلال الفترة المحددة"
+  },
+  {
+   "fieldname": "delegation_type",
+   "fieldtype": "Select",
+   "label": "نوع التفويض",
+   "options": "دور وظيفي (Role)\nمدير فرع محدد (Branch Manager)",
+   "reqd": 1,
+   "in_list_view": 1,
+   "default": "دور وظيفي (Role)"
+  },
+  {
+   "fieldname": "role",
+   "fieldtype": "Link",
+   "label": "الدور المُفوَّض",
+   "options": "Role",
+   "depends_on": "eval:doc.delegation_type==\"دور وظيفي (Role)\"",
+   "mandatory_depends_on": "eval:doc.delegation_type==\"دور وظيفي (Role)\"",
+   "description": "مثال: Asset Finance Manager أو Asset Manager — أي مرحلة اعتماد في مصفوفة اعتماد طلب الأصل (Asset Requisition) تشترط هذا الدور، يُسمح للمُفوَّض إليه بتنفيذها أيضاً خلال الفترة"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "الفرع",
+   "options": "Branch",
+   "depends_on": "eval:doc.delegation_type==\"مدير فرع محدد (Branch Manager)\"",
+   "mandatory_depends_on": "eval:doc.delegation_type==\"مدير فرع محدد (Branch Manager)\"",
+   "description": "يُسمح للمُفوَّض إليه بالاعتماد بدلاً من مدير هذا الفرع تحديداً (Branch.custom_branch_manager) خلال الفترة، دون تغيير إعداد الفرع نفسه"
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "من تاريخ",
+   "reqd": 1,
+   "in_list_view": 1,
+   "default": "Today"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "إلى تاريخ",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "السبب",
+   "description": "مثال: إجازة سنوية، مهمة عمل خارجية"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  }
+ ]
+}

@@ -24,12 +24,20 @@ Frappe.
 
 System Manager مخوَّل بتجاوز أي مرحلة (دعم إداري)، بنفس صلاحياته
 الكاملة الموجودة أصلاً على هذا المستند.
+
+التفويض المؤقت (Delegation): أي معتمد (دور وظيفي أو مدير فرع محدد) يمكنه
+تفويض شخص آخر مؤقتاً (إجازة/مهمة خارجية) عبر إنشاء سجل "Asset Approval
+Delegate" — راجع asset_mgmt_custom.approvals للتفاصيل. لا يُغيَّر إعداد
+الفرع أو الدور نفسه؛ الفحص وقت التنفيذ فقط يتحقق أيضاً من وجود تفويض
+فعّال لليوم الحالي.
 """
 
 import frappe
 from frappe import _
 from frappe.utils import today, now_datetime
 from frappe.model.document import Document
+
+from asset_mgmt_custom.approvals import is_delegated_for_branch_manager, is_delegated_for_role
 
 
 APPROVAL_CHAIN = {
@@ -131,9 +139,11 @@ class AssetRequisition(Document):
                     ).format(self.branch),
                     title=_("Branch Manager Not Configured"),
                 )
-            if frappe.session.user != self.branch_manager:
+            if frappe.session.user != self.branch_manager and not is_delegated_for_branch_manager(
+                frappe.session.user, self.branch
+            ):
                 frappe.throw(
-                    _("Only the designated Branch Manager ({0}) can approve this stage.").format(
+                    _("Only the designated Branch Manager ({0}) — or their delegate — can approve this stage.").format(
                         self.branch_manager
                     ),
                     title=_("Not Authorized"),
@@ -179,9 +189,12 @@ class AssetRequisition(Document):
         elif stage == "asset_manager":
             self._check_stage(self.status, "Asset Manager")
         elif stage == "branch_manager" and not self._is_system_manager():
-            if not self.branch_manager or frappe.session.user != self.branch_manager:
+            if not self.branch_manager or (
+                frappe.session.user != self.branch_manager
+                and not is_delegated_for_branch_manager(frappe.session.user, self.branch)
+            ):
                 frappe.throw(
-                    _("Only the designated Branch Manager can reject at this stage."),
+                    _("Only the designated Branch Manager — or their delegate — can reject at this stage."),
                     title=_("Not Authorized"),
                 )
 
@@ -202,9 +215,15 @@ class AssetRequisition(Document):
                 _("This requisition is not currently at the {0} stage.").format(expected_status),
                 title=_("Wrong Stage"),
             )
-        if required_role not in frappe.get_roles() and not self._is_system_manager():
+        if (
+            required_role not in frappe.get_roles()
+            and not self._is_system_manager()
+            and not is_delegated_for_role(frappe.session.user, required_role)
+        ):
             frappe.throw(
-                _("You need the '{0}' role to act at this stage.").format(required_role),
+                _("You need the '{0}' role (or a valid delegation for it) to act at this stage.").format(
+                    required_role
+                ),
                 title=_("Not Authorized"),
             )
 

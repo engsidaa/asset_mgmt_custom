@@ -303,6 +303,15 @@
     "onboard": 0
    },
    {
+    "type": "Link",
+    "label": "تفويض الاعتماد",
+    "link_to": "Asset Approval Delegate",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
     "type": "Card Break",
     "label": "نقل وتسليم الأصول",
     "hidden": 0
