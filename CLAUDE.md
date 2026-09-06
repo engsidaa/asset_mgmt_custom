@@ -135,3 +135,18 @@ Vendor Contract، Energy/Fuel Log، Safety Inspection، إلخ). **قبل إنش
   أي تنفيذ (أغلب الحالات كانت "ابنِ فوق سقالة موجودة" أو "اربط بمنطق
   Core أصلي بدل تكراره"، وليس "أنشئ من الصفر"). التفاصيل الكاملة في
   `ENTERPRISE_EAM_PHASE6_README.md`.
+- **Phase 7 — مزايا احترافية إضافية (6 من 7 مقترحة؛ تم تخطي #2 عمداً)**:
+  (1) لوحة تحكم تنفيذية عبر Dashboard Chart القياسي (Group By/Timeseries،
+  بلا رسم مخصص)، (3) تفويض مؤقت لصلاحية الاعتماد (Asset Approval
+  Delegate + `approvals.py`) لمصفوفة اعتماد Asset Requisition الوحيدة
+  ببوابات فردية غير قابلة للتفويض عبر Frappe Workflow، (4) صفحة مسح
+  جماعي بالباركود للتدقيق المادي (Asset Physical Audit.scan_mark_found)
+  مع استخراج resolve_asset_identifier كنقطة مطابقة كود مشتركة وحيدة، (5)
+  إرسال Twilio WhatsApp/SMS فعلي مباشر بجانب الـ Webhook العام الموجود
+  (`notifications.py`)، (6) سجل تدقيق كامل للأصل (`audit_trail.py`
+  + Print Format "Asset Full Audit Trail" يستدعيه عبر `frappe.call` من
+  داخل Jinja)، (7) أداة مقارنة سيناريوهات إهلاك (`depreciation_scenarios.py`)
+  تُعيد استخدام محرك حساب الإهلاك الأصلي في core (AssetDepreciationSchedule)
+  في الذاكرة فقط بلا حفظ. تم تخطي #2 (تصدير ضريبة/VAT الكويت) بطلب
+  صريح من المستخدم. التفاصيل الكاملة في
+  `PROFESSIONAL_FEATURES_ROUND2_README.md`.
