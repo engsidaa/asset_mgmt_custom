@@ -126,6 +126,7 @@ doctype_js = {
     "Asset Handover": "asset_mgmt_custom/doctype/asset_handover/asset_handover.js",
     "Asset Write Off Request": "asset_mgmt_custom/doctype/asset_write_off_request/asset_write_off_request.js",
     "Asset Vendor Performance Rating": "asset_mgmt_custom/doctype/asset_vendor_performance_rating/asset_vendor_performance_rating.js",
+    "Asset Complaint": "asset_mgmt_custom/doctype/asset_complaint/asset_complaint.js",
 }
 
 # ---------------------------------------------------------------------------
@@ -144,6 +145,7 @@ scheduler_events = {
         "asset_mgmt_custom.tasks.check_lease_expiry",
         "asset_mgmt_custom.tasks.check_overdue_checkouts",
         "asset_mgmt_custom.tasks.check_open_critical_incidents",
+        "asset_mgmt_custom.tasks.check_open_complaints",
         "asset_mgmt_custom.tasks.check_missed_cleaning",
         "asset_mgmt_custom.tasks.check_spare_parts_low",
         "asset_mgmt_custom.tasks.check_permit_expiry",

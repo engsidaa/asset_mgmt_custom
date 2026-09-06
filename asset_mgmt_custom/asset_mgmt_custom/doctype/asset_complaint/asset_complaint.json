@@ -119,6 +119,14 @@
    "label": "Assigned To"
   },
   {
+   "fieldname": "escalated_work_order",
+   "fieldtype": "Link",
+   "label": "أمر العمل الناتج",
+   "options": "Asset Work Order",
+   "read_only": 1,
+   "description": "يُنشأ عند تصعيد الشكوى لأمر عمل صيانة رسمي (زر 'تصعيد لأمر عمل')"
+  },
+  {
    "fieldname": "resolution_date",
    "fieldtype": "Date",
    "label": "تاريخ الحل"

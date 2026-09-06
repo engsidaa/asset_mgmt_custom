@@ -767,6 +767,37 @@ def check_open_critical_incidents():
 
 
 # ---------------------------------------------------------------------------
+# Daily: stale open complaints (Asset Complaint لم يكن له أي تتبُّع آلي
+# إطلاقاً من قبل — بلا هذه المهمة، شكوى قد تبقى "Open" للأبد بلا أي
+# تصعيد أو تنبيه)
+# ---------------------------------------------------------------------------
+
+def check_open_complaints(threshold_days=3):
+    """
+    Daily: notify about complaints still Open/In Progress after 3+ days
+    without being escalated to a Work Order.
+    """
+    complaints = frappe.db.sql("""
+        SELECT name, asset, asset_name, complaint_type, priority, complaint_date
+        FROM `tabAsset Complaint`
+        WHERE status IN ('Open', 'In Progress')
+          AND (escalated_work_order IS NULL OR escalated_work_order = '')
+          AND complaint_date <= %(cutoff)s
+    """, {"cutoff": add_days(today(), -threshold_days)}, as_dict=True)
+
+    if not complaints:
+        return
+
+    manager_users = _get_manager_users()
+    for c in complaints:
+        subject = _("Unresolved Complaint ({0}): {1}").format(c.priority, c.asset_name or c.asset)
+        content = _("Complaint <b>{0}</b> ({1}) for asset <b>{2}</b> has been open since <b>{3}</b> "
+                    "with no Work Order created for it yet.").format(
+            c.name, c.complaint_type or "-", c.asset_name or c.asset, c.complaint_date)
+        _create_notification(subject, content, "Asset Complaint", c.name, manager_users)
+
+
+# ---------------------------------------------------------------------------
 # Daily: missed cleaning schedules
 # ---------------------------------------------------------------------------
 
