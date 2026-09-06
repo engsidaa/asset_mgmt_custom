@@ -42,6 +42,15 @@
    "in_list_view": 1
   },
   {
+   "fieldname": "asset_category",
+   "fieldtype": "Link",
+   "label": "فئة الأصل",
+   "options": "Asset Category",
+   "fetch_from": "asset.asset_category",
+   "read_only": 1,
+   "description": "تُجلَب تلقائياً من الأصل — تتيح لمسؤول الصيانة تقييد صلاحيته (User Permission) بفئات أصول محددة بدل فرع كامل"
+  },
+  {
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "الفرع",
@@ -247,6 +256,64 @@
    "label": "تاريخ الرفض",
    "read_only": 1,
    "allow_on_submit": 1
+  },
+  {
+   "fieldname": "sec_break_branch_confirmation",
+   "fieldtype": "Section Break",
+   "label": "تأكيد الفرع",
+   "collapsible": 1,
+   "depends_on": "eval:doc.status=='مكتمل'",
+   "description": "يؤكِّده مقدِّم الطلب أو مدير الفرع بعد أن يتحقق فعلياً من أن الجهاز يعمل الآن — منفصل عمداً عن 'مكتمل' (وهي حالة يضعها الفني بمجرد انتهائه من العمل، ولا تعني بالضرورة أن الفرع تحقق من النتيجة)"
+  },
+  {
+   "fieldname": "branch_confirmation_status",
+   "fieldtype": "Select",
+   "label": "حالة تأكيد الفرع",
+   "options": "\nConfirmed Working\nIssue Persists",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "branch_rating",
+   "fieldtype": "Int",
+   "label": "تقييم الفرع لعملية الصيانة (١-٥)",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "col_break_branch_confirmation",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch_confirmed_by",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "أكَّده",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "branch_confirmed_on",
+   "fieldtype": "Datetime",
+   "label": "تاريخ التأكيد",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "branch_feedback",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات الفرع",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "follow_up_work_order",
+   "fieldtype": "Link",
+   "options": "Asset Work Order",
+   "label": "أمر متابعة (عند استمرار المشكلة)",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "description": "يُنشأ تلقائياً عند تأكيد الفرع أن المشكلة لم تُحل — بدل إعادة فتح هذا الأمر (وتعريض قيده المحاسبي/حركاته المخزنية بالفعل للتناقض)"
   },
   {
    "fieldname": "sec_break_cost",

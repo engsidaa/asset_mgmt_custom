@@ -1,7 +1,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import add_to_date, flt, now_datetime, today
+from frappe.utils import add_to_date, cint, flt, now_datetime, today
 
 from asset_mgmt_custom.overrides.asset_repair import _update_asset_maintenance_summary
 from asset_mgmt_custom.notifications import send_critical_alert
@@ -24,6 +24,7 @@ class AssetWorkOrder(Document):
     FINAL_STATUSES = ("مكتمل", "ملغي", "مرفوض")
     MAINTENANCE_ROLES = ("Asset Technician", "Asset Manager", "System Manager", "Maintenance Vendor")
     UNRESTRICTED_ROLES = ("Asset Technician", "Asset Manager", "System Manager")
+    BRANCH_CONFIRMATION_ROLES = ("Asset Manager", "System Manager", "Branch Manager")
 
     def validate(self):
         self._set_default_title()
@@ -313,6 +314,71 @@ class AssetWorkOrder(Document):
         self.rejected_on = now_datetime()
         self.save()
         return self.status
+
+    @frappe.whitelist()
+    def confirm_branch_resolution(self, confirmed_working, rating=None, feedback=None):
+        """
+        تأكيد الفرع (وليس الفني) أن الجهاز يعمل فعلاً — منفصل عمداً عن
+        "مكتمل" التي يضعها الفني بمجرد انتهائه من العمل، ولا تعني بالضرورة
+        أن نتيجة الصيانة صحيحة فعلياً من وجهة نظر من طلبها. لا يُعاد فتح
+        هذا الأمر عند استمرار المشكلة (كان سيُعرِّض قيده المحاسبي/حركاته
+        المخزنية المُرحَّلة بالفعل للتناقض) — بدلاً من ذلك يُنشأ أمر متابعة
+        جديد تلقائياً، بنفس أسلوب التصعيد المُتَّبع فعلياً في هذا التطبيق
+        (Asset Complaint.escalate_to_work_order، Asset Environmental Log).
+        """
+        if self.status != "مكتمل":
+            frappe.throw(_("Only a completed work order can be confirmed by the branch."))
+        if self.branch_confirmation_status:
+            frappe.throw(_("This work order has already been confirmed by the branch."))
+        self._check_branch_confirmation_role()
+
+        confirmed_working = cint(confirmed_working)
+        if rating is not None:
+            rating = cint(rating)
+            if rating < 1 or rating > 5:
+                frappe.throw(_("Rating must be between 1 and 5."))
+            self.branch_rating = rating
+        if feedback:
+            self.branch_feedback = feedback
+
+        self.branch_confirmation_status = "Confirmed Working" if confirmed_working else "Issue Persists"
+        self.branch_confirmed_by = frappe.session.user
+        self.branch_confirmed_on = now_datetime()
+
+        if not confirmed_working:
+            self.follow_up_work_order = self._create_follow_up_work_order()
+
+        self.save()
+        return {
+            "name": self.name,
+            "branch_confirmation_status": self.branch_confirmation_status,
+            "follow_up_work_order": self.follow_up_work_order,
+        }
+
+    def _check_branch_confirmation_role(self):
+        if self.requested_by == frappe.session.user:
+            return
+        roles = set(frappe.get_roles())
+        if roles & set(self.BRANCH_CONFIRMATION_ROLES):
+            return
+        frappe.throw(
+            _("Only the requester of this work order, or a branch/asset manager, can confirm its resolution."),
+            frappe.PermissionError,
+        )
+
+    def _create_follow_up_work_order(self):
+        follow_up = frappe.new_doc("Asset Work Order")
+        follow_up.asset = self.asset
+        follow_up.branch = self.branch
+        follow_up.work_type = self.work_type
+        follow_up.priority = self.priority
+        follow_up.problem_description = _(
+            "إعادة فتح — لم يُؤكَّد حل المشكلة بعد أمر العمل السابق {0}:\n{1}"
+        ).format(self.name, self.problem_description or "")
+        follow_up.requested_by = frappe.session.user
+        follow_up.insert(ignore_permissions=True)
+        follow_up.submit()
+        return follow_up.name
 
     def _check_maintenance_role(self):
         """

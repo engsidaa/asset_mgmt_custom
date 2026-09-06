@@ -28,7 +28,7 @@ User Permission التلقائية إطلاقاً — دوال `list_pending_rec
 
 import frappe
 from frappe import _
-from frappe.utils import add_days, today
+from frappe.utils import add_days, cint, date_diff, getdate, today
 
 
 ALLOWED_REMINDER_DOCTYPES = ("Asset Work Order", "Asset", "Asset Requisition")
@@ -120,6 +120,45 @@ def get_dashboard_summary():
 
 
 @frappe.whitelist()
+def get_upcoming_maintenance_tasks(window_days=30):
+    """
+    نفس عدد "صيانة دورية قادمة" في get_dashboard_summary لكن كصفوف كاملة
+    قابلة للعرض (وليس رقماً فقط) — لشاشة "الصيانة الدورية" المخصصة في
+    تطبيق الموبايل. يشمل المتأخر فعلياً (is_overdue) والقادم خلال
+    window_days معاً، بنفس التقييد الجغرافي التلقائي (get_list على Asset
+    Maintenance يُطبِّق User Permission تلقائياً عبر حقلها asset_name).
+    """
+    schedules = frappe.get_list("Asset Maintenance", pluck="name")
+    if not schedules:
+        return []
+
+    cutoff = add_days(today(), cint(window_days))
+    rows = frappe.db.sql(
+        """
+        SELECT mt.name, mt.maintenance_task, mt.periodicity, mt.next_due_date,
+               mt.maintenance_status, am.name AS maintenance_schedule,
+               am.asset_name AS asset, a.asset_name AS asset_display_name,
+               a.custom_branch AS branch, a.asset_category AS asset_category
+        FROM `tabAsset Maintenance Task` mt
+        JOIN `tabAsset Maintenance` am ON am.name = mt.parent
+        JOIN `tabAsset` a ON a.name = am.asset_name
+        WHERE am.name IN %(schedules)s
+          AND mt.maintenance_status != 'Completed'
+          AND mt.next_due_date IS NOT NULL
+          AND mt.next_due_date <= %(cutoff)s
+        ORDER BY mt.next_due_date ASC
+        """,
+        {"schedules": schedules, "cutoff": cutoff},
+        as_dict=True,
+    )
+
+    today_date = getdate(today())
+    for row in rows:
+        row["is_overdue"] = bool(row.next_due_date and getdate(row.next_due_date) < today_date)
+    return rows
+
+
+@frappe.whitelist()
 def list_my_assets(asset_category=None):
     """
     قائمة أصول الفرع — الحقول المختارة هنا فقط هي اللي تطبيق موبايل محتاجها
@@ -192,6 +231,8 @@ def get_asset_detail(asset):
         limit_page_length=0,
     )
 
+    work_order_history = _get_work_order_history(asset)
+
     maintenance_tasks = frappe.db.sql(
         """
         SELECT mt.maintenance_task, mt.periodicity, mt.next_due_date,
@@ -222,10 +263,41 @@ def get_asset_detail(asset):
     return {
         "asset": asset_doc,
         "open_work_orders": open_work_orders,
+        "work_order_history": work_order_history,
         "maintenance_tasks": maintenance_tasks,
         "attachments": attachments,
         "comments": comments,
     }
+
+
+def _get_work_order_history(asset):
+    """
+    كل طلبات الصيانة السابقة لنفس الجهاز (وليس فقط المفتوحة منها كما في
+    open_work_orders أعلاه) — مع مدة كل طلب من لحظة تقديمه حتى إغلاقه
+    فعلياً (سواء بالرفض أو بإتمام الصيانة)، محسوبة هنا مرة واحدة بدل ترك
+    حساب التاريخ يتكرر ويختلف بين العميل (Flutter) والديسك مستقبلاً.
+    """
+    rows = frappe.get_list(
+        "Asset Work Order",
+        filters={"asset": asset, "docstatus": ["<", 2]},
+        fields=[
+            "name", "title", "status", "priority", "work_type", "request_date",
+            "completion_date", "rejected_on", "assigned_technician",
+            "branch_confirmation_status", "branch_rating", "follow_up_work_order",
+        ],
+        order_by="request_date desc, creation desc",
+        limit_page_length=0,
+    )
+    for row in rows:
+        closed_on = None
+        if row.status == "مكتمل" and row.completion_date:
+            closed_on = row.completion_date
+        elif row.status == "مرفوض" and row.rejected_on:
+            closed_on = row.rejected_on.date() if hasattr(row.rejected_on, "date") else row.rejected_on
+
+        row["closed_on"] = closed_on
+        row["duration_days"] = date_diff(closed_on, row.request_date) if closed_on and row.request_date else None
+    return rows
 
 
 @frappe.whitelist()
@@ -302,22 +374,41 @@ def create_maintenance_request(asset, problem_description, work_type=None, prior
 
 
 @frappe.whitelist()
-def list_my_work_orders(status=None):
+def list_my_work_orders(status=None, branch=None):
+    """
+    branch اختياري: تصفية إضافية داخل نطاق ما يقدر المستخدم أصلاً رؤيته
+    (لا تُوسِّع الصلاحية بأي شكل — get_list يُطبِّق User Permission تلقائياً
+    فوقها كالمعتاد) — مفيدة لمسؤول صيانة مُهيَّأ لعدة فروع/فئات معاً حتى
+    يقدر يُركِّز على فرع واحد من قائمة طويلة بدل السكرول فيها كلها.
+    """
     filters = {"docstatus": ["<", 2]}
     if status:
         filters["status"] = status
+    if branch:
+        filters["branch"] = branch
 
     return frappe.get_list(
         "Asset Work Order",
         filters=filters,
         fields=[
-            "name", "title", "asset", "asset_name", "status", "priority",
+            "name", "title", "asset", "asset_name", "asset_category", "branch", "status", "priority",
             "work_type", "request_date", "completion_date", "actual_cost",
-            "assigned_technician", "fault_photo",
+            "assigned_technician", "fault_photo", "branch_confirmation_status",
         ],
         order_by="creation desc",
         limit_page_length=0,
     )
+
+
+@frappe.whitelist()
+def list_accessible_branches():
+    """
+    قائمة الفروع التي يقدر المستخدم الحالي رؤيتها فعلياً — تُستخدَم لملء
+    فلتر الفرع في شاشة "طلبات الصيانة" لمسؤول صيانة مُهيَّأ لأكثر من فرع؛
+    get_list (وليس get_all) تعني أن التقييد الجغرافي التلقائي (User
+    Permission) يُطبَّق هنا تماماً كباقي دوال هذا الملف.
+    """
+    return frappe.get_list("Branch", fields=["name", "branch"], order_by="name asc", limit_page_length=0)
 
 
 @frappe.whitelist()
