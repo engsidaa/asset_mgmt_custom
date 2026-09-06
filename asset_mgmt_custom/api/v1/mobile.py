@@ -55,11 +55,36 @@ def get_app_context():
         "user": user,
         "full_name": frappe.db.get_value("User", user, "full_name"),
         "user_image": frappe.db.get_value("User", user, "user_image"),
+        "email": frappe.db.get_value("User", user, "email"),
+        "mobile_no": frappe.db.get_value("User", user, "mobile_no"),
         "roles": frappe.get_roles(user),
         "employee": employee,
         "managed_branches": managed_branches,
         "default_branch": default_branch,
     }
+
+
+@frappe.whitelist()
+def update_my_profile_picture(file_url):
+    """
+    يحدِّث صورة حساب المستخدم الحالي فقط — لا يوجد لدى الأدوار الميدانية
+    (فني/مستخدم فرع/مدير فرع) أي صلاحية "write" على مستند User نفسه (مقصورة
+    على System Manager في صلاحيات هذا الـ doctype الأساسية)، فمسار الحفظ
+    العام (frappe.client.set_value، الذي يمر عبر doc.save() الكامل) كان
+    سيفشل بصلاحية لأي مستخدم ميداني يحاول تغيير صورته الشخصية.
+
+    db_set هنا آمن تماماً رغم تجاوزه فحص الصلاحية القياسي، لأنه مُقيَّد
+    صراحة بـ frappe.session.user فقط ولا يقبل أي معرِّف مستخدم آخر — لا
+    يقدر أي مستخدم عبر هذا الاستدعاء تعديل صورة غيره مهما كانت أدواره.
+
+    الملف نفسه يُرفَع أولاً عبر /api/method/upload_file القياسي بلا
+    doctype/docname (رفع عام غير مربوط) تفادياً لنفس فحص الصلاحية على
+    User، ثم يُربَط هنا بالحقل الصحيح.
+    """
+    if not file_url:
+        frappe.throw(_("file_url is required."))
+    frappe.db.set_value("User", frappe.session.user, "user_image", file_url, update_modified=False)
+    return {"user_image": file_url}
 
 
 @frappe.whitelist()
