@@ -5,6 +5,9 @@ app_description = "Custom extensions for ERPNext Asset & Maintenance modules"
 app_email = ""
 app_license = "MIT"
 
+app_include_js = "/assets/asset_mgmt_custom/js/wizard_framework.js"
+app_include_css = "/assets/asset_mgmt_custom/css/wizard_framework.css"
+
 # ---------------------------------------------------------------------------
 # Fixtures – تُصدَّر وتُستورَد تلقائياً عند bench migrate
 # ---------------------------------------------------------------------------
