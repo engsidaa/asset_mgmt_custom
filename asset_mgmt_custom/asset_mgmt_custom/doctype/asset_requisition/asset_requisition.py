@@ -312,14 +312,36 @@ class AssetRequisition(Document):
         # مقطوعة بصمت من نقطة البداية نفسها).
         mr.custom_source_asset_requisition = self.name
 
-        if self.item_code:
-            mr.append("items", {
-                "item_code": self.item_code,
-                "qty": self.quantity or 1,
-                "schedule_date": mr.schedule_date,
-            })
-        else:
+        if not self.item_code:
             frappe.throw(_("Please set Item Code on the requisition before creating a purchase request."))
+
+        item_row = {
+            "item_code": self.item_code,
+            "qty": self.quantity or 1,
+            "schedule_date": mr.schedule_date,
+        }
+
+        # Material Request يفرض (buying/utils.validate_stock_item_warehouse)
+        # وجود مخزن على أي صف لصنف "مخزون" (is_stock_item) — بدونه يفشل
+        # الحفظ برسالة "Warehouse is mandatory...". self.check_warehouse
+        # محسوب مسبقاً في _check_warehouse_stock من Branch.custom_default_warehouse؛
+        # نُعيد جلبه احتياطاً هنا فقط لو لم يكن محسوباً (مثلاً مستند قديم).
+        is_stock_item = frappe.db.get_value("Item", self.item_code, "is_stock_item")
+        if is_stock_item:
+            warehouse = self.check_warehouse or frappe.db.get_value(
+                "Branch", self.branch, "custom_default_warehouse"
+            )
+            if not warehouse:
+                frappe.throw(
+                    _(
+                        "Please set a 'Default Warehouse' on Branch {0} before creating a "
+                        "purchase request for stock item {1}."
+                    ).format(self.branch or _("(not set)"), self.item_code),
+                    title=_("Missing Branch Warehouse"),
+                )
+            item_row["warehouse"] = warehouse
+
+        mr.append("items", item_row)
 
         mr.insert(ignore_permissions=True)
         self.db_set("material_request", mr.name)
