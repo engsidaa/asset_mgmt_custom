@@ -108,6 +108,15 @@
    "description": "تُنشأ تلقائياً كمسودة عند التسليم إذا كان أسلوب التخلص 'بيع'/'مزاد' — راجع المشتري والضريبة وسلِّمها لإتمام البيع محاسبياً"
   },
   {
+   "fieldname": "disposal_certificate",
+   "fieldtype": "Link",
+   "label": "شهادة التخلص",
+   "options": "Asset Disposal Certificate",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "description": "تُصدَر تلقائياً عند تسليم هذا التنفيذ — وثيقة امتثال رسمية توثِّق التخلص من الأصل"
+  },
+  {
    "fieldname": "sec_break_docs",
    "fieldtype": "Section Break",
    "label": "Documents"

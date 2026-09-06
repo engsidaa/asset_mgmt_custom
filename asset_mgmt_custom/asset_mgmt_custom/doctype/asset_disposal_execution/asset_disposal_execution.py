@@ -21,6 +21,7 @@ class AssetDisposalExecution(Document):
                 update_modified=False
             )
         self._execute_financial_disposal()
+        self._issue_disposal_certificate()
 
     def _execute_financial_disposal(self):
         """
@@ -71,6 +72,39 @@ class AssetDisposalExecution(Document):
                 _("Draft Sales Invoice {0} created — set the buyer and tax details and submit it "
                   "to complete the sale accounting.").format(si.name),
                 alert=True, indicator="blue",
+            )
+
+    def _issue_disposal_certificate(self):
+        """
+        Asset Disposal Certificate كان DocType موجوداً (رقم شهادة، طريقة
+        تخلص، قيمة، مُصرِّح، مشترٍ...) بلا أي إصدار تلقائي — التخلص
+        المالي كان يكتمل (شطب/بيع) دون أي وثيقة امتثال رسمية تُصدَر
+        لتوثيقه، رغم أن الحقول مُعَدَّة بالكامل لهذا الغرض تحديداً.
+        """
+        if self.get("disposal_certificate"):
+            return
+
+        try:
+            cert = frappe.new_doc("Asset Disposal Certificate")
+            cert.asset = self.asset
+            cert.asset_category = frappe.db.get_value("Asset", self.asset, "asset_category")
+            cert.disposal_date = self.execution_date or today()
+            cert.disposal_method = self.disposal_method
+            cert.disposal_value = self.get("actual_sale_value") or 0
+            cert.authorized_by = frappe.session.user
+            cert.buyer_name = self.get("buyer_name")
+            cert.remarks = self.get("notes")
+            cert.insert(ignore_permissions=True)
+            cert.submit()
+            self.db_set("disposal_certificate", cert.name, update_modified=False)
+            frappe.msgprint(
+                _("تم إصدار شهادة التخلص تلقائياً: <a href='/app/asset-disposal-certificate/{0}'>{0}</a>").format(cert.name),
+                alert=True, indicator="green",
+            )
+        except Exception:
+            frappe.log_error(
+                title="Auto disposal certificate issuance failed",
+                message=frappe.get_traceback(),
             )
 
     def on_cancel(self):
