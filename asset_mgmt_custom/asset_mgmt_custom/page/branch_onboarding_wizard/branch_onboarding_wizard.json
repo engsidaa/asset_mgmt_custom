@@ -1,0 +1,21 @@
+{
+ "content": null,
+ "docstatus": 0,
+ "doctype": "Page",
+ "module": "Asset Mgmt Custom",
+ "name": "branch-onboarding-wizard",
+ "owner": "Administrator",
+ "page_name": "branch-onboarding-wizard",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Asset Manager"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "title": "معالج فتح فرع جديد"
+}
