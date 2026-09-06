@@ -982,13 +982,19 @@
   "public": 1,
   "is_hidden": 0,
   "icon": "tool",
-  "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0646\\u0638\\u0631\\u0629 \\u0639\\u0627\\u0645\\u0629 \\u0639\\u0644\\u0649 \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Asset Repairs\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0627\\u062e\\u062a\\u0635\\u0627\\u0631\\u0627\\u062a \\u0633\\u0631\\u064a\\u0639\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0625\\u0635\\u0644\\u0627\\u062d \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0635\\u064a\\u0627\\u0646\\u0629 \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0639\\u0642\\u062f \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629 \\u0627\\u0644\\u0642\\u0627\\u062f\\u0645\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0623\\u0645\\u0631 \\u0627\\u0644\\u0639\\u0645\\u0644\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0623\\u062f\\u0648\\u0627\\u062a \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0639\\u0645\\u0644\\u064a\\u0627\\u062a \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629\", \"col\": 6}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0645\\u064a\\u0632\\u0627\\u0646\\u064a\\u0629 \\u0648\\u0627\\u0644\\u062a\\u0648\\u062b\\u064a\\u0642\", \"col\": 6}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0627\\u0644\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631 \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629\", \"col\": 6}}]",
+  "content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0646\\u0638\\u0631\\u0629 \\u0639\\u0627\\u0645\\u0629 \\u0639\\u0644\\u0649 \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Under Repair\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Asset Repairs\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Work Orders\", \"col\": 3}}, {\"type\": \"number_card\", \"data\": {\"number_card_name\": \"SLA Breached Work Orders\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0627\\u062e\\u062a\\u0635\\u0627\\u0631\\u0627\\u062a \\u0633\\u0631\\u064a\\u0639\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0625\\u0635\\u0644\\u0627\\u062d \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0635\\u064a\\u0627\\u0646\\u0629 \\u0627\\u0644\\u0623\\u0635\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0639\\u0642\\u062f \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629 \\u0627\\u0644\\u0642\\u0627\\u062f\\u0645\\u0629\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0623\\u0645\\u0631 \\u0627\\u0644\\u0639\\u0645\\u0644\", \"col\": 3}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"\\u0637\\u0644\\u0628 \\u0642\\u0637\\u0639\\u0629 \\u063a\\u064a\\u0627\\u0631\", \"col\": 3}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0623\\u062f\\u0648\\u0627\\u062a \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0639\\u0645\\u0644\\u064a\\u0627\\u062a \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629\", \"col\": 6}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0642\\u0637\\u0639 \\u0627\\u0644\\u063a\\u064a\\u0627\\u0631 \\u0648\\u062a\\u062d\\u0644\\u064a\\u0644 \\u0627\\u0644\\u0623\\u0639\\u0637\\u0627\\u0644\", \"col\": 6}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0633\\u0644\\u0627\\u0645\\u0629 \\u0648\\u0627\\u0644\\u062a\\u0635\\u0627\\u0631\\u064a\\u062d\", \"col\": 6}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u0627\\u0644\\u0645\\u064a\\u0632\\u0627\\u0646\\u064a\\u0629 \\u0648\\u0627\\u0644\\u062a\\u0648\\u062b\\u064a\\u0642\", \"col\": 6}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>\\u0627\\u0644\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631</b></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"\\u062a\\u0642\\u0627\\u0631\\u064a\\u0631 \\u0627\\u0644\\u0635\\u064a\\u0627\\u0646\\u0629\", \"col\": 6}}]",
   "number_cards": [
    {
     "number_card_name": "Assets Under Repair"
    },
    {
     "number_card_name": "Open Asset Repairs"
+   },
+   {
+    "number_card_name": "Open Work Orders"
+   },
+   {
+    "number_card_name": "SLA Breached Work Orders"
    }
   ],
   "shortcuts": [
@@ -1016,6 +1022,11 @@
    {
     "label": "أمر العمل",
     "link_to": "Asset Work Order",
+    "type": "DocType"
+   },
+   {
+    "label": "طلب قطعة غيار",
+    "link_to": "Asset Spare Part Request",
     "type": "DocType"
    }
   ],
@@ -1092,6 +1103,92 @@
    },
    {
     "type": "Card Break",
+    "label": "قطع الغيار وتحليل الأعطال",
+    "hidden": 0,
+    "link_count": 4,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "قطعة الغيار",
+    "link_to": "Asset Spare Part",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "طلب قطعة غيار",
+    "link_to": "Asset Spare Part Request",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تحليل أسباب العطل",
+    "link_to": "Asset Failure Analysis",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "خطة الاستبدال",
+    "link_to": "Asset Replacement Plan",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
+    "label": "السلامة والتصاريح",
+    "hidden": 0,
+    "link_count": 4,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تصريح العمل",
+    "link_to": "Asset Work Permit",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "تقرير الحادث",
+    "link_to": "Asset Incident Report",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "فحص السلامة",
+    "link_to": "Asset Safety Inspection",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "تقييم المخاطر",
+    "link_to": "Asset Risk Assessment",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Card Break",
     "label": "الميزانية والتوثيق",
     "hidden": 0,
     "link_count": 5,
@@ -1146,7 +1243,7 @@
     "type": "Card Break",
     "label": "تقارير الصيانة",
     "hidden": 0,
-    "link_count": 8,
+    "link_count": 10,
     "onboard": 0
    },
    {
@@ -1218,6 +1315,24 @@
     "type": "Link",
     "label": "ميزانية الصيانة مقابل الفعلي",
     "link_to": "Maintenance Budget vs Actual",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "حالة قطع الغيار",
+    "link_to": "Asset Spare Parts Status",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "إجمالي تكلفة الملكية (إصلاح أم استبدال)",
+    "link_to": "Asset Total Cost of Ownership",
     "link_type": "Report",
     "is_query_report": 1,
     "hidden": 0,
