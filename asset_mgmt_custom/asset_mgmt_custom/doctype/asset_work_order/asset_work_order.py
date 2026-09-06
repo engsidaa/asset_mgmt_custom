@@ -15,6 +15,33 @@ class AssetWorkOrder(Document):
     def validate(self):
         self._set_default_title()
 
+    def before_submit(self):
+        self._enforce_loto_gate()
+
+    def _enforce_loto_gate(self):
+        """
+        تسليم أمر العمل (submit) هو اللحظة التي تتحول فيها حالته تلقائياً
+        إلى "قيد التنفيذ" (on_submit) — أي بدء العمل الفعلي على الأصل.
+        لو مرتبط بتصريح عمل (work_permit) يتطلب عزل طاقة (requires_loto)،
+        يُمنَع التسليم حتى يُوقَّع اكتمال قائمة العزل فعلياً
+        (Asset Work Permit.complete_loto_checklist) — لا يمكن بدء العمل
+        على معدة خطرة بدون توثيق العزل أولاً.
+        """
+        if not self.get("work_permit"):
+            return
+        permit = frappe.db.get_value(
+            "Asset Work Permit", self.work_permit, ["requires_loto", "loto_verified"], as_dict=True
+        )
+        if permit and permit.requires_loto and not permit.loto_verified:
+            frappe.throw(
+                _(
+                    "The linked Work Permit {0} requires energy isolation (LOTO) sign-off before "
+                    "this work order can start. Complete and sign off the isolation checklist on "
+                    "the permit first."
+                ).format(self.work_permit),
+                title=_("LOTO Sign-off Required"),
+            )
+
     def before_insert(self):
         self._apply_sla_policy()
         if not self.assigned_technician:

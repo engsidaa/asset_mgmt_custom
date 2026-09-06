@@ -126,6 +126,94 @@
    "label": "أمر العمل المرتبط",
    "options": "Asset Work Order",
    "description": "أمر العمل الذي يستلزم هذا التصريح"
+  },
+  {
+   "fieldname": "sec_break_loto",
+   "fieldtype": "Section Break",
+   "label": "عزل الطاقة (Lockout / Tagout)",
+   "description": "للمعدات الخطرة (كهرباء جهد عالي، خطوط غاز، محركات دوارة...) — يمنع أمر العمل المرتبط من الانتقال لحالة 'قيد التنفيذ' حتى تكتمل هذه الخطوات وتُوقَّع"
+  },
+  {
+   "fieldname": "requires_loto",
+   "fieldtype": "Check",
+   "label": "يتطلب إجراءات عزل طاقة"
+  },
+  {
+   "fieldname": "energy_source_identified",
+   "fieldtype": "Check",
+   "label": "تحديد مصدر (مصادر) الطاقة",
+   "depends_on": "eval:doc.requires_loto"
+  },
+  {
+   "fieldname": "equipment_deenergized",
+   "fieldtype": "Check",
+   "label": "فصل الطاقة عن المعدة",
+   "depends_on": "eval:doc.requires_loto"
+  },
+  {
+   "fieldname": "col_break_loto_1",
+   "fieldtype": "Column Break",
+   "depends_on": "eval:doc.requires_loto"
+  },
+  {
+   "fieldname": "lockout_applied",
+   "fieldtype": "Check",
+   "label": "تركيب أقفال العزل (Lockout)",
+   "depends_on": "eval:doc.requires_loto"
+  },
+  {
+   "fieldname": "tagout_applied",
+   "fieldtype": "Check",
+   "label": "تعليق لافتات التحذير (Tagout)",
+   "depends_on": "eval:doc.requires_loto"
+  },
+  {
+   "fieldname": "col_break_loto_2",
+   "fieldtype": "Column Break",
+   "depends_on": "eval:doc.requires_loto"
+  },
+  {
+   "fieldname": "zero_energy_verified",
+   "fieldtype": "Check",
+   "label": "التحقق الفعلي من صفر طاقة",
+   "depends_on": "eval:doc.requires_loto"
+  },
+  {
+   "fieldname": "ppe_confirmed",
+   "fieldtype": "Check",
+   "label": "تأكيد توفر معدات الحماية الشخصية",
+   "depends_on": "eval:doc.requires_loto"
+  },
+  {
+   "fieldname": "sec_break_loto_signoff",
+   "fieldtype": "Section Break",
+   "depends_on": "eval:doc.requires_loto"
+  },
+  {
+   "fieldname": "loto_verified",
+   "fieldtype": "Check",
+   "label": "اكتمل عزل الطاقة (موقَّع)",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "loto_verified_by",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "وقَّع عليه",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "col_break_loto_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "loto_verified_on",
+   "fieldtype": "Datetime",
+   "label": "تاريخ التوقيع",
+   "read_only": 1,
+   "allow_on_submit": 1
   }
  ],
  "permissions": [
