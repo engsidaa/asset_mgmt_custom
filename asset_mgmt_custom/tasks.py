@@ -1,7 +1,7 @@
 """Scheduled tasks for asset_mgmt_custom."""
 import frappe
 from frappe import _
-from frappe.utils import date_diff, today, add_days, now_datetime
+from frappe.utils import date_diff, today, add_days, now_datetime, flt
 
 
 # ---------------------------------------------------------------------------
@@ -621,10 +621,14 @@ def check_missed_cleaning():
 
 def check_spare_parts_low():
     """
-    Daily: notify when Asset Spare Part quantity is below minimum_qty.
+    Daily: notify when Asset Spare Part quantity is below minimum_qty, and
+    auto-create a draft restocking Material Request when neither is
+    already true (Asset Category BOM feature closed the loop on knowing
+    what parts an asset needs — this closes the loop on actually
+    reordering them instead of relying on someone noticing the alert).
     """
     low_parts = frappe.db.sql("""
-        SELECT name, item_name, quantity, minimum_qty, location
+        SELECT name, item_name, quantity, minimum_qty, location, item_code
         FROM `tabAsset Spare Part`
         WHERE minimum_qty > 0 AND quantity < minimum_qty
     """, as_dict=True)
@@ -640,6 +644,46 @@ def check_spare_parts_low():
             part.item_name, part.quantity, part.minimum_qty,
             part.location or "N/A")
         _create_notification(subject, content, "Asset Spare Part", part.name, manager_users)
+        _auto_reorder_spare_part(part)
+
+
+def _auto_reorder_spare_part(part):
+    """
+    ينشئ Material Request (Purchase) كمسودة فقط — بنفس نمط
+    Asset Requisition.create_purchase_requisition الموجود بالفعل (مسودة
+    تنتظر مراجعة بشرية قبل التسليم، وليست طلباً ملزماً تلقائياً بالكامل).
+    يتحقق أولاً أنه لا يوجد بالفعل طلب شراء معتمد لنفس الصنف لسه Pending،
+    لتفادي تكرار الطلب كل يوم لحد ما حد يعالج الأول.
+    """
+    if not part.item_code:
+        return
+
+    existing = frappe.db.sql("""
+        SELECT mri.parent
+        FROM `tabMaterial Request Item` mri
+        JOIN `tabMaterial Request` mr ON mr.name = mri.parent
+        WHERE mri.item_code = %s AND mr.docstatus < 2
+          AND mr.status IN ('Draft', 'Pending', 'Partially Ordered', 'Partially Received')
+        LIMIT 1
+    """, part.item_code)
+    if existing:
+        return
+
+    # هدف إعادة التخزين: ضعف الحد الأدنى — رصيد احتياطي بدل الاكتفاء
+    # بالوصول للحد الأدنى بالظبط، فيُعاد الطلب فوراً تاني.
+    target_stock = flt(part.minimum_qty) * 2
+    reorder_qty = max(target_stock - flt(part.quantity), flt(part.minimum_qty))
+
+    mr = frappe.new_doc("Material Request")
+    mr.material_request_type = "Purchase"
+    mr.transaction_date = today()
+    mr.schedule_date = add_days(today(), 14)
+    mr.append("items", {
+        "item_code": part.item_code,
+        "qty": reorder_qty,
+        "schedule_date": mr.schedule_date,
+    })
+    mr.insert(ignore_permissions=True)
 
 
 # ---------------------------------------------------------------------------
