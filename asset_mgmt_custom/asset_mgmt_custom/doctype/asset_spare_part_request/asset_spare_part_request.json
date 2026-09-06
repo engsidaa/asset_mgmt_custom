@@ -193,6 +193,17 @@
   {
    "role": "Asset Technician",
    "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
+   "print": 1
+  },
+  {
+   "role": "Maintenance Vendor",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 1,
    "print": 1
   },
   {

@@ -5,6 +5,14 @@ from frappe.utils import flt, today
 
 
 class AssetSparePartRequest(Document):
+    def before_insert(self):
+        # requested_by إجباري (Link إلى Employee) — الفني في تطبيق الموبايل
+        # لا يعرف بالضرورة اسم سجل الموظف الخاص به، فيُشتَق تلقائياً من
+        # حساب المستخدم الحالي (نفس نمط ربط User<->Employee المُستخدَم فعلاً
+        # في get_app_context)، بدل إجباره على اختياره يدوياً في كل مرة.
+        if not self.requested_by:
+            self.requested_by = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
+
     def validate(self):
         if (self.quantity_requested or 0) <= 0:
             frappe.throw("Quantity requested must be greater than zero.")
