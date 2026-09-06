@@ -86,6 +86,15 @@
    "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "ملاحظات"
+  },
+  {
+   "fieldname": "linked_allocation",
+   "fieldtype": "Link",
+   "label": "تخصيص الموظف المرتبط",
+   "options": "Asset Employee Allocation",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "description": "يُحدَّث تلقائياً (Status=Returned) عند تعليم هذا الطلب كمُعاد (mark_returned) إن وُجد تخصيص نشط مطابق لنفس الأصل والموظف"
   }
  ],
  "permissions": [
