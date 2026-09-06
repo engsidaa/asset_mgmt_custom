@@ -26,14 +26,92 @@ from frappe.utils import flt, today
 
 
 def validate(doc, method=None):
+    _inherit_branch_and_cost_center(doc)
     _enforce_spare_asset_rules(doc)
     _apply_used_depreciation_rate(doc)
     _auto_set_incomplete_status(doc)
     _auto_set_uncoded_status(doc)
 
 
+# ---------------------------------------------------------------------------
+# Branch / Cost Center Inheritance (Company -> Branch -> Location -> Asset)
+# ---------------------------------------------------------------------------
+
+def _inherit_branch_and_cost_center(doc):
+    """
+    يفرض هرمية الوراثة الإجبارية Company -> Branch -> Location -> Asset:
+    أي أصل جديد (بما فيها الأصول التي ينشئها ERPNext تلقائياً كمسودة عند
+    تسليم Purchase Receipt/Purchase Invoice لصنف is_fixed_asset — انظر
+    buying_controller.make_asset()، الذي يضبط location فقط ولا يعرف شيئاً
+    عن custom_branch/cost_center الخاصين بهذا التطبيق) يجب أن يرث الفرع
+    ومركز التكلفة تلقائياً من موقعه، دون إدخال يدوي.
+
+    هذا ضروري تحديداً لرسملة الـ CWIP: Asset.make_gl_entries() (كود Core
+    في erpnext/assets/doctype/asset/asset.py) يستخدم self.cost_center
+    مباشرة في قيد تحويل رصيد "أصول تحت التنفيذ" إلى "الأصول الثابتة" عند
+    تسليم الأصل — فلو تُرك فارغاً، يُفقد ربط مركز التكلفة بالفرع في هذا
+    القيد المحاسبي الأهم في دورة حياة الأصل بالكامل.
+
+    ملاحظة: لا حاجة لأي كود مخصص لتوليد قيد الرسملة نفسه — رسملة CWIP
+    كاملة (تفعيل enable_cwip_accounting على Asset Category + ضبط
+    capital_work_in_progress_account/fixed_asset_account على Asset
+    Category Account) مبنية بالفعل في ERPNext الأساسي وتعمل تلقائياً
+    عند تسليم (submit) الأصل — إعادة بنائها هنا كانت ستكرر/تصادم مع
+    منطق Core مباشرة.
+    """
+    if not doc.location:
+        return
+
+    if not doc.get("custom_branch"):
+        branch = frappe.db.get_value(
+            "Branch", {"custom_default_location": doc.location}, "name"
+        )
+        if branch:
+            doc.custom_branch = branch
+
+    if not doc.cost_center:
+        cost_center = frappe.db.get_value("Location", doc.location, "custom_cost_center")
+        if not cost_center and doc.get("custom_branch"):
+            cost_center = frappe.db.get_value("Branch", doc.custom_branch, "custom_cost_center")
+        if cost_center:
+            doc.cost_center = cost_center
+
+
 def after_insert(doc, method=None):
     _set_maintenance_schedule_from_category(doc)
+    _link_source_requisition(doc)
+
+
+def _link_source_requisition(doc):
+    """
+    يُكمِل سلسلة التتبع الكاملة لرسملة الأصل من ميزانية رأسمالية:
+    Asset Requisition -> Material Request -> Purchase Receipt -> Asset.
+
+    ERPNext الأساسي (buying_controller.make_asset()) يضبط
+    doc.purchase_receipt_item عند إنشاء الأصل تلقائياً من بند فعلي في
+    Purchase Receipt، لكنه لا يعرف شيئاً عن Asset Requisition الخاص بهذا
+    التطبيق. هنا نتتبَّع للخلف: Purchase Receipt Item -> Material Request
+    (حقل قياسي) -> custom_source_asset_requisition (حقل مخصص أضفناه) ->
+    Asset Requisition، ثم نربط الاتجاهين معاً.
+    """
+    if not doc.get("purchase_receipt_item"):
+        return
+
+    material_request = frappe.db.get_value(
+        "Purchase Receipt Item", doc.purchase_receipt_item, "material_request"
+    )
+    if not material_request:
+        return
+
+    requisition = frappe.db.get_value(
+        "Material Request", material_request, "custom_source_asset_requisition"
+    )
+    if not requisition:
+        return
+
+    frappe.db.set_value("Asset", doc.name, "custom_source_requisition", requisition, update_modified=False)
+    if not frappe.db.get_value("Asset Requisition", requisition, "linked_asset"):
+        frappe.db.set_value("Asset Requisition", requisition, "linked_asset", doc.name, update_modified=False)
 
 
 def _set_maintenance_schedule_from_category(doc):

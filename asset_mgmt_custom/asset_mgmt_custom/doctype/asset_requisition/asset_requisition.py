@@ -286,8 +286,12 @@ class AssetRequisition(Document):
         mr.material_request_type = "Purchase"
         mr.transaction_date = frappe.utils.today()
         mr.schedule_date = self.required_by or frappe.utils.add_days(frappe.utils.today(), 30)
-        mr.custom_source_asset_requisition = self.name if frappe.db.exists("Custom Field",
-            "Material Request-custom_source_asset_requisition") else None
+        # custom_source_asset_requisition الآن حقل مضبوط فعلياً عبر
+        # fixtures/custom_field.json (كان قبل ذلك مجرد شرط دفاعي دائماً
+        # False لأن الحقل لم يكن موجوداً إطلاقاً — فكانت حلقة التتبع
+        # Asset Requisition -> Material Request -> Purchase Receipt -> Asset
+        # مقطوعة بصمت من نقطة البداية نفسها).
+        mr.custom_source_asset_requisition = self.name
 
         if self.item_code:
             mr.append("items", {

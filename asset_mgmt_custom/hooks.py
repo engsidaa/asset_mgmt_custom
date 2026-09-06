@@ -14,7 +14,7 @@ app_include_css = "/assets/asset_mgmt_custom/css/wizard_framework.css"
 fixtures = [
     {
         "dt": "Custom Field",
-        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Category Account", "Asset Maintenance Contract", "Asset Maintenance", "Branch", "Maintenance Team Member"]]],
+        "filters": [["dt", "in", ["Asset", "Asset Repair", "Location", "Asset Movement", "Asset Movement Item", "Asset Category", "Asset Category Account", "Asset Maintenance Contract", "Asset Maintenance", "Branch", "Maintenance Team Member", "Material Request"]]],
     },
     {
         "dt": "Property Setter",
