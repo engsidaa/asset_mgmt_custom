@@ -1,0 +1,24 @@
+{
+ "content": null,
+ "docstatus": 0,
+ "doctype": "Page",
+ "module": "Asset Mgmt Custom",
+ "name": "bulk-barcode-label-printing",
+ "owner": "Administrator",
+ "page_name": "bulk-barcode-label-printing",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Asset Manager"
+  },
+  {
+   "role": "Asset Technician"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "title": "طباعة ملصقات الباركود دفعة واحدة"
+}
