@@ -1,7 +1,16 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import today
+from frappe.utils import add_days, getdate, today
+
+# مصفوفة الحرجية (Asset Criticality Matrix) كانت غير مربوطة بأي قرار
+# تشغيلي فعلي — هذا هو أقصى فاصل مسموح بين فحصين للأصول الأعلى حرجية،
+# بحيث لا يقدر أحد (سهواً) يحدِّد فحص السلامة القادم بعد 6 أشهر لأصل
+# "حرج جداً".
+CRITICALITY_MAX_INSPECTION_INTERVAL_DAYS = {
+    "Critical": 30,
+    "High": 90,
+}
 
 
 class AssetSafetyInspection(Document):
@@ -9,7 +18,22 @@ class AssetSafetyInspection(Document):
         if self.inspection_date and self.next_inspection_date:
             if self.next_inspection_date <= self.inspection_date:
                 frappe.throw("Next Inspection Date must be after Inspection Date.")
+        self._cap_next_inspection_by_criticality()
         self._require_photo_on_fail()
+
+    def _cap_next_inspection_by_criticality(self):
+        if not self.asset or not self.inspection_date or not self.next_inspection_date:
+            return
+
+        max_days = CRITICALITY_MAX_INSPECTION_INTERVAL_DAYS.get(
+            frappe.db.get_value("Asset Criticality Matrix", {"asset": self.asset}, "criticality_level")
+        )
+        if not max_days:
+            return
+
+        max_allowed = add_days(self.inspection_date, max_days)
+        if getdate(self.next_inspection_date) > getdate(max_allowed):
+            self.next_inspection_date = max_allowed
 
     def _require_photo_on_fail(self):
         """توثيق حي إلزامي: أي بند فحص بنتيجة 'Fail' بلا صورة يُرفَض

@@ -7,6 +7,19 @@ from asset_mgmt_custom.overrides.asset_repair import _update_asset_maintenance_s
 from asset_mgmt_custom.notifications import send_critical_alert
 
 
+PRIORITY_RANK = {"عادي": 1, "متوسط": 2, "عاجل": 3, "حرج": 4}
+
+# مصفوفة الحرجية (Asset Criticality Matrix) كانت DocType موجوداً بالفعل
+# (بيانات تقييم فقط: مستوى الحرجية، الأثر، احتمالية العطل...) لكن غير
+# مربوط بأي قرار تشغيلي فعلي — مجرد تقرير يُقرأ يدوياً. هذا هو أدنى حد
+# لأولوية أمر العمل حسب حرجية الأصل، بحيث لا يُفتح أمر عمل لأصل "حرج
+# جداً" بأولوية "عادي" لمجرد أن مُنشئ الطلب لم ينتبه لذلك.
+CRITICALITY_PRIORITY_FLOOR = {
+    "Critical": "حرج",
+    "High": "عاجل",
+}
+
+
 class AssetWorkOrder(Document):
     FINAL_STATUSES = ("مكتمل", "ملغي", "مرفوض")
     MAINTENANCE_ROLES = ("Asset Technician", "Asset Manager", "System Manager", "Maintenance Vendor")
@@ -14,6 +27,23 @@ class AssetWorkOrder(Document):
 
     def validate(self):
         self._set_default_title()
+        self._apply_criticality_priority_floor()
+
+    def _apply_criticality_priority_floor(self):
+        """
+        يرفع أولوية أمر العمل تلقائياً (لا يخفضها أبداً) إذا كان الأصل
+        مُصنَّفاً High/Critical في Asset Criticality Matrix وأولوية
+        الطلب الحالية أقل من الحد الأدنى المفروض لهذا التصنيف.
+        """
+        if not self.asset:
+            return
+        floor = CRITICALITY_PRIORITY_FLOOR.get(
+            frappe.db.get_value("Asset Criticality Matrix", {"asset": self.asset}, "criticality_level")
+        )
+        if not floor:
+            return
+        if PRIORITY_RANK.get(self.priority, 0) < PRIORITY_RANK[floor]:
+            self.priority = floor
 
     def before_submit(self):
         self._enforce_loto_gate()

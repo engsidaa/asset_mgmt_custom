@@ -940,6 +940,47 @@ def check_calibration_due():
 
 
 # ---------------------------------------------------------------------------
+# Daily: safety inspection due (لم تكن موجودة إطلاقاً من قبل — Asset
+# Safety Inspection.next_inspection_date كان حقلاً بلا أي تتبُّع آلي،
+# خلافاً لكل الحقول المشابهة الأخرى في هذا التطبيق: Calibration، PM،
+# Compliance Certificate... إلخ، وكلها لها مهمة تنبيه مجدولة)
+# ---------------------------------------------------------------------------
+
+def check_safety_inspection_due():
+    """
+    Daily: notify when the NEXT safety inspection (per asset — أحدث فحص
+    مُسجَّل لكل أصل تحديداً، وليس كل السجلات التاريخية) is due in 30, 14,
+    or 7 days.
+    """
+    for days_ahead in [30, 14, 7]:
+        target = add_days(today(), days_ahead)
+        records = frappe.db.sql("""
+            SELECT si.name, si.asset, si.asset_name, si.inspection_date,
+                   si.next_inspection_date, si.inspector
+            FROM `tabAsset Safety Inspection` si
+            INNER JOIN (
+                SELECT asset, MAX(inspection_date) AS max_date
+                FROM `tabAsset Safety Inspection`
+                GROUP BY asset
+            ) latest ON latest.asset = si.asset AND latest.max_date = si.inspection_date
+            WHERE si.next_inspection_date = %(target)s
+        """, {"target": target}, as_dict=True)
+
+        if not records:
+            continue
+
+        manager_users = _get_manager_users()
+        for r in records:
+            subject = _("Safety Inspection Due in {0} days: {1}").format(
+                days_ahead, r.asset_name or r.asset)
+            content = _("Asset <b>{0}</b> is due for its next safety inspection on <b>{1}</b>. "
+                        "Last inspected by: {2} on {3}.").format(
+                r.asset_name or r.asset, r.next_inspection_date,
+                r.inspector or "N/A", r.inspection_date)
+            _create_notification(subject, content, "Asset Safety Inspection", r.name, manager_users)
+
+
+# ---------------------------------------------------------------------------
 # Daily: overdue employee allocations
 # ---------------------------------------------------------------------------
 
