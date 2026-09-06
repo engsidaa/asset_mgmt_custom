@@ -33,6 +33,56 @@
    "label": "أرقام المستلمين",
    "depends_on": "eval:doc.critical_alerts_enabled",
    "description": "أرقام هواتف بصيغة دولية (مثال: 96550001234)، مفصولة بفاصلة — تُرسَل ضمن جسم الطلب لتحدد بوابتك من يستقبل التنبيه"
+  },
+  {
+   "fieldname": "sec_esg",
+   "fieldtype": "Section Break",
+   "label": "محاسبة الكربون (ESG)",
+   "description": "معاملات تحويل الاستهلاك إلى مكافئ انبعاثات كربونية (CO2e) — قيم افتراضية عامة تقريبية فقط، يجب تعديلها بمعامل شبكة الكهرباء/الوقود الفعلي في الكويت أو حسب شهادة المورِّد"
+  },
+  {
+   "fieldname": "electricity_emission_factor",
+   "fieldtype": "Float",
+   "label": "معامل انبعاث الكهرباء (كجم CO2e / كيلوواط ساعة)",
+   "default": "0.4",
+   "precision": "4"
+  },
+  {
+   "fieldname": "diesel_emission_factor",
+   "fieldtype": "Float",
+   "label": "معامل انبعاث الديزل (كجم CO2e / لتر)",
+   "default": "2.68",
+   "precision": "4"
+  },
+  {
+   "fieldname": "col_break_esg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "petrol_emission_factor",
+   "fieldtype": "Float",
+   "label": "معامل انبعاث البنزين (كجم CO2e / لتر)",
+   "default": "2.31",
+   "precision": "4"
+  },
+  {
+   "fieldname": "natural_gas_emission_factor",
+   "fieldtype": "Float",
+   "label": "معامل انبعاث الغاز الطبيعي (كجم CO2e / لتر مكافئ)",
+   "default": "1.9",
+   "precision": "4"
+  },
+  {
+   "fieldname": "sec_energy_anomaly",
+   "fieldtype": "Section Break",
+   "label": "كشف شذوذ استهلاك الطاقة"
+  },
+  {
+   "fieldname": "energy_anomaly_threshold_pct",
+   "fieldtype": "Float",
+   "label": "نسبة الانحراف المُحفِّزة للتنبيه (%)",
+   "default": "15",
+   "description": "لو تجاوز استهلاك أصل ما هذه النسبة فوق متوسطه التاريخي الخاص، يُنشأ تنبيه وأمر فحص مبكر تلقائياً"
   }
  ],
  "permissions": [

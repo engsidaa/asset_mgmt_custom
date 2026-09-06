@@ -119,6 +119,28 @@
    "label": "Fuel Station / Vendor"
   },
   {
+   "fieldname": "co2e_kg",
+   "fieldtype": "Float",
+   "label": "مكافئ الكربون (كجم CO2e)",
+   "read_only": 1,
+   "precision": "2",
+   "description": "يُحسب تلقائياً حسب نوع الوقود ومعامل الانبعاث المطابق (Asset Mgmt Settings) — لا يُحسب لنوع 'Electric' (لا يوجد استهلاك وقود سائل فعلي)"
+  },
+  {
+   "fieldname": "is_anomaly",
+   "fieldtype": "Check",
+   "label": "استهلاك شاذ (Anomaly)",
+   "read_only": 1,
+   "description": "يتجاوز متوسط استهلاك هذا الأصل التاريخي الخاص (لتر/كم مقطوع) بالنسبة المحدَّدة في Asset Mgmt Settings"
+  },
+  {
+   "fieldname": "anomaly_work_order",
+   "fieldtype": "Link",
+   "options": "Asset Work Order",
+   "label": "أمر فحص الشذوذ",
+   "read_only": 1
+  },
+  {
    "fieldname": "sec_break_notes",
    "fieldtype": "Section Break",
    "label": "Notes"

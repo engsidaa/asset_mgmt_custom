@@ -1285,7 +1285,7 @@
     "type": "Card Break",
     "label": "تقارير الصيانة",
     "hidden": 0,
-    "link_count": 11,
+    "link_count": 12,
     "onboard": 0
    },
    {
@@ -1388,6 +1388,15 @@
     "is_query_report": 1,
     "hidden": 0,
     "onboard": 1
+   },
+   {
+    "type": "Link",
+    "label": "بصمة الكربون حسب الفرع",
+    "link_to": "Carbon Footprint by Branch",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 0
    }
   ]
  }

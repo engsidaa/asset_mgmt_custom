@@ -1,0 +1,33 @@
+{
+ "doctype": "Report",
+ "name": "Carbon Footprint by Branch",
+ "report_name": "Carbon Footprint by Branch",
+ "ref_doctype": "Branch",
+ "report_type": "Script Report",
+ "is_standard": "Yes",
+ "module": "Asset Mgmt Custom",
+ "disabled": 0,
+ "filters": [
+  {
+   "fieldname": "from_date",
+   "label": "From Date",
+   "fieldtype": "Date"
+  },
+  {
+   "fieldname": "to_date",
+   "label": "To Date",
+   "fieldtype": "Date"
+  }
+ ],
+ "roles": [
+  {
+   "role": "Asset Manager"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Accounts Manager"
+  }
+ ]
+}

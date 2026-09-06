@@ -93,6 +93,28 @@
    "description": "يُحسب تلقائياً: الوحدات × السعر"
   },
   {
+   "fieldname": "co2e_kg",
+   "fieldtype": "Float",
+   "label": "مكافئ الكربون (كجم CO2e)",
+   "read_only": 1,
+   "precision": "2",
+   "description": "يُحسب تلقائياً: الوحدات المستهلكة × معامل انبعاث الكهرباء (Asset Mgmt Settings)"
+  },
+  {
+   "fieldname": "is_anomaly",
+   "fieldtype": "Check",
+   "label": "استهلاك شاذ (Anomaly)",
+   "read_only": 1,
+   "description": "يتجاوز متوسط استهلاك هذا الأصل التاريخي الخاص بالنسبة المحدَّدة في Asset Mgmt Settings"
+  },
+  {
+   "fieldname": "anomaly_work_order",
+   "fieldtype": "Link",
+   "options": "Asset Work Order",
+   "label": "أمر فحص الشذوذ",
+   "read_only": 1
+  },
+  {
    "fieldname": "sec_break_notes",
    "fieldtype": "Section Break",
    "label": "ملاحظات"
