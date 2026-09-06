@@ -4,6 +4,7 @@ from frappe.model.document import Document
 from frappe.utils import add_to_date, flt, now_datetime, today
 
 from asset_mgmt_custom.overrides.asset_repair import _update_asset_maintenance_summary
+from asset_mgmt_custom.notifications import send_critical_alert
 
 
 class AssetWorkOrder(Document):
@@ -17,6 +18,18 @@ class AssetWorkOrder(Document):
         self._apply_sla_policy()
         if not self.assigned_technician:
             self._auto_dispatch_technician()
+
+    def after_insert(self):
+        if self.priority == "حرج":
+            send_critical_alert(
+                subject=_("عطل حرج: {0}").format(self.title),
+                message=_("أمر عمل بأولوية 'حرج' على الأصل {0} ({1}). الوصف: {2}").format(
+                    self.asset, frappe.db.get_value("Asset", self.asset, "asset_name") or "",
+                    (self.problem_description or "")[:200],
+                ),
+                reference_doctype="Asset Work Order",
+                reference_name=self.name,
+            )
 
     def _set_default_title(self):
         """

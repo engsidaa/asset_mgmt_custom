@@ -912,3 +912,12 @@ def check_overdue_work_orders():
             recipients.append(policy_escalate_to)
 
         _create_notification(subject, content, "Asset Work Order", wo.name, recipients)
+
+        if wo.priority == "حرج":
+            from asset_mgmt_custom.notifications import send_critical_alert
+            send_critical_alert(
+                subject=subject,
+                message=content,
+                reference_doctype="Asset Work Order",
+                reference_name=wo.name,
+            )

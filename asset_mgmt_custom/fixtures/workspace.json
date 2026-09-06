@@ -1204,7 +1204,7 @@
     "type": "Card Break",
     "label": "الميزانية والتوثيق",
     "hidden": 0,
-    "link_count": 5,
+    "link_count": 6,
     "onboard": 0
    },
    {
@@ -1247,6 +1247,15 @@
     "type": "Link",
     "label": "مطالبة بالضمان",
     "link_to": "Asset Warranty Claim",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "إعدادات إدارة الأصول",
+    "link_to": "Asset Mgmt Settings",
     "link_type": "DocType",
     "is_query_report": 0,
     "hidden": 0,

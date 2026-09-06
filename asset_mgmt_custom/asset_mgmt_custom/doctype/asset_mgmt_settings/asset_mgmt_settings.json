@@ -1,0 +1,52 @@
+{
+ "doctype": "DocType",
+ "name": "Asset Mgmt Settings",
+ "module": "Asset Mgmt Custom",
+ "issingle": 1,
+ "fields": [
+  {
+   "fieldname": "sec_critical_alerts",
+   "fieldtype": "Section Break",
+   "label": "تنبيهات الأعطال الحرجة (واتساب/SMS)"
+  },
+  {
+   "fieldname": "critical_alerts_enabled",
+   "fieldtype": "Check",
+   "label": "تفعيل التنبيهات الفورية للأعطال الحرجة",
+   "default": "0",
+   "description": "عند التفعيل، يُرسَل طلب HTTP إلى الرابط أدناه فور إنشاء أمر عمل بأولوية 'حرج'، أو عند خرق مهلة SLA لأمر عمل حرج"
+  },
+  {
+   "fieldname": "critical_alert_webhook_url",
+   "fieldtype": "Data",
+   "label": "رابط بوابة الإشعارات (Webhook URL)",
+   "depends_on": "eval:doc.critical_alerts_enabled",
+   "description": "رابط أي بوابة تستقبل POST بصيغة JSON وتُرسِل بدورها واتساب/SMS — مثل Webhook خاص بـ Twilio، أو أتمتة عبر Zapier/Make/n8n. هذا التطبيق لا يرسل واتساب/SMS مباشرة، بل يُسلِّم البيانات لأي بوابة تحددها"
+  },
+  {
+   "fieldname": "col_break_critical",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "critical_alert_recipients",
+   "fieldtype": "Small Text",
+   "label": "أرقام المستلمين",
+   "depends_on": "eval:doc.critical_alerts_enabled",
+   "description": "أرقام هواتف بصيغة دولية (مثال: 96550001234)، مفصولة بفاصلة — تُرسَل ضمن جسم الطلب لتحدد بوابتك من يستقبل التنبيه"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "print": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "print": 1
+  }
+ ]
+}
