@@ -27,7 +27,21 @@ class AssetWorkPermit(Document):
         كل خطوات العزل + الوقت، عبر استدعاء صريح (وليس مجرد وضع علامة على
         حقل عادي) — بنفس نمط mark_coded()/set_operational() في هذا
         التطبيق. يُشترَط اكتمال كل خطوات القائمة أولاً.
+
+        فصل الصلاحيات (Segregation of Duties): يُشترَط دور "Safety
+        Inspector" تحديداً (أو System Manager للدعم الإداري) — لولا هذا
+        الشرط، كان أي فني (Asset Technician، وهو نفسه من يملك صلاحية
+        الكتابة على هذا المستند ونفَّذ خطوات العزل غالباً) يقدر يوقِّع
+        على عزل قام هو نفسه بتنفيذه، مما يُبطِل الغرض الأساسي من توقيع
+        LOTO (تحقق طرف مستقل).
         """
+        if "Safety Inspector" not in frappe.get_roles() and "System Manager" not in frappe.get_roles():
+            frappe.throw(
+                _("Only a Safety Inspector (or System Manager) can sign off on a LOTO checklist — "
+                  "the technician who performed the isolation cannot verify their own work."),
+                title=_("Not Authorized"),
+            )
+
         if not self.requires_loto:
             frappe.throw(_("This permit is not marked as requiring energy isolation (LOTO)."))
 

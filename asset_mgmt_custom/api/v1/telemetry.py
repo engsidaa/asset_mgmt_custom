@@ -23,7 +23,7 @@ import json
 
 import frappe
 from frappe import _
-from frappe.utils import flt, getdate, today
+from frappe.utils import flt, get_datetime, now_datetime
 
 PARAMETER_TO_METER_TYPE = {
     "temperature": "درجة الحرارة",
@@ -72,11 +72,16 @@ def _ingest_one_reading(reading):
     if not frappe.db.exists("Asset", asset):
         return {"asset": asset, "status": "error", "message": f"Asset {asset} not found."}
 
-    reading_date = getdate(timestamp) if timestamp else today()
+    reading_date = get_datetime(timestamp) if timestamp else now_datetime()
     value_fieldname = "temperature_celsius" if meter_type == "درجة الحرارة" else "current_reading"
 
-    # حماية بسيطة ضد التكرار: نفس الأصل/النوع/التاريخ/القيمة بالضبط —
-    # سيناريو واقعي عند إعادة إرسال شبكية لنفس الحزمة من بوابة IoT.
+    # حماية ضد التكرار: نفس الأصل/النوع/الطابع الزمني الكامل (لحظة
+    # بالثانية، وليس يوماً فقط — reading_date أصبح Datetime عمداً)/القيمة
+    # بالضبط — سيناريو واقعي عند إعادة إرسال شبكية لنفس الحزمة من بوابة
+    # IoT. قبل هذا التعديل كان reading_date تاريخاً فقط (بلا وقت)، فكانت
+    # قراءات متكررة مشروعة بنفس القيمة المستقرة (مثال: سلسلة تبريد ثابتة
+    # عند 4.0°م كل 5 دقائق طوال اليوم) تُصنَّف خطأً كتكرار وتُرفَض بعد أول
+    # قراءة في اليوم — يحرم ذلك إثبات استمرارية عمل الحساس زمنياً.
     duplicate = frappe.db.exists("Asset Meter Reading", {
         "asset": asset,
         "meter_type": meter_type,

@@ -168,6 +168,14 @@ class AssetSparePartRequest(Document):
             "qty": 1,
             "t_warehouse": spare_part.core_return_warehouse,
             "basic_rate": 0,
+            # allow_zero_valuation_rate إلزامي هنا (وليس مجرد basic_rate=0):
+            # هذا الحقل يعيش على سطر Stock Entry Detail نفسه، وليس على
+            # بطاقة الصنف (Item) — بدونه، set_basic_rate() في core يتجاهل
+            # الصفر ويحاول استنتاج قيمة تقييم فعلية عبر get_valuation_rate(
+            # raise_error_if_no_rate=True)، والتي ترمي استثناء "Valuation
+            # rate cannot be zero" لأي وحدة تالفة تُستلَم لأول مرة في
+            # مستودع استلام الأعطاب (لا يوجد له تاريخ تقييم سابق أصلاً).
+            "allow_zero_valuation_rate": 1,
             "serial_no": self.failed_unit_serial_no,
         }
         if cost_center:

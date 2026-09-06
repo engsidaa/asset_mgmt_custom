@@ -1,3 +1,4 @@
+import erpnext
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -46,7 +47,14 @@ class AssetWriteoffRequest(Document):
             # حقل parent فيه يشاور على "Asset Depreciation Schedule" الأب،
             # وليس على الأصل نفسه أبداً — فالقيمة الدفترية كانت دائماً =
             # سعر الشراء الكامل بدون خصم أي إهلاك متراكم فعلي).
-            book_value = asset.get_value_after_depreciation()
+            #
+            # تمرير finance_book صراحة إلزامي لو المنشأة تطبق دفاتر إهلاك
+            # متعددة (Multi-Book Depreciation — مثال: دفتر محاسبي + دفتر
+            # ضريبي بمعدل مختلف): بدونه، get_value_after_depreciation()
+            # تُعيد افتراضياً finance_books[0] فقط — قد لا يكون الدفتر
+            # الأساسي/الافتراضي فعلياً للشركة.
+            finance_book = asset.get("default_finance_book") or erpnext.get_default_finance_book(company)
+            book_value = asset.get_value_after_depreciation(finance_book)
 
         if not book_value:
             frappe.throw(_("لا يمكن تحديد القيمة الدفترية للأصل. يرجى تحديد المبلغ يدوياً."))

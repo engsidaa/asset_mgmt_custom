@@ -124,8 +124,22 @@ def update_job_status(work_order, action, reason=None):
     Asset Work Order، بما فيها كل فحوصات الصلاحية (_check_maintenance_role)
     والترحيل المحاسبي والصرف المخزني التلقائي — بلا أي منطق أعمال مكرر
     هنا.
+
+    فحص إضافي خاص بقناة الموبايل تحديداً: _check_maintenance_role في
+    Asset Work Order تسمح لأي مستخدم بدور "Asset Technician" بإتمام/رفض
+    أي أمر عمل (وليس المُسنَد إليه هو تحديداً فقط) — مقصود لواجهة Desk
+    (تغطية بين الفنيين). لكن قناة تطبيق الموبايل الميداني (هذا الملف) يجب
+    أن تقيّد كل فني بمهامه المُسنَدة إليه هو فقط، بنفس القيد المستخدَم
+    أصلاً في get_technician_jobs أعلاه — وإلا يقدر فني (من جهازه الخاص)
+    إغلاق مهمة مُسنَدة لزميل آخر عبر الـ API مباشرة.
     """
     doc = frappe.get_doc("Asset Work Order", work_order)
+    is_supervisor = bool({"Asset Manager", "System Manager"} & set(frappe.get_roles()))
+    if not is_supervisor and doc.assigned_technician and doc.assigned_technician != frappe.session.user:
+        frappe.throw(
+            _("You can only update work orders assigned to you."), frappe.PermissionError
+        )
+
     if action == "complete":
         doc.complete_work_order()
     elif action == "reject":

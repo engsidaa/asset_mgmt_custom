@@ -223,6 +223,15 @@ class AssetWorkOrder(Document):
         هذا الأمر (stock_entry موجود) يُلغى بالكامل — يُلغي حركة المخزون
         الخاصة به ويُعيد الكمية إلى Asset Spare Part، عبر
         Asset Spare Part Request.on_cancel() الموجودة أصلاً (بلا تكرار).
+
+        الإلغاء قد يفشل فعلياً (ليس افتراضياً نظرياً): لو حدثت حركة لاحقة
+        على نفس المستودع بعد الصرف (تسوية مخزون Stock Reconciliation، أو
+        صرف/بيع آخر)، سيرفض core إلغاء الـ Stock Entry القديمة لمنع هبوط
+        الرصيد لقيمة سالبة بتاريخ ماضٍ. بدون معالجة، هذا الاستثناء كان
+        سيُسقِط عملية إلغاء أمر العمل بالكامل (on_cancel لا يكتمل، فيبقى
+        أمر العمل غير قابل للإلغاء نهائياً حتى تُحل المشكلة يدوياً في
+        المخزون أولاً) — بدلاً من ذلك: نُسجِّل الفشل وننبِّه الإدارة
+        المالية لتسوية يدوية، ونكمل إلغاء بقية الطلبات وأمر العمل نفسه.
         """
         requests = frappe.get_all(
             "Asset Spare Part Request",
@@ -231,8 +240,25 @@ class AssetWorkOrder(Document):
         )
         for request_name in requests:
             request = frappe.get_doc("Asset Spare Part Request", request_name)
-            if request.get("stock_entry"):
+            if not request.get("stock_entry"):
+                continue
+            try:
                 request.cancel()
+            except Exception:
+                frappe.log_error(
+                    title="Failed to auto-cancel Asset Spare Part Request on Work Order cancellation",
+                    message=frappe.get_traceback(),
+                )
+                send_critical_alert(
+                    _("Manual stock reversal required — {0}").format(request_name),
+                    _(
+                        "Cancelling Asset Work Order {0} could not automatically reverse the linked "
+                        "Stock Entry for Asset Spare Part Request {1} (likely a later stock movement "
+                        "on the same warehouse blocks it). Please reverse it manually in Stock."
+                    ).format(self.name, request_name),
+                    reference_doctype="Asset Spare Part Request",
+                    reference_name=request_name,
+                )
 
     @frappe.whitelist()
     def reject_work_order(self, reason):

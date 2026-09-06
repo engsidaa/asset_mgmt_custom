@@ -176,6 +176,30 @@ def _higher_level_pm_due_same_day(asset, periodicity, exclude_task, target_date)
     return any(PM_PERIODICITY_RANK.get(s.periodicity, 0) > my_rank for s in siblings)
 
 
+def _advance_next_due_date_for_covered_task(task_name, periodicity):
+    """
+    مهمة صيانة أدنى مستوى لم يُنشأ لها أمر عمل مستقل لأن مهمة أعلى مستوى
+    غطَّتها في نفس اليوم (انظر _higher_level_pm_due_same_day) — لو تُركت
+    next_due_date كما هي (فائتة بالفعل)، ستظل تظهر "متأخرة (Overdue)" إلى
+    الأبد في send_maintenance_due_alerts/تقارير المتابعة رغم أنها مُغطاة
+    فعلياً. نُقدِّم الاستحقاق للدورة القادمة بنفس دالة Core الأصلية
+    (calculate_next_due_date)، بدل حساب الفاصل الزمني يدوياً هنا.
+    """
+    from erpnext.assets.doctype.asset_maintenance.asset_maintenance import calculate_next_due_date
+
+    current_due_date, end_date = frappe.db.get_value(
+        "Asset Maintenance Task", task_name, ["next_due_date", "end_date"]
+    )
+    if not current_due_date:
+        return
+
+    new_due_date = calculate_next_due_date(periodicity, start_date=current_due_date, end_date=end_date)
+    if new_due_date:
+        frappe.db.set_value(
+            "Asset Maintenance Task", task_name, "next_due_date", new_due_date, update_modified=False
+        )
+
+
 def _auto_create_work_order_from_task(task):
     """
     ينشئ Asset Work Order تلقائياً (كمسودة، لم يُسلَّم بعد) من بند صيانة
@@ -197,6 +221,7 @@ def _auto_create_work_order_from_task(task):
     if task.get("periodicity") and _higher_level_pm_due_same_day(
         task.asset, task.periodicity, task.task_name, today()
     ):
+        _advance_next_due_date_for_covered_task(task.task_name, task.periodicity)
         return
 
     branch = frappe.db.get_value("Asset", task.asset, "custom_branch")
@@ -271,7 +296,22 @@ def check_meter_triggered_pm():
         if latest_reading is None:
             continue
 
-        delta = flt(latest_reading) - flt(task.last_triggered_value)
+        last_triggered_value = flt(task.last_triggered_value)
+        if flt(latest_reading) < last_triggered_value:
+            # العداد استُبدل أو أُعيد ضبطه فعلياً (Meter Rollover/Replacement):
+            # القراءة الحالية أقل من آخر مرجع مُخزَّن، فحساب الفرق كتراكم
+            # سالب كان سيوقف محرك الصيانة المُشغَّل بالعداد لهذا الأصل نهائياً
+            # (لن يصل الفرق للحد المطلوب مرة أخرى أبداً عملياً). نُعيد ضبط
+            # المرجع للصفر فوراً في قاعدة البيانات (باعتبار العداد الجديد بدأ
+            # من الصفر)، فتُحسَب القراءات اللاحقة كتراكم جديد صحيح.
+            last_triggered_value = 0
+            frappe.db.set_value(
+                "Asset Maintenance Task", task.task_name,
+                "custom_last_triggered_meter_value", 0,
+                update_modified=False,
+            )
+
+        delta = flt(latest_reading) - last_triggered_value
         if delta < flt(task.trigger_value):
             continue
 
