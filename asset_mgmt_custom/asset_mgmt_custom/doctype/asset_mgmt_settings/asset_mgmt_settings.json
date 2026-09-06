@@ -5,9 +5,16 @@
  "issingle": 1,
  "fields": [
   {
-   "fieldname": "sec_critical_alerts",
+   "fieldname": "sec_daily_digest",
    "fieldtype": "Section Break",
-   "label": "تنبيهات الأعطال الحرجة (واتساب/SMS)"
+   "label": "الملخص اليومي الموحّد"
+  },
+  {
+   "fieldname": "daily_digest_enabled",
+   "fieldtype": "Check",
+   "label": "تفعيل الملخص اليومي الموحّد بالبريد",
+   "default": "0",
+   "description": "عند التفعيل، يُرسَل بريد واحد يومياً لكل مستخدم يجمع كل تنبيهاته من مهام هذا اليوم (صيانة مستحقة، عقود منتهية، مخزون منخفض...) بدل رسائل/إشعارات متناثرة طوال اليوم. لا يُلغي هذا إشعارات الجرس داخل النظام (In-App) — يضيف قناة ملخّص مجمَّع اختيارية فقط."
   },
   {
    "fieldname": "critical_alerts_enabled",

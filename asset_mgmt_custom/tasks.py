@@ -1242,6 +1242,72 @@ def check_overdue_work_orders():
 
 
 # ---------------------------------------------------------------------------
+# Daily: consolidated digest email (يُشغَّل آخر مهمة يومية عمداً — بعد كل
+# مهام التنبيه الأخرى، ليجمع كل ما أُنشئ منها في هذا التشغيل نفسه)
+# ---------------------------------------------------------------------------
+
+def send_daily_digest_email():
+    """
+    24 مهمة تنبيه يومية منفصلة في هذا الملف، كل واحدة تُنشئ Notification
+    Log مستقلاً (جرس داخل النظام) لكل مستلم — يظهر للمستخدم كرسائل
+    متناثرة طوال اليوم بدل ملخص واحد يفتحه صباحاً. هذه المهمة **إضافية**
+    (لا تُلغي أو تُعدِّل أياً من المهام الـ24، ولا تمسّ إشعارات الجرس
+    القائمة) — تفعيلها اختياري عبر Asset Mgmt Settings.daily_digest_
+    enabled (افتراضياً معطَّلة).
+
+    تُقرَأ كل سجلات Notification Log من نوع 'Alert' التي أُنشئت اليوم
+    (نفس السجلات التي تُنشئها _create_notification في كل مكان بهذا
+    الملف — مصدر بيانات واحد موجود بالفعل، بلا أي استعلام مكرر لكل نوع
+    تنبيه على حدة)، تُجمَّع حسب المستلم (for_user)، ويُرسَل بريد واحد
+    لكل مستلم له تنبيه واحد على الأقل اليوم.
+    """
+    if not frappe.db.get_single_value("Asset Mgmt Settings", "daily_digest_enabled"):
+        return
+
+    today_start = f"{today()} 00:00:00"
+    alerts = frappe.db.sql("""
+        SELECT for_user, subject, document_type, document_name
+        FROM `tabNotification Log`
+        WHERE type = 'Alert' AND creation >= %(today_start)s
+        ORDER BY for_user, creation
+    """, {"today_start": today_start}, as_dict=True)
+
+    if not alerts:
+        return
+
+    by_user = {}
+    for a in alerts:
+        if not a.for_user:
+            continue
+        by_user.setdefault(a.for_user, []).append(a)
+
+    for user, user_alerts in by_user.items():
+        rows_html = "".join(
+            f"<li><b>{frappe.utils.escape_html(a.subject)}</b>"
+            f"{' — ' + frappe.utils.get_url_to_form(a.document_type, a.document_name) if a.document_type and a.document_name else ''}"
+            f"</li>"
+            for a in user_alerts
+        )
+        message = _(
+            "<p>ملخص تنبيهات اليوم ({0}) — {1} تنبيه:</p><ul>{2}</ul>"
+        ).format(today(), len(user_alerts), rows_html)
+
+        email = frappe.db.get_value("User", user, "email")
+        if not email:
+            continue
+
+        try:
+            frappe.sendmail(
+                recipients=[email],
+                subject=_("الملخص اليومي — {0} تنبيه ({1})").format(len(user_alerts), today()),
+                message=message,
+                now=False,
+            )
+        except Exception:
+            frappe.log_error(title="send_daily_digest_email failed", message=frappe.get_traceback())
+
+
+# ---------------------------------------------------------------------------
 # Weekly: CapEx budget overrun alert
 # ---------------------------------------------------------------------------
 
