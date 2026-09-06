@@ -44,6 +44,16 @@
    "in_list_view": 1
   },
   {
+   "fieldname": "lease_direction",
+   "fieldtype": "Select",
+   "label": "اتجاه الإيجار",
+   "options": "We are the Lessor\nWe are the Lessee",
+   "default": "We are the Lessor",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "We are the Lessor: نؤجِّر أصلاً نملكه لطرف آخر (الوضع الافتراضي، السلوك الحالي دون تغيير). We are the Lessee: نستأجر معدة لا نملكها من طرف آخر — هذا هو الوضع الذي تنطبق عليه محاسبة IFRS 16 (أصل حق الاستخدام + التزام الإيجار) أسفل هذا النموذج"
+  },
+  {
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
@@ -146,6 +156,122 @@
    "label": "Company",
    "options": "Company",
    "reqd": 1
+  },
+  {
+   "fieldname": "section_ifrs16",
+   "fieldtype": "Section Break",
+   "label": "محاسبة الإيجار (IFRS 16) — للمعدات المُستأجَرة من الغير",
+   "depends_on": "eval:doc.lease_direction === 'We are the Lessee'",
+   "collapsible": 0
+  },
+  {
+   "fieldname": "discount_rate",
+   "fieldtype": "Float",
+   "label": "معدل الخصم السنوي (%)",
+   "description": "معدل الاقتراض الإضافي للمستأجر (Incremental Borrowing Rate) — يُستخدَم لحساب القيمة الحالية لأصل حق الاستخدام والتزام الإيجار",
+   "mandatory_depends_on": "eval:doc.lease_direction === 'We are the Lessee'"
+  },
+  {
+   "fieldname": "col_ifrs16_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "initial_rou_value",
+   "fieldtype": "Currency",
+   "label": "القيمة الابتدائية لأصل حق الاستخدام (ROU)",
+   "read_only": 1,
+   "description": "القيمة الحالية (Present Value) لإجمالي دفعات الإيجار المتبقية عند بدء العقد، محسوبة تلقائياً عند التسليم"
+  },
+  {
+   "fieldname": "lease_liability_balance",
+   "fieldtype": "Currency",
+   "label": "رصيد التزام الإيجار الحالي",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "description": "يتناقص تلقائياً مع كل قسط شهري (جزء أصل الالتزام فقط، وليس الفائدة)"
+  },
+  {
+   "fieldname": "sec_ifrs16_accounts",
+   "fieldtype": "Section Break",
+   "label": "الحسابات المحاسبية",
+   "depends_on": "eval:doc.lease_direction === 'We are the Lessee'"
+  },
+  {
+   "fieldname": "rou_asset_account",
+   "fieldtype": "Link",
+   "options": "Account",
+   "label": "حساب أصل حق الاستخدام (ROU Asset)",
+   "mandatory_depends_on": "eval:doc.lease_direction === 'We are the Lessee'"
+  },
+  {
+   "fieldname": "accumulated_rou_depreciation_account",
+   "fieldtype": "Link",
+   "options": "Account",
+   "label": "حساب مجمع إهلاك أصل حق الاستخدام",
+   "mandatory_depends_on": "eval:doc.lease_direction === 'We are the Lessee'"
+  },
+  {
+   "fieldname": "col_ifrs16_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "lease_liability_account",
+   "fieldtype": "Link",
+   "options": "Account",
+   "label": "حساب التزام الإيجار",
+   "mandatory_depends_on": "eval:doc.lease_direction === 'We are the Lessee'"
+  },
+  {
+   "fieldname": "interest_expense_account",
+   "fieldtype": "Link",
+   "options": "Account",
+   "label": "حساب مصروف الفائدة (تكلفة تمويل)",
+   "mandatory_depends_on": "eval:doc.lease_direction === 'We are the Lessee'"
+  },
+  {
+   "fieldname": "col_ifrs16_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rou_depreciation_expense_account",
+   "fieldtype": "Link",
+   "options": "Account",
+   "label": "حساب مصروف إهلاك أصل حق الاستخدام",
+   "mandatory_depends_on": "eval:doc.lease_direction === 'We are the Lessee'"
+  },
+  {
+   "fieldname": "lease_payable_account",
+   "fieldtype": "Link",
+   "options": "Account",
+   "label": "حساب دفع الإيجار (نقدية/دائنون)",
+   "mandatory_depends_on": "eval:doc.lease_direction === 'We are the Lessee'"
+  },
+  {
+   "fieldname": "sec_ifrs16_schedule",
+   "fieldtype": "Section Break",
+   "label": "جدول إطفاء الإيجار",
+   "depends_on": "eval:doc.lease_direction === 'We are the Lessee'"
+  },
+  {
+   "fieldname": "next_amortization_date",
+   "fieldtype": "Date",
+   "label": "تاريخ القسط التالي",
+   "read_only": 1,
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "initial_journal_entry",
+   "fieldtype": "Link",
+   "options": "Journal Entry",
+   "label": "قيد الاعتراف الابتدائي",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lease_amortization_schedule",
+   "fieldtype": "Table",
+   "options": "Asset Lease Amortization Entry",
+   "label": "أقساط الإيجار المُرحَّلة",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "section_notes",

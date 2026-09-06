@@ -1,0 +1,88 @@
+{
+ "doctype": "DocType",
+ "name": "Asset Lease Amortization Entry",
+ "module": "Asset Mgmt Custom",
+ "istable": 1,
+ "editable_grid": 1,
+ "track_changes": 0,
+ "fields": [
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "تاريخ القسط",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "payment_amount",
+   "fieldtype": "Currency",
+   "label": "قيمة القسط",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "interest_amount",
+   "fieldtype": "Currency",
+   "label": "الفائدة (تكلفة تمويل)",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "principal_amount",
+   "fieldtype": "Currency",
+   "label": "أصل الالتزام",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "closing_liability_balance",
+   "fieldtype": "Currency",
+   "label": "رصيد الالتزام بعد القسط",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "depreciation_amount",
+   "fieldtype": "Currency",
+   "label": "إهلاك أصل حق الاستخدام",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "options": "Journal Entry",
+   "label": "قيد اليومية",
+   "read_only": 1,
+   "in_list_view": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Finance Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  }
+ ]
+}

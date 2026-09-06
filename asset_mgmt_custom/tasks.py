@@ -528,6 +528,37 @@ def check_lease_expiry():
 
 
 # ---------------------------------------------------------------------------
+# Daily: IFRS 16 lease amortization (Lessee leases only)
+# ---------------------------------------------------------------------------
+
+def process_lease_amortization():
+    """
+    يومي: يفحص كل عقود الإيجار النشطة التي "نحن المستأجر" فيها
+    (lease_direction == "We are the Lessee") وحان تاريخ قسطها التالي
+    (next_amortization_date <= اليوم)، ويُرحِّل كل واحد عبر
+    frappe.enqueue منفصل — قيد يومية بفائدة/أصل التزام/إهلاك أصل حق
+    الاستخدام لكل عقد على حدة (انظر asset_lease.py::_post_monthly_amortization
+    لتفاصيل الحساب). مُرحَّل للخلفية تحسباً لعدد كبير من العقود دفعة واحدة.
+    """
+    leases = frappe.get_all(
+        "Asset Lease",
+        filters={
+            "docstatus": 1,
+            "status": "Active",
+            "lease_direction": "We are the Lessee",
+            "next_amortization_date": ["<=", today()],
+        },
+        pluck="name",
+    )
+    for lease_name in leases:
+        frappe.enqueue(
+            "asset_mgmt_custom.asset_mgmt_custom.doctype.asset_lease.asset_lease.post_monthly_amortization",
+            queue="long",
+            lease_name=lease_name,
+        )
+
+
+# ---------------------------------------------------------------------------
 # Daily: overdue asset checkouts
 # ---------------------------------------------------------------------------
 
