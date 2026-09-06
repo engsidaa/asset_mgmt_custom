@@ -1265,7 +1265,7 @@
     "type": "Card Break",
     "label": "تقارير الصيانة",
     "hidden": 0,
-    "link_count": 10,
+    "link_count": 11,
     "onboard": 0
    },
    {
@@ -1359,6 +1359,15 @@
     "is_query_report": 1,
     "hidden": 0,
     "onboard": 0
+   },
+   {
+    "type": "Link",
+    "label": "مؤشر صحة الفرع",
+    "link_to": "Branch Health Score",
+    "link_type": "Report",
+    "is_query_report": 1,
+    "hidden": 0,
+    "onboard": 1
    }
   ]
  }
