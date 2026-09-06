@@ -157,11 +157,19 @@ function build_wizard(page) {
 			);
 
 			if (wiz_state.photo_file && r && r.name) {
-				await asset_mgmt_custom.Wizard.upload_file(wiz_state.photo_file, {
+				const upload_res = await asset_mgmt_custom.Wizard.upload_file(wiz_state.photo_file, {
 					doctype: 'Asset Work Order',
 					docname: r.name,
 					fieldname: 'fault_photo',
 				});
+				// رفع الملف عبر upload_file يُنشئ سجل File مرتبطاً بالمستند فقط —
+				// لا يضبط قيمة الحقل fault_photo نفسه تلقائياً، فلازم تحديثه صراحةً.
+				if (upload_res && upload_res.message && upload_res.message.file_url) {
+					await frappe.xcall('frappe.client.set_value', {
+						doctype: 'Asset Work Order', name: r.name,
+						fieldname: 'fault_photo', value: upload_res.message.file_url,
+					});
+				}
 			}
 
 			frappe.show_alert({ message: __('تم إرسال طلب الصيانة بنجاح: {0}', [r.name]), indicator: 'green' });

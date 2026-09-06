@@ -1,0 +1,24 @@
+{
+ "content": null,
+ "docstatus": 0,
+ "doctype": "Page",
+ "module": "Asset Mgmt Custom",
+ "name": "asset-coding-wizard",
+ "owner": "Administrator",
+ "page_name": "asset-coding-wizard",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Asset Manager"
+  },
+  {
+   "role": "Branch Manager"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "title": "ترميز / تفعيل أصل"
+}
