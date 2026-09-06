@@ -1,10 +1,16 @@
 const FINAL_STATUSES = ["مكتمل", "ملغي", "مرفوض"];
-const MAINTENANCE_ROLES = ["Asset Technician", "Asset Manager", "System Manager"];
+const UNRESTRICTED_MAINTENANCE_ROLES = ["Asset Technician", "Asset Manager", "System Manager"];
 
 frappe.ui.form.on("Asset Work Order", {
 	refresh(frm) {
 		const is_open = frm.doc.docstatus === 1 && !FINAL_STATUSES.includes(frm.doc.status);
-		const is_maintenance_staff = MAINTENANCE_ROLES.some((r) => frappe.user_roles.includes(r));
+		const is_unrestricted_staff = UNRESTRICTED_MAINTENANCE_ROLES.some((r) => frappe.user_roles.includes(r));
+		// مورد صيانة خارجي (Maintenance Vendor) يقدر يتصرف بس في الأمر
+		// المُسنَد له هو تحديداً — نفس القيد المفروض على السيرفر
+		// (has_permission/get_permission_query_conditions).
+		const is_assigned_vendor = frappe.user_roles.includes("Maintenance Vendor")
+			&& frm.doc.assigned_technician === frappe.session.user;
+		const is_maintenance_staff = is_unrestricted_staff || is_assigned_vendor;
 
 		if (is_open && is_maintenance_staff) {
 			frm.add_custom_button(__("إتمام أمر العمل"), () => {

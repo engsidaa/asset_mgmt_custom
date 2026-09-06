@@ -68,6 +68,16 @@ fixtures = [
 ]
 
 # ---------------------------------------------------------------------------
+# Permission scoping — "مُسنَد إليّ فقط" لمورد الصيانة الخارجي
+# ---------------------------------------------------------------------------
+permission_query_conditions = {
+    "Asset Work Order": "asset_mgmt_custom.asset_mgmt_custom.doctype.asset_work_order.asset_work_order.get_permission_query_conditions",
+}
+has_permission = {
+    "Asset Work Order": "asset_mgmt_custom.asset_mgmt_custom.doctype.asset_work_order.asset_work_order.has_permission",
+}
+
+# ---------------------------------------------------------------------------
 # Doc Events – هوكات server-side على doctypes موجودة في ERPNext
 # ---------------------------------------------------------------------------
 doc_events = {

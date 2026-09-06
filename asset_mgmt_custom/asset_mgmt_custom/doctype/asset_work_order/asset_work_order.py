@@ -9,7 +9,8 @@ from asset_mgmt_custom.notifications import send_critical_alert
 
 class AssetWorkOrder(Document):
     FINAL_STATUSES = ("مكتمل", "ملغي", "مرفوض")
-    MAINTENANCE_ROLES = ("Asset Technician", "Asset Manager", "System Manager")
+    MAINTENANCE_ROLES = ("Asset Technician", "Asset Manager", "System Manager", "Maintenance Vendor")
+    UNRESTRICTED_ROLES = ("Asset Technician", "Asset Manager", "System Manager")
 
     def validate(self):
         self._set_default_title()
@@ -125,14 +126,26 @@ class AssetWorkOrder(Document):
         """
         Branch Manager عنده write=1 على هذا الـ DocType (عشان يعدّل مسودته
         قبل التسليم)، لكن ده لازم ميدّيهوش صلاحية إتمام أو رفض طلب صيانة —
-        دي مسؤولية فريق الصيانة فقط (Asset Technician/Asset Manager)،
+        دي مسؤولية فريق الصيانة فقط (Asset Technician/Asset Manager) أو
+        مورد صيانة خارجي (Maintenance Vendor) مُسنَد إليه الأمر تحديداً،
         مش صاحب الطلب نفسه.
+
+        دفاع مزدوج عمداً: has_permission()/get_permission_query_conditions
+        أسفل هذا الملف يمنعان أصلاً مورد الصيانة من فتح أمر عمل غير مُسنَد
+        له عبر أي مسار (واجهة، API، REST) — هذا الفحص هنا طبقة حماية
+        إضافية داخل الطريقة نفسها، تحسباً لأي مسار نداء مباشر يتجاوز طبقة
+        الصلاحيات القياسية (مثلاً استدعاء من سكريبت سيرفر آخر).
         """
-        if not set(self.MAINTENANCE_ROLES) & set(frappe.get_roles()):
-            frappe.throw(
-                _("Only maintenance staff (Asset Technician / Asset Manager) can perform this action."),
-                frappe.PermissionError,
-            )
+        roles = set(frappe.get_roles())
+        if roles & set(self.UNRESTRICTED_ROLES):
+            return
+        if "Maintenance Vendor" in roles and self.assigned_technician == frappe.session.user:
+            return
+        frappe.throw(
+            _("Only maintenance staff, or the vendor assigned to this specific work order, "
+              "can perform this action."),
+            frappe.PermissionError,
+        )
 
     def _post_maintenance_cost_gl_entry(self):
         """
@@ -292,3 +305,37 @@ class AssetWorkOrder(Document):
 
         if best_technician:
             self.assigned_technician = best_technician
+
+
+# ---------------------------------------------------------------------------
+# Maintenance Vendor scoping — bوابة موردي الصيانة الخارجيين
+# ---------------------------------------------------------------------------
+# مورد صيانة خارجي (Maintenance Vendor) لازم ميشوفش إلا أوامر العمل
+# المُسنَدة له تحديداً (assigned_technician = مستخدمه)، بلا صلاحية كاملة
+# زي Asset Manager. لا يوجد حقل Link مباشر يصلح لتقييد User Permission
+# التلقائي هنا (assigned_technician هو نفسه حقل Link->User، وتقييده عبر
+# User Permission كان سيُخفي كل المستخدمين الآخرين من كل الحقول في
+# النظام لهذا المستخدم) — لذلك يُستخدَم نفس أسلوب Frappe القياسي لتقييد
+# "مُسنَد إليّ فقط" (has_permission + permission_query_conditions)، مسجَّلان
+# في hooks.py.
+
+def get_permission_query_conditions(user=None):
+    if not user:
+        user = frappe.session.user
+    roles = set(frappe.get_roles(user))
+    if roles & set(AssetWorkOrder.UNRESTRICTED_ROLES):
+        return ""
+    if "Maintenance Vendor" in roles:
+        return f"`tabAsset Work Order`.assigned_technician = {frappe.db.escape(user)}"
+    return ""
+
+
+def has_permission(doc, ptype=None, user=None):
+    if not user:
+        user = frappe.session.user
+    roles = set(frappe.get_roles(user))
+    if roles & set(AssetWorkOrder.UNRESTRICTED_ROLES):
+        return None
+    if "Maintenance Vendor" in roles:
+        return doc.assigned_technician == user
+    return None
