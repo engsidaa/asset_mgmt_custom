@@ -50,6 +50,14 @@
    "default": "Today"
   },
   {
+   "fieldname": "asset_work_order",
+   "fieldtype": "Link",
+   "options": "Asset Work Order",
+   "label": "أمر العمل",
+   "description": "أمر العمل الذي استهلك هذه القطعة — عند تعبئته، تُصرَف القطعة تلقائياً (Stock Entry حقيقي) لحظة إتمام أمر العمل، بدل الصرف اليدوي المنفصل",
+   "allow_on_submit": 1
+  },
+  {
    "fieldname": "spare_part",
    "fieldtype": "Link",
    "options": "Asset Spare Part",
@@ -77,6 +85,21 @@
    "label": "الكمية الصادرة",
    "read_only": 1,
    "default": "0",
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "batch_no",
+   "fieldtype": "Link",
+   "options": "Batch",
+   "label": "رقم الوجبة (Batch)",
+   "description": "اختياري — للأصناف المتتبَّعة بالوجبة فقط",
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "serial_no",
+   "fieldtype": "Small Text",
+   "label": "الرقم التسلسلي (Serial No)",
+   "description": "اختياري — للأصناف المتتبَّعة بالرقم التسلسلي فقط، رقم واحد بكل سطر",
    "allow_on_submit": 1
   },
   {

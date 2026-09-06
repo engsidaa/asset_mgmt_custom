@@ -80,6 +80,10 @@ class AssetSparePartRequest(Document):
             item_row["cost_center"] = cost_center
         if expense_account:
             item_row["expense_account"] = expense_account
+        if self.get("batch_no"):
+            item_row["batch_no"] = self.batch_no
+        if self.get("serial_no"):
+            item_row["serial_no"] = self.serial_no
         se.append("items", item_row)
 
         se.insert(ignore_permissions=True)

@@ -72,6 +72,7 @@ class AssetWorkOrder(Document):
     def on_cancel(self):
         self.db_set("status", "ملغي")
         self._cancel_maintenance_cost_gl_entry()
+        self._cancel_linked_spare_part_requests()
         _update_asset_maintenance_summary(self.asset)
 
     @frappe.whitelist()
@@ -92,11 +93,61 @@ class AssetWorkOrder(Document):
             frappe.throw(
                 _("This work order is already in a final status ({0}).").format(self.status)
             )
+        self._auto_issue_linked_spare_parts()
         self.status = "مكتمل"
         if not self.completion_date:
             self.completion_date = today()
         self.save()
         return self.status
+
+    def _auto_issue_linked_spare_parts(self):
+        """
+        قبل الفصل: تكلفة قطع الغيار (spare_parts_cost) كانت رقماً يُكتب
+        يدوياً، بدون أي أثر مخزني فعلي — مجرد رقم يُستخدم في القيد
+        المحاسبي. الآن: أي Asset Spare Part Request مرتبط بهذا الأمر
+        (asset_work_order) وبحالة "Approved" لم يُصرَف بعد، يُصرَف تلقائياً
+        هنا (حركة Stock Entry حقيقية عبر issue_spare_part() الموجودة
+        أصلاً — بلا تكرار منطق)، ثم يُجمَّع spare_parts_cost من القيمة
+        المُقيَّمة الفعلية لهذه الحركات (وليس تقديراً يدوياً بعد الآن).
+
+        هذا يعني أيضاً أن تكلفة قطع الغيار لم تعد تُرحَّل ضمن القيد
+        اليومي في _post_maintenance_cost_gl_entry — لأن Stock Entry نفسها
+        تُنشئ قيدها المحاسبي الخاص بها تلقائياً (مدين حساب مصروف الصيانة/
+        دائن قيمة المخزون بالمستودع) لحظة تسليمها؛ ترحيلها مرة أخرى ضمن
+        قيد أمر العمل كان سيُكرِّر نفس المصروف محاسبياً مرتين.
+        """
+        requests = frappe.get_all(
+            "Asset Spare Part Request",
+            filters={"asset_work_order": self.name, "status": "Approved", "docstatus": 1},
+            pluck="name",
+        )
+        if not requests:
+            return
+
+        total = flt(self.spare_parts_cost)
+        for request_name in requests:
+            request = frappe.get_doc("Asset Spare Part Request", request_name)
+            se_name = request.issue_spare_part()
+            total += flt(frappe.db.get_value("Stock Entry", se_name, "total_outgoing_value"))
+
+        self.spare_parts_cost = total
+
+    def _cancel_linked_spare_part_requests(self):
+        """
+        عكس تلقائي عند إلغاء أمر العمل: أي طلب قطعة غيار صُرف فعلياً عبر
+        هذا الأمر (stock_entry موجود) يُلغى بالكامل — يُلغي حركة المخزون
+        الخاصة به ويُعيد الكمية إلى Asset Spare Part، عبر
+        Asset Spare Part Request.on_cancel() الموجودة أصلاً (بلا تكرار).
+        """
+        requests = frappe.get_all(
+            "Asset Spare Part Request",
+            filters={"asset_work_order": self.name, "docstatus": 1},
+            pluck="name",
+        )
+        for request_name in requests:
+            request = frappe.get_doc("Asset Spare Part Request", request_name)
+            if request.get("stock_entry"):
+                request.cancel()
 
     @frappe.whitelist()
     def reject_work_order(self, reason):
@@ -155,11 +206,21 @@ class AssetWorkOrder(Document):
         (custom_maintenance_accrued_liability_account) — نفس نمط OpEx
         المُستخدَم فعلياً في Asset Repair، لأن أمر العمل هنا دائماً مصروف
         تشغيلي (لا يوجد له مفهوم رسملة/CapEx مثل الإصلاح).
+
+        ملاحظة مهمة: spare_parts_cost لم يعد يُضاف هنا إلى القيد — منذ
+        _auto_issue_linked_spare_parts()، أصبحت تكلفة قطع الغيار (إن
+        وُجدت طلبات قطع غيار مرتبطة بهذا الأمر) تُرحَّل محاسبياً من خلال
+        القيد التلقائي الخاص بـ Stock Entry نفسها (تُنشئه ERPNext تلقائياً
+        عند تسليم حركة Material Issue). لو تُرحِّل هنا مرة أخرى ضمن
+        total_cost، ستُحمَّل نفس تكلفة قطع الغيار على حساب مصروف الصيانة
+        مرتين. لذلك: total_cost = العمالة (labor_cost) فقط، إلا لو حُدِّد
+        actual_cost يدوياً كتجاوز صريح — وفي هذه الحالة مسؤولية من يُدخله
+        عدم تضمين تكلفة قطع غيار مصروفة فعلياً بالفعل عبر Stock Entry.
         """
         if self.get("journal_entry"):
             return
 
-        total_cost = flt(self.actual_cost) or (flt(self.labor_cost) + flt(self.spare_parts_cost))
+        total_cost = flt(self.actual_cost) or flt(self.labor_cost)
         if not total_cost:
             return
 

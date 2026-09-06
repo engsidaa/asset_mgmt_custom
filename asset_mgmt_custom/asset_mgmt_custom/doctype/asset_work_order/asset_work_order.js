@@ -61,5 +61,17 @@ frappe.ui.form.on("Asset Work Order", {
 				frappe.set_route("Form", "Journal Entry", frm.doc.journal_entry);
 			}, __("المحاسبة"));
 		}
+
+		if (frm.doc.docstatus === 1 && !FINAL_STATUSES.includes(frm.doc.status)) {
+			// يُصرَف تلقائياً (Stock Entry حقيقي) لحظة إتمام أمر العمل —
+			// انظر Asset Work Order.complete_work_order() ->
+			// _auto_issue_linked_spare_parts()، وليس هنا.
+			frm.add_custom_button(__("طلب قطعة غيار لهذا الأمر"), () => {
+				frappe.new_doc("Asset Spare Part Request", {
+					asset: frm.doc.asset,
+					asset_work_order: frm.doc.name,
+				});
+			}, __("المخزون"));
+		}
 	},
 });
