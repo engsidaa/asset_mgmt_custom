@@ -127,6 +127,9 @@ doctype_js = {
     "Asset Write Off Request": "asset_mgmt_custom/doctype/asset_write_off_request/asset_write_off_request.js",
     "Asset Vendor Performance Rating": "asset_mgmt_custom/doctype/asset_vendor_performance_rating/asset_vendor_performance_rating.js",
     "Asset Complaint": "asset_mgmt_custom/doctype/asset_complaint/asset_complaint.js",
+    "Asset Performance Rating": "asset_mgmt_custom/doctype/asset_performance_rating/asset_performance_rating.js",
+    "Asset Transfer Request": "asset_mgmt_custom/doctype/asset_transfer_request/asset_transfer_request.js",
+    "Asset Return Request": "asset_mgmt_custom/doctype/asset_return_request/asset_return_request.js",
 }
 
 # ---------------------------------------------------------------------------
