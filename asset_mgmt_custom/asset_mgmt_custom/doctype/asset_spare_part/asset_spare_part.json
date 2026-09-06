@@ -115,6 +115,39 @@
    "label": "تاريخ آخر تعبئة"
   },
   {
+   "fieldname": "sec_break_rotable",
+   "fieldtype": "Section Break",
+   "label": "قطعة دوارة (Rotable)",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "is_rotable",
+   "fieldtype": "Check",
+   "label": "قطعة دوارة قابلة للتجديد",
+   "description": "أجزاء ميكانيكية/إلكترونية عالية القيمة تُفكَّك وتُستبدَل بأخرى جاهزة، ثم تُرسَل التالفة للتجديد بدل التخلص منها — وليس استهلاكاً نهائياً كقطع الغيار العادية"
+  },
+  {
+   "fieldname": "core_return_warehouse",
+   "fieldtype": "Link",
+   "options": "Warehouse",
+   "label": "مستودع استلام الأعطاب (Core Return)",
+   "depends_on": "eval:doc.is_rotable",
+   "description": "مستودع ورشة الصيانة المركزية الذي تُستقبَل فيه الوحدة التالفة عند فك واستبدالها، تمهيداً لتجديدها"
+  },
+  {
+   "fieldname": "col_break_rotable",
+   "fieldtype": "Column Break",
+   "depends_on": "eval:doc.is_rotable"
+  },
+  {
+   "fieldname": "pending_refurbishment_qty",
+   "fieldtype": "Float",
+   "label": "كمية بانتظار التجديد",
+   "read_only": 1,
+   "depends_on": "eval:doc.is_rotable",
+   "description": "عدد الوحدات التالفة المستلَمة في مستودع الاستلام وبانتظار تجديدها لإعادتها للخدمة"
+  },
+  {
    "fieldname": "sec_break_notes",
    "fieldtype": "Section Break",
    "label": "ملاحظات"

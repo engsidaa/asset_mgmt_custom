@@ -97,11 +97,60 @@ class AssetSparePartRequest(Document):
         self.db_set("quantity_issued", qty)
         self.db_set("status", "Issued")
 
+        if spare_part.get("is_rotable") and self.get("failed_unit_serial_no"):
+            self._receive_failed_core_unit(spare_part, company, cost_center)
+
         frappe.msgprint(
             _("تم إنشاء حركة المخزون: <a href='/app/stock-entry/{0}'>{0}</a>").format(se.name),
             alert=True, indicator="green"
         )
         return se.name
+
+    def _receive_failed_core_unit(self, spare_part, company, cost_center):
+        """
+        قطع الغيار الدوارة (Rotable): الوحدة التالفة التي فُكَّت واستُبدلت
+        بأخرى جاهزة **لا** تُشطَب — تُستلَم كمخزون حقيقي (Material Receipt)
+        في مستودع "استلام الأعطاب" المخصص على قطعة الغيار، تمهيداً لتجديدها
+        وإعادتها للخدمة لاحقاً (بدل معاملتها كنفاية). القيمة الدفترية لهذه
+        الوحدة التالفة تُسجَّل بصفر مبدئياً (basic_rate=0) — لأن تكلفتها
+        الفعلية ستتحدد فقط بعد تجديدها (حركة Repack/تحويل لاحقة يقوم بها
+        فريق الورشة يدوياً عند اكتمال التجديد، تحوِّلها لمخزون صالح
+        بتكلفة التجديد الفعلية — خارج نطاق هذا الاستدعاء التلقائي).
+        """
+        if not spare_part.core_return_warehouse:
+            frappe.throw(
+                _(
+                    "قطعة الغيار {0} دوارة (Rotable) لكن لم يُحدَّد لها 'مستودع استلام الأعطاب'. "
+                    "حدِّده أولاً من شاشة Asset Spare Part."
+                ).format(spare_part.name)
+            )
+
+        se = frappe.new_doc("Stock Entry")
+        se.stock_entry_type = "Material Receipt"
+        se.company = company
+        se.posting_date = today()
+        se.remarks = _("Failed rotable core received for refurbishment — Asset Spare Part Request {0}").format(self.name)
+
+        item_row = {
+            "item_code": spare_part.item_code,
+            "qty": 1,
+            "t_warehouse": spare_part.core_return_warehouse,
+            "basic_rate": 0,
+            "serial_no": self.failed_unit_serial_no,
+        }
+        if cost_center:
+            item_row["cost_center"] = cost_center
+        se.append("items", item_row)
+
+        se.insert(ignore_permissions=True)
+        se.submit()
+
+        self.db_set("core_return_stock_entry", se.name)
+        frappe.db.set_value(
+            "Asset Spare Part", spare_part.name,
+            "pending_refurbishment_qty", flt(spare_part.get("pending_refurbishment_qty")) + 1,
+            update_modified=False,
+        )
 
     def _cancel_stock_entry(self):
         """
@@ -122,4 +171,22 @@ class AssetSparePartRequest(Document):
             current_qty = flt(frappe.db.get_value("Asset Spare Part", self.spare_part, "quantity"))
             frappe.db.set_value(
                 "Asset Spare Part", self.spare_part, "quantity", current_qty + qty_to_restore
+            )
+
+        self._cancel_core_return_entry()
+
+    def _cancel_core_return_entry(self):
+        core_se_name = self.get("core_return_stock_entry")
+        if not core_se_name or not frappe.db.exists("Stock Entry", core_se_name):
+            return
+        core_se = frappe.get_doc("Stock Entry", core_se_name)
+        if core_se.docstatus == 1:
+            core_se.cancel()
+
+        if self.spare_part:
+            current_pending = flt(frappe.db.get_value("Asset Spare Part", self.spare_part, "pending_refurbishment_qty"))
+            frappe.db.set_value(
+                "Asset Spare Part", self.spare_part,
+                "pending_refurbishment_qty", max(current_pending - 1, 0),
+                update_modified=False,
             )
