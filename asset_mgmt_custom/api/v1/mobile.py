@@ -161,6 +161,9 @@ def create_complaint(asset, problem_description, work_type=None, priority=None, 
     return result
 
 
+_PRIORITY_RANK = {"حرج": 4, "عاجل": 3, "متوسط": 2, "عادي": 1}
+
+
 @frappe.whitelist()
 def get_technician_jobs(status=None):
     """
@@ -174,11 +177,18 @@ def get_technician_jobs(status=None):
     لو اقتصر الفلتر على docstatus=1، لن يرى الفني مهمته الخطرة المُسنَدة
     له إطلاقاً طالما هي بانتظار التوقيع، رغم أنه هو من يحتاج متابعة حالة
     التصريح والضغط على "بدء العمل" بمجرد اكتماله.
+
+    الترتيب حسب الأولوية يتم في بايثون بعد الجلب، وليس عبر order_by خام
+    في SQL (field(priority, 'حرج', ...)) — Frappe يرفض أي order_by يحتوي
+    حرفاً خارج [a-z0-9-_ ,`'".()] برسالة "Illegal SQL Query"
+    (frappe.model.db_query.ORDER_GROUP_PATTERN)، والأحرف العربية هنا
+    تسقط دائماً خارج هذه المجموعة مهما حاولت تنسيقها — لا يوجد صيغة SQL
+    خام صالحة تتضمن نص عربي حرفي في order_by إطلاقاً.
     """
     filters = {"assigned_technician": frappe.session.user, "docstatus": ["<", 2]}
     filters["status"] = status or ["not in", ["مكتمل", "ملغي", "مرفوض"]]
 
-    return frappe.get_list(
+    jobs = frappe.get_list(
         "Asset Work Order",
         filters=filters,
         fields=[
@@ -186,9 +196,11 @@ def get_technician_jobs(status=None):
             "request_date", "resolution_due_by", "sla_breached", "problem_description", "fault_photo",
             "docstatus", "work_permit",
         ],
-        order_by="field(priority, 'حرج', 'عاجل', 'متوسط', 'عادي'), resolution_due_by asc",
+        order_by="resolution_due_by asc",
         limit_page_length=0,
     )
+    jobs.sort(key=lambda j: -_PRIORITY_RANK.get(j.get("priority"), 0))
+    return jobs
 
 
 @frappe.whitelist()
