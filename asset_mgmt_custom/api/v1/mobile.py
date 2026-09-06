@@ -160,7 +160,15 @@ def get_technician_jobs(status=None):
 
 
 @frappe.whitelist()
-def update_job_status(work_order, action, reason=None):
+def update_job_status(
+    work_order,
+    action,
+    reason=None,
+    completion_notes=None,
+    actual_cost=None,
+    cost_classification=None,
+    increase_in_asset_life_months=None,
+):
     """
     معالجة (إتمام/رفض) أمر عمل — استدعاء واحد يُفوِّض مباشرة لنفس
     الدوال الموثَّقة والمحمية (complete_work_order/reject_work_order) في
@@ -175,6 +183,13 @@ def update_job_status(work_order, action, reason=None):
     أن تقيّد كل فني بمهامه المُسنَدة إليه هو فقط، بنفس القيد المستخدَم
     أصلاً في get_technician_jobs أعلاه — وإلا يقدر فني (من جهازه الخاص)
     إغلاق مهمة مُسنَدة لزميل آخر عبر الـ API مباشرة.
+
+    معاملات الإتمام الإضافية (completion_notes/actual_cost/
+    cost_classification/increase_in_asset_life_months) اختيارية — نفس
+    الحقول بالضبط التي تُملأ بواسطة معالج سطح المكتب
+    (work_order_completion_wizard) عبر frappe.client.set_value قبل
+    استدعاء complete_work_order؛ تُطبَّق هنا مباشرة على المستند قبل
+    استدعاء نفس الدالة، بلا تكرار منطق الإتمام نفسه.
     """
     doc = frappe.get_doc("Asset Work Order", work_order)
     is_supervisor = bool({"Asset Manager", "System Manager"} & set(frappe.get_roles()))
@@ -184,6 +199,14 @@ def update_job_status(work_order, action, reason=None):
         )
 
     if action == "complete":
+        if completion_notes is not None:
+            doc.completion_notes = completion_notes
+        if actual_cost is not None:
+            doc.actual_cost = actual_cost
+        if cost_classification is not None:
+            doc.cost_classification = cost_classification
+        if increase_in_asset_life_months is not None:
+            doc.increase_in_asset_life_months = increase_in_asset_life_months
         doc.complete_work_order()
     elif action == "reject":
         doc.reject_work_order(reason)

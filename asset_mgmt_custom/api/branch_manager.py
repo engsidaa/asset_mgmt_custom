@@ -73,6 +73,19 @@ def get_dashboard_summary():
         pluck="name",
     ))
 
+    # مؤشرات إضافية لشاشة الصيانة في تطبيق الموبايل — نفس منطق التقييد
+    # الجغرافي التلقائي أعلاه (get_list وليس get_all)، بلا استعلامات منفصلة
+    # يحتاجها العميل لعرضها.
+    pending_work_orders = len(frappe.get_list(
+        "Asset Work Order", filters={"docstatus": 1, "status": "مفتوح"}, pluck="name",
+    ))
+    rejected_work_orders = len(frappe.get_list(
+        "Asset Work Order", filters={"docstatus": 1, "status": "مرفوض"}, pluck="name",
+    ))
+    completed_work_orders = len(frappe.get_list(
+        "Asset Work Order", filters={"docstatus": 1, "status": "مكتمل"}, pluck="name",
+    ))
+
     incomplete_assets = len(frappe.get_list(
         "Asset",
         filters={"docstatus": 1, "custom_operational_status": ["in", ["Incomplete", "In Transit"]]},
@@ -98,6 +111,9 @@ def get_dashboard_summary():
         "total_assets": total_assets,
         "pending_requisitions": pending_requisitions,
         "open_work_orders": open_work_orders,
+        "pending_work_orders": pending_work_orders,
+        "rejected_work_orders": rejected_work_orders,
+        "completed_work_orders": completed_work_orders,
         "incomplete_or_in_transit_assets": incomplete_assets,
         "upcoming_maintenance_tasks": upcoming_maintenance,
     }
