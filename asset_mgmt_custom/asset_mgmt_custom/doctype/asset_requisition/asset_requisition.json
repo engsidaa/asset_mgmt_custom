@@ -73,7 +73,9 @@
    "fieldname": "item_code",
    "fieldtype": "Link",
    "label": "الصنف",
-   "options": "Item"
+   "options": "Item",
+   "reqd": 1,
+   "description": "لازم لكل مسارات التحقق اللاحقة (مطابقة الأصل الاحتياطي بدقة، فحص المخزون، وإنشاء طلب الشراء إذا لزم)"
   },
   {
    "fieldname": "quantity",
