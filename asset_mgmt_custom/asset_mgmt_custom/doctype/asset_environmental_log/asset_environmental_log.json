@@ -87,6 +87,14 @@
    "description": "الخطوات المتخذة لمعالجة حالات عدم الامتثال"
   },
   {
+   "fieldname": "corrective_work_order",
+   "fieldtype": "Link",
+   "label": "أمر العمل التصحيحي",
+   "options": "Asset Work Order",
+   "read_only": 1,
+   "description": "يُنشأ تلقائياً عند تسجيل مخالفة (مستوفٍ للمعايير = لا)"
+  },
+  {
    "fieldname": "notes",
    "fieldtype": "Small Text",
    "label": "ملاحظات"
