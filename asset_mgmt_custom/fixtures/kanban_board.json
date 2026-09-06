@@ -7,7 +7,6 @@
   "field_name": "status",
   "private": 0,
   "show_labels": 1,
-  "filters": "[]",
   "fields": "[\"priority\", \"asset_name\", \"assigned_technician\", \"request_date\", \"sla_breached\"]",
   "columns": [
    {"column_name": "مفتوح", "status": "Active", "indicator": "Gray"},
