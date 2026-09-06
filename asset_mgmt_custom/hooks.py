@@ -65,6 +65,10 @@ fixtures = [
         "filters": [["module", "=", "Asset Mgmt Custom"]],
     },
     {
+        "dt": "Dashboard Chart",
+        "filters": [["module", "=", "Asset Mgmt Custom"]],
+    },
+    {
         "dt": "Workspace",
         "filters": [["module", "=", "Asset Mgmt Custom"]],
     },
