@@ -8,6 +8,38 @@ class AssetSparePartRequest(Document):
     def validate(self):
         if (self.quantity_requested or 0) <= 0:
             frappe.throw("Quantity requested must be greater than zero.")
+        self._enforce_warranty_gate()
+
+    def _enforce_warranty_gate(self):
+        """
+        أصل تحت ضمان نشط: قطع الغيار المفروض تأتي من المورِّد عبر مطالبة
+        ضمان (Asset Warranty Claim) وليس من مخزوننا الخاص — صرفها من هنا
+        بلا مبرر يعني الشركة تدفع تكلفة قطعة كان يجب أن تكون مجانية
+        تعاقدياً. يُسمَح بالاستثناء الوحيد: أمر عمل مرتبط صراحة بمطالبة
+        ضمان (warranty_claim مضبوط عليه) — مثلاً قطع تكميلية غير مشمولة
+        بالضمان نفسه.
+        """
+        if not self.asset:
+            return
+        if not frappe.db.get_value("Asset", self.asset, "custom_under_warranty"):
+            return
+
+        has_warranty_claim = bool(
+            self.get("asset_work_order")
+            and frappe.db.get_value("Asset Work Order", self.asset_work_order, "warranty_claim")
+        )
+        if has_warranty_claim:
+            return
+
+        frappe.throw(
+            _(
+                "Asset {0} is under active warranty. Spare parts for it should be obtained via an "
+                "Asset Warranty Claim, not issued from our own stock. If this request covers parts "
+                "genuinely outside the warranty's scope, link the related Asset Work Order to its "
+                "Asset Warranty Claim first."
+            ).format(self.asset),
+            title=_("Asset Under Warranty"),
+        )
 
     def on_submit(self):
         self.db_set("status", "Approved")

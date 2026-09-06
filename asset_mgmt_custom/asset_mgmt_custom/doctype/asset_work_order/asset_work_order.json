@@ -367,6 +367,32 @@
    "options": "Asset Failure Analysis",
    "allow_on_submit": 1,
    "description": "اربط تحليل سبب العطل (رموز المشكلة/السبب/الإجراء التصحيحي) بهذا الأمر عند إتمامه لتغذية مصفوفة FMEA ومحرك التوصيات — اختياري، لكن موصى به لأي عطل غير روتيني"
+  },
+  {
+   "fieldname": "warranty_claim",
+   "fieldtype": "Link",
+   "label": "مطالبة ضمان مرتبطة",
+   "options": "Asset Warranty Claim",
+   "allow_on_submit": 1,
+   "description": "إن كان الأصل تحت ضمان نشط، اربط مطالبة الضمان هنا للسماح بصرف قطع غيار من مخزوننا استثناءً (غالباً غير مطلوب — القطع تأتي من المورِّد عبر الضمان مباشرة)"
+  },
+  {
+   "fieldname": "vendor_contract",
+   "fieldtype": "Link",
+   "label": "عقد مورِّد الصيانة",
+   "options": "Asset Vendor Contract",
+   "allow_on_submit": 1,
+   "read_only": 1,
+   "description": "يُملأ تلقائياً (أول عقد نشط مطابق لفئة/أصل هذا الأمر) عند خرق اتفاقية مستوى الخدمة — لتحديد الجزاء التعاقدي المُقترَح"
+  },
+  {
+   "fieldname": "penalty_journal_entry",
+   "fieldtype": "Link",
+   "label": "مسودة إشعار مدين (جزاء SLA)",
+   "options": "Journal Entry",
+   "allow_on_submit": 1,
+   "read_only": 1,
+   "description": "مسودة قيد يومية (غير مُسلَّمة) تقترح خصم الجزاء التعاقدي من مستحقات المورِّد بسبب خرق SLA — تتطلب مراجعة واعتماد المحاسب قبل التسليم"
   }
  ],
  "permissions": [

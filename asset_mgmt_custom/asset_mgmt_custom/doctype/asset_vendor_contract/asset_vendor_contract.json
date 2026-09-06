@@ -98,6 +98,19 @@
    "description": "الوقت الأقصى المسموح به للرد على طلبات الصيانة"
   },
   {
+   "fieldname": "penalty_per_sla_breach",
+   "fieldtype": "Currency",
+   "label": "الجزاء التعاقدي لكل خرق SLA",
+   "description": "إن حُدِّد (> صفر)، تُقترَح تلقائياً مسودة إشعار مدين (Journal Entry غير مُسلَّم) لهذا المبلغ على المورد عند خرق أمر عمل لهذا العقد لاتفاقية مستوى الخدمة"
+  },
+  {
+   "fieldname": "penalty_account",
+   "fieldtype": "Link",
+   "options": "Account",
+   "label": "حساب تخفيض المستحقات (دائن الجزاء)",
+   "depends_on": "eval:doc.penalty_per_sla_breach"
+  },
+  {
    "fieldname": "sec_break_assets",
    "fieldtype": "Section Break",
    "label": "Covered Assets"

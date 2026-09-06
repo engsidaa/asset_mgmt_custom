@@ -92,5 +92,11 @@ frappe.ui.form.on("Asset Work Order", {
 				frappe.set_route("Form", "Asset Failure Analysis", frm.doc.failure_analysis);
 			}, __("الموثوقية"));
 		}
+
+		if (frm.doc.penalty_journal_entry) {
+			frm.add_custom_button(__("مراجعة مسودة جزاء SLA"), () => {
+				frappe.set_route("Form", "Journal Entry", frm.doc.penalty_journal_entry);
+			}, __("المحاسبة"));
+		}
 	},
 });

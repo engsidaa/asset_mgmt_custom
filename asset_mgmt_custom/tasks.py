@@ -1060,7 +1060,7 @@ def check_overdue_work_orders():
 
     overdue = frappe.db.sql("""
         SELECT name, title, asset, asset_name, assigned_technician, priority,
-               request_date, resolution_due_by, sla_policy
+               request_date, resolution_due_by, sla_policy, sla_breached
         FROM `tabAsset Work Order`
         WHERE docstatus = 1
           AND status IN ('مفتوح', 'قيد التنفيذ')
@@ -1087,7 +1087,10 @@ def check_overdue_work_orders():
                         "has been open since <b>{3}</b> with no completion.").format(
                 wo.title, wo.asset_name or wo.asset, wo.priority, wo.request_date)
 
+        first_breach = not wo.sla_breached
         frappe.db.set_value("Asset Work Order", wo.name, "sla_breached", 1, update_modified=False)
+        if first_breach:
+            _propose_sla_penalty(wo)
 
         recipients = list(manager_users)
         policy_escalate_to = wo.sla_policy and frappe.db.get_value(
@@ -1304,3 +1307,87 @@ def _ensure_draft_replacement_plan(asset, ahi, rul_months):
         frappe.db.set_value("Asset", asset.name, "custom_replacement_plan", plan.name, update_modified=False)
     except Exception:
         frappe.log_error(title="Auto Replacement Plan creation failed", message=frappe.get_traceback())
+
+
+# ---------------------------------------------------------------------------
+# SLA breach penalty proposal (called from check_overdue_work_orders above,
+# only the first time a work order transitions into sla_breached=1)
+# ---------------------------------------------------------------------------
+
+def _find_matching_vendor_contract(asset, asset_category):
+    """أول عقد مورِّد نشط (Active, submitted) يغطي هذا الأصل تحديداً (عبر
+    جدول Asset Vendor Contract Asset) أو فئته بالكامل، وله جزاء SLA
+    مُحدَّد فعلياً (> صفر) وحساب دائن — نفس منطق مطابقة العقود المُستخدَم
+    فعلياً في تقرير TCO لتوزيع تكلفة العقود، بلا تكرار."""
+    rows = frappe.db.sql("""
+        SELECT vc.name, vc.supplier, vc.penalty_per_sla_breach, vc.penalty_account
+        FROM `tabAsset Vendor Contract` vc
+        WHERE vc.docstatus = 1 AND vc.status = 'Active'
+          AND IFNULL(vc.penalty_per_sla_breach, 0) > 0
+          AND vc.penalty_account IS NOT NULL AND vc.penalty_account != ''
+          AND (
+              vc.asset_category = %(asset_category)s
+              OR EXISTS (
+                  SELECT 1 FROM `tabAsset Vendor Contract Asset` a
+                  WHERE a.parent = vc.name AND a.asset = %(asset)s
+              )
+          )
+        LIMIT 1
+    """, {"asset_category": asset_category, "asset": asset}, as_dict=True)
+    return rows[0] if rows else None
+
+
+def _propose_sla_penalty(wo):
+    """
+    "يقترح النظام تلقائياً إصدار إشعار مدين" — حرفياً: يُقترَح فقط، لا
+    يُنفَّذ. يُنشئ Journal Entry **بدون تسليمه** (docstatus يبقى 0،
+    مسودة) يخصم الجزاء التعاقدي من حساب مستحقات المورِّد (Payable،
+    party_type=Supplier) مقابل حساب الجزاء المحدَّد على العقد — يحتاج
+    مراجعة واعتماد المحاسب صراحة قبل التسليم، بنفس أسلوب كل الاقتراحات
+    التلقائية الأخرى في هذه المرحلة (Asset Replacement Plan، فاتورة بيع
+    التخلص من الأصل).
+    """
+    asset_category = frappe.db.get_value("Asset", wo.asset, "asset_category")
+    contract = _find_matching_vendor_contract(wo.asset, asset_category)
+    if not contract:
+        return
+
+    company = frappe.db.get_value("Asset", wo.asset, "company") or frappe.defaults.get_user_default("Company")
+    payable_account = frappe.db.get_value("Company", company, "default_payable_account")
+    if not payable_account:
+        return
+
+    penalty = flt(contract.penalty_per_sla_breach)
+
+    je = frappe.new_doc("Journal Entry")
+    je.voucher_type = "Journal Entry"
+    je.posting_date = today()
+    je.company = company
+    je.user_remark = _(
+        "Proposed SLA breach penalty against {0} for Asset Work Order {1} (contract {2}) — "
+        "DRAFT, review and submit to apply."
+    ).format(contract.supplier, wo.name, contract.name)
+
+    ref = {"reference_type": "Asset Work Order", "reference_name": wo.name}
+    je.append("accounts", {
+        "account": payable_account,
+        "party_type": "Supplier",
+        "party": contract.supplier,
+        "debit_in_account_currency": penalty,
+        **ref,
+    })
+    je.append("accounts", {
+        "account": contract.penalty_account,
+        "credit_in_account_currency": penalty,
+        **ref,
+    })
+
+    try:
+        je.insert(ignore_permissions=True)  # عمداً بلا submit() — مسودة اقتراح فقط
+        frappe.db.set_value(
+            "Asset Work Order", wo.name,
+            {"vendor_contract": contract.name, "penalty_journal_entry": je.name},
+            update_modified=False,
+        )
+    except Exception:
+        frappe.log_error(title="SLA penalty proposal failed", message=frappe.get_traceback())
