@@ -31,8 +31,8 @@
    "fieldname": "current_expected_disposal_date",
    "fieldtype": "Date",
    "label": "تاريخ التخلص الحالي المتوقع",
-   "fetch_from": "asset.disposal_date",
-   "read_only": 1
+   "read_only": 1,
+   "description": "يُحسَب تلقائياً من بيانات الإهلاك الحالية (تاريخ بدء الاستخدام + مدة الإهلاك المتبقية) — وليس من Asset.disposal_date الذي يبقى فارغاً حتى يُتخلَّص من الأصل فعلياً"
   },
   {
    "fieldname": "requested_by",
@@ -91,6 +91,15 @@
    "fieldname": "decision_notes",
    "fieldtype": "Small Text",
    "label": "ملاحظات القرار"
+  },
+  {
+   "fieldname": "resulting_asset_repair",
+   "fieldtype": "Link",
+   "label": "سجل الإصلاح الناتج (تمديد فعلي)",
+   "options": "Asset Repair",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "description": "يُنشأ ويُسلَّم تلقائياً عند تسليم هذا الطلب — هو من يُنفِّذ فعلياً رسملة التكلفة وإعادة جدولة الإهلاك بالعمر الإنتاجي الجديد"
   }
  ],
  "permissions": [
