@@ -10,10 +10,35 @@ class AssetWorkOrder(Document):
     FINAL_STATUSES = ("مكتمل", "ملغي", "مرفوض")
     MAINTENANCE_ROLES = ("Asset Technician", "Asset Manager", "System Manager")
 
+    def validate(self):
+        self._set_default_title()
+
     def before_insert(self):
         self._apply_sla_policy()
         if not self.assigned_technician:
             self._auto_dispatch_technician()
+
+    def _set_default_title(self):
+        """
+        title لم يعد إجبارياً (problem_description أصبح هو الإجباري بدلاً
+        منه) — لتبسيط نموذج الإدخال السريع (Quick Entry) لطلب صيانة عاجل:
+        اسم الأصل + وصف المشكلة كافيان لفتح الطلب، بدون إجبار كتابة عنوان
+        منفصل. لو تُرك title فارغاً، يُولَّد تلقائياً من الاثنين معاً.
+        """
+        if self.title:
+            return
+
+        asset_label = frappe.db.get_value("Asset", self.asset, "asset_name") if self.asset else None
+        desc = (self.problem_description or "").strip().replace("\n", " ")
+        if len(desc) > 60:
+            desc = desc[:57] + "..."
+
+        if asset_label and desc:
+            self.title = f"{asset_label} — {desc}"
+        elif asset_label:
+            self.title = asset_label
+        else:
+            self.title = _("طلب صيانة جديد")
 
     def on_submit(self):
         self.db_set("status", "قيد التنفيذ")

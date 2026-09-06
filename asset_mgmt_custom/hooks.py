@@ -22,6 +22,10 @@ fixtures = [
         "filters": [["role", "=", "Branch Manager"]],
     },
     {
+        "dt": "Kanban Board",
+        "filters": [["name", "in", ["متابعة أوامر العمل"]]],
+    },
+    {
         "dt": "Workflow",
         "filters": [["document_type", "in", ["Asset Movement", "Asset Retention Request"]]],
     },

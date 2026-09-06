@@ -6,6 +6,7 @@
  "autoname": "naming_series:",
  "is_submittable": 1,
  "track_changes": 1,
+ "quick_entry": 1,
  "fields": [
   {
    "fieldname": "naming_series",
@@ -18,10 +19,9 @@
    "fieldname": "title",
    "fieldtype": "Data",
    "label": "عنوان أمر العمل",
-   "reqd": 1,
    "in_list_view": 1,
    "bold": 1,
-   "description": "وصف موجز لأمر العمل أو المشكلة"
+   "description": "وصف موجز لأمر العمل أو المشكلة — يُملأ تلقائياً من اسم الأصل ووصف المشكلة إن تُرك فارغاً"
   },
   {
    "fieldname": "asset",
@@ -193,6 +193,7 @@
    "fieldname": "problem_description",
    "fieldtype": "Long Text",
    "label": "وصف المشكلة",
+   "reqd": 1,
    "description": "شرح تفصيلي للمشكلة أو سبب إنشاء أمر العمل"
   },
   {

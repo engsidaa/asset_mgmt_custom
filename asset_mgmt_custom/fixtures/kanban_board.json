@@ -1,0 +1,20 @@
+[
+ {
+  "doctype": "Kanban Board",
+  "kanban_board_name": "متابعة أوامر العمل",
+  "reference_doctype": "Asset Work Order",
+  "field_name": "status",
+  "private": 0,
+  "show_labels": 1,
+  "filters": "[]",
+  "fields": "[\"priority\", \"asset_name\", \"assigned_technician\", \"request_date\", \"sla_breached\"]",
+  "columns": [
+   {"column_name": "مفتوح", "status": "Active", "indicator": "Gray"},
+   {"column_name": "قيد التنفيذ", "status": "Active", "indicator": "Blue"},
+   {"column_name": "معلق", "status": "Active", "indicator": "Orange"},
+   {"column_name": "مكتمل", "status": "Active", "indicator": "Green"},
+   {"column_name": "مرفوض", "status": "Active", "indicator": "Pink"},
+   {"column_name": "ملغي", "status": "Active", "indicator": "Red"}
+  ]
+ }
+]
