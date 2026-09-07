@@ -291,6 +291,38 @@ def update_asset_image(asset, file_url):
     return {"image": file_url}
 
 
+@frappe.whitelist()
+def attach_file_to_asset(asset, file_url):
+    """
+    ربط ملف (مستند/صورة عامة) مرفوع مسبقاً بلا doctype/docname بمرفقات
+    أصل مُحدَّد — تبويب "المرفقات"/"الملفات" في تفاصيل الأصل بالموبايل
+    كان يرفع الملف مباشرة عبر upload_file بـ doctype='Asset',
+    docname=asset، فيمر عبر frappe.handler.check_write_permission الذي
+    يتطلب صلاحية "write" الأساسية على Asset (مقصورة على Accounts
+    User/Quality Manager فقط — انظر ملاحظة update_asset_image أعلاه)،
+    فكان يفشل بصلاحية لأغلب الأدوار الميدانية (فني/مستخدم فرع/حتى مدير
+    فرع). الحل هنا هو نفس نمط صورة الحساب الشخصية وصورة الأصل تماماً:
+    الرفع أولاً بلا doctype (يتجاوز الفحص كلياً)، ثم هذا الاستدعاء يربط
+    الملف الناتج بالأصل بعد التحقق من صلاحية قراءة هذا الأصل تحديداً
+    فقط — لا صلاحية كتابة عامة مطلوبة لمجرد إرفاق ملف تراه أصلاً.
+    """
+    if not file_url:
+        frappe.throw(_("file_url is required."))
+    _check_read("Asset", asset)
+
+    file_name = frappe.db.get_value("File", {"file_url": file_url}, "name")
+    if not file_name:
+        frappe.throw(_("File not found for the given file_url."))
+
+    frappe.db.set_value(
+        "File",
+        file_name,
+        {"attached_to_doctype": "Asset", "attached_to_name": asset, "attached_to_field": None},
+        update_modified=False,
+    )
+    return {"file_url": file_url}
+
+
 def _get_work_order_history(asset):
     """
     كل طلبات الصيانة السابقة لنفس الجهاز (وليس فقط المفتوحة منها كما في
