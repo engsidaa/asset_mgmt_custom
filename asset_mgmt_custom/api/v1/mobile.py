@@ -17,6 +17,7 @@ import json
 
 import frappe
 from frappe import _
+from frappe.utils.password import set_encrypted_password
 
 from asset_mgmt_custom.api.branch_manager import create_maintenance_request, get_asset_detail
 
@@ -45,6 +46,16 @@ def generate_my_api_keys():
     الأصلية التي تُعيد api_secret فقط وتترك api_key ليُقرأ لاحقاً عبر
     /api/resource/User — وهو حقل بمستوى صلاحية (permlevel) أعلى مقصور
     أيضاً على System Manager، فكان سيفشل بنفس السبب حتى لو نجح التوليد).
+
+    api_secret تحديداً حقل نوعه Password في Frappe — لا يُخزَّن في عمود
+    عادي بجدول tabUser، بل مُشفَّراً في جدول __Auth منفصل عبر
+    frappe.utils.password. الكتابة المباشرة بـ frappe.db.set_value (كما
+    في المحاولة الأولى لهذا الإصلاح) كانت تكتب فقط عمود tabUser الخام
+    بلا أثر فعلي على القيمة المُشفَّرة الحقيقية في __Auth، فيفشل تسجيل
+    الدخول لاحقاً بـ AuthenticationError صامتة عند مقارنة السر المُرسَل
+    بالسر المفكوك تشفيره من __Auth (frappe.auth.validate_api_key_secret)
+    — رغم نجاح التوليد ورغم أن الحساب مُفعَّل. set_encrypted_password هو
+    نفس المسار الذي يستخدمه doc.save() داخلياً لأي حقل Password.
     """
     user = frappe.session.user
     if user == "Guest":
@@ -53,8 +64,9 @@ def generate_my_api_keys():
     api_key = frappe.db.get_value("User", user, "api_key")
     if not api_key:
         api_key = frappe.generate_hash(length=15)
+        frappe.db.set_value("User", user, "api_key", api_key, update_modified=False)
     api_secret = frappe.generate_hash(length=15)
-    frappe.db.set_value("User", user, {"api_key": api_key, "api_secret": api_secret}, update_modified=False)
+    set_encrypted_password("User", user, api_secret, fieldname="api_secret")
 
     return {"api_key": api_key, "api_secret": api_secret}
 
