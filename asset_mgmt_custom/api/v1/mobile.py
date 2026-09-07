@@ -194,7 +194,7 @@ def get_technician_jobs(status=None):
         fields=[
             "name", "title", "asset", "asset_name", "status", "priority", "work_type",
             "request_date", "resolution_due_by", "sla_breached", "problem_description", "fault_photo",
-            "docstatus", "work_permit",
+            "docstatus", "work_permit", "creation",
         ],
         order_by="resolution_due_by asc",
         limit_page_length=0,

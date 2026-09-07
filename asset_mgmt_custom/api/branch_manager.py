@@ -405,7 +405,7 @@ def list_pending_asset_requisitions():
                 "Pending Asset Manager Approval",
             ]],
         },
-        fields=["name", "asset_category", "item_code", "quantity", "status", "request_date", "required_by", "employee"],
+        fields=["name", "asset_category", "item_code", "quantity", "status", "request_date", "required_by", "employee", "creation"],
         order_by="request_date desc",
         limit_page_length=0,
     )
@@ -515,7 +515,7 @@ def list_my_work_orders(status=None, branch=None):
             "name", "title", "asset", "asset_name", "asset_category", "branch", "status", "priority",
             "work_type", "request_date", "completion_date", "actual_cost",
             "assigned_technician", "fault_photo", "branch_confirmation_status",
-            "docstatus", "work_permit",
+            "docstatus", "work_permit", "creation",
         ],
         order_by="creation desc",
         limit_page_length=0,
