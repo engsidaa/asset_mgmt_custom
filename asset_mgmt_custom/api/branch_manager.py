@@ -674,6 +674,60 @@ def create_physical_audit():
 
 
 @frappe.whitelist()
+def list_my_physical_audits():
+    """
+    عمليات الجرد الفعلي (مسودة ومُرسَلة) التي أنشأها المستخدم الحالي —
+    لا توجد شاشة بالتطبيق تعرض الجرد بعد إرساله، فيبدو الأمر وكأن
+    النتيجة لا تصل للنظام إطلاقاً رغم نجاح الإرسال فعلياً. audited_by
+    (وليس صلاحية doctype القياسية) هو معيار الوصول هنا لنفس السبب
+    المذكور في submit_physical_audit — Branch Manager ليس له صلاحية
+    قراءة أساسية على هذا الدكتايب أصلاً.
+    """
+    return frappe.get_list(
+        "Asset Physical Audit",
+        filters={"audited_by": frappe.session.user},
+        fields=[
+            "name", "audit_date", "cost_center", "docstatus", "audit_status",
+            "total_assets", "found_count", "missing_count", "damaged_count", "creation",
+        ],
+        order_by="creation desc",
+        limit_page_length=0,
+    )
+
+
+@frappe.whitelist()
+def get_physical_audit_detail(audit_id):
+    """تفاصيل جرد فعلي واحد كاملة (بما فيها نتيجة كل بند وملاحظاته) لصاحبه فقط."""
+    doc = frappe.get_doc("Asset Physical Audit", audit_id)
+    if doc.audited_by != frappe.session.user:
+        frappe.throw(_("You are not the owner of this audit."), frappe.PermissionError)
+
+    return {
+        "name": doc.name,
+        "audit_date": doc.audit_date,
+        "cost_center": doc.cost_center,
+        "docstatus": doc.docstatus,
+        "audit_status": doc.audit_status,
+        "total_assets": doc.total_assets,
+        "found_count": doc.found_count,
+        "missing_count": doc.missing_count,
+        "damaged_count": doc.damaged_count,
+        "items": [
+            {
+                "asset": r.asset,
+                "asset_name": r.asset_name,
+                "asset_category": r.asset_category,
+                "expected_location": r.expected_location,
+                "audit_result": r.audit_result,
+                "actual_location": r.actual_location,
+                "remarks": r.remarks,
+            }
+            for r in doc.items
+        ],
+    }
+
+
+@frappe.whitelist()
 def list_accessible_branches():
     """
     قائمة الفروع التي يقدر المستخدم الحالي رؤيتها فعلياً — تُستخدَم لملء
