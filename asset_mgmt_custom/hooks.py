@@ -22,7 +22,7 @@ fixtures = [
     },
     {
         "dt": "Custom DocPerm",
-        "filters": [["role", "=", "Branch Manager"]],
+        "filters": [["role", "in", ["Branch Manager", "Asset Technician", "Maintenance Vendor"]]],
     },
     {
         "dt": "Kanban Board",
