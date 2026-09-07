@@ -101,6 +101,15 @@ def get_app_context():
         "User Permission", {"user": user, "allow": "Branch"}, "for_value"
     )
 
+    # فني مُعيَّن صراحةً لجهة "تقنية المعلومات" ضمن أي فريق صيانة — نفس
+    # المعيار المستخدم في التوزيع التلقائي لشكاوى IT
+    # (AssetWorkOrder._auto_dispatch_technician) وتنبيهات تراخيص البرامج
+    # (tasks._get_it_department_users). يُستخدَم في العميل لإظهار عناصر
+    # خاصة بقسم IT (تراخيص البرامج مثلاً) لفنيّي هذا القسم فقط.
+    is_it_technician = bool(frappe.db.exists(
+        "Maintenance Team Member", {"team_member": user, "custom_complaint_department": "تقنية المعلومات"}
+    ))
+
     return {
         "user": user,
         "full_name": frappe.db.get_value("User", user, "full_name"),
@@ -111,6 +120,7 @@ def get_app_context():
         "employee": employee,
         "managed_branches": managed_branches,
         "default_branch": default_branch,
+        "is_it_technician": is_it_technician,
     }
 
 
@@ -275,13 +285,45 @@ def get_technician_jobs(status=None):
         fields=[
             "name", "title", "asset", "asset_name", "status", "priority", "work_type",
             "request_date", "resolution_due_by", "sla_breached", "problem_description", "fault_photo",
-            "docstatus", "work_permit", "creation",
+            "docstatus", "work_permit", "creation", "complaint_department", "it_device_type", "it_full_outage",
         ],
         order_by="resolution_due_by asc",
         limit_page_length=0,
     )
     jobs.sort(key=lambda j: -_PRIORITY_RANK.get(j.get("priority"), 0))
     return jobs
+
+
+@frappe.whitelist()
+def list_software_licenses(only_expiring=False):
+    """
+    تراخيص البرامج (Asset Software License) — خاصة بفنيّي تقنية المعلومات
+    تحديداً (انظر is_it_technician في get_app_context، مُستخدَمة في
+    العميل لإظهار هذه الشاشة أصلاً)، ليست وظيفة عامة لكل فني. تعتمد
+    بالكامل على صلاحية القراءة القياسية الممنوحة فعلاً لدور Asset
+    Technician على هذا الدكتايب (frappe.get_list تُطبِّقها تلقائياً)،
+    بلا أي تقييد إضافي هنا.
+
+    only_expiring: يُرجِع فقط التراخيص المنتهية أو المقتربة من الانتهاء
+    خلال 30 يوماً القادمة — لعرض مختصر في الشاشة الرئيسية بدل القائمة
+    الكاملة.
+    """
+    filters = {}
+    if frappe.utils.cint(only_expiring):
+        filters["expiry_date"] = ["<=", frappe.utils.add_days(frappe.utils.today(), 30)]
+        filters["status"] = ["not in", ["Terminated"]]
+
+    return frappe.get_list(
+        "Asset Software License",
+        filters=filters,
+        fields=[
+            "name", "software_name", "vendor", "license_type", "license_key",
+            "asset", "asset_name", "purchase_date", "expiry_date",
+            "total_seats", "used_seats", "annual_cost", "status", "renewal_reminder_days", "notes",
+        ],
+        order_by="expiry_date asc",
+        limit_page_length=0,
+    )
 
 
 @frappe.whitelist()

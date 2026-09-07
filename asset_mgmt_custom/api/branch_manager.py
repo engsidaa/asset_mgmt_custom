@@ -560,7 +560,7 @@ def list_my_work_orders(status=None, branch=None):
             "name", "title", "asset", "asset_name", "asset_category", "branch", "status", "priority",
             "work_type", "request_date", "completion_date", "actual_cost",
             "assigned_technician", "fault_photo", "branch_confirmation_status",
-            "docstatus", "work_permit", "creation",
+            "docstatus", "work_permit", "creation", "complaint_department", "it_device_type", "it_full_outage",
         ],
         order_by="creation desc",
         limit_page_length=0,
