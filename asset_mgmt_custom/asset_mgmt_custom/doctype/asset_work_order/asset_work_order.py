@@ -29,6 +29,20 @@ class AssetWorkOrder(Document):
     def validate(self):
         self._set_default_title()
         self._apply_criticality_priority_floor()
+        self._validate_capitalized_overhaul_requires_asset()
+
+    def _validate_capitalized_overhaul_requires_asset(self):
+        """
+        شكوى عامة (بلا أصل مرتبط) لا يمكن أن تُرسمَل كعمرة كبرى — الرسملة
+        بحكم تعريفها ترفع القيمة الدفترية وتمدد العمر الإنتاجي لأصل بعينه
+        (انظر _escalate_to_asset_repair)، وهو غير موجود هنا أصلاً.
+        """
+        if not self.asset and self.cost_classification == "Capitalized Overhaul":
+            frappe.throw(
+                _("'Capitalized Overhaul' cost classification requires a linked Asset — "
+                  "this work order has none (general complaint)."),
+                title=_("Asset Required"),
+            )
 
     def _apply_criticality_priority_floor(self):
         """
@@ -80,12 +94,20 @@ class AssetWorkOrder(Document):
 
     def after_insert(self):
         if self.priority == "حرج":
-            send_critical_alert(
-                subject=_("عطل حرج: {0}").format(self.title),
-                message=_("أمر عمل بأولوية 'حرج' على الأصل {0} ({1}). الوصف: {2}").format(
+            if self.asset:
+                subject_line = _("عطل حرج: {0}").format(self.title)
+                message = _("أمر عمل بأولوية 'حرج' على الأصل {0} ({1}). الوصف: {2}").format(
                     self.asset, frappe.db.get_value("Asset", self.asset, "asset_name") or "",
                     (self.problem_description or "")[:200],
-                ),
+                )
+            else:
+                subject_line = _("شكوى عامة حرجة: {0}").format(self.title)
+                message = _("شكوى عامة بأولوية 'حرج' غير مرتبطة بأصل محدد. الوصف: {0}").format(
+                    (self.problem_description or "")[:200],
+                )
+            send_critical_alert(
+                subject=subject_line,
+                message=message,
                 reference_doctype="Asset Work Order",
                 reference_name=self.name,
             )
@@ -125,14 +147,16 @@ class AssetWorkOrder(Document):
         """
         if self.status == "مكتمل":
             self._post_maintenance_cost_gl_entry()
-        _update_asset_maintenance_summary(self.asset)
+        if self.asset:
+            _update_asset_maintenance_summary(self.asset)
 
     def on_cancel(self):
         self.db_set("status", "ملغي")
         self._cancel_maintenance_cost_gl_entry()
         self._cancel_linked_spare_part_requests()
         self._cancel_linked_asset_repair()
-        _update_asset_maintenance_summary(self.asset)
+        if self.asset:
+            _update_asset_maintenance_summary(self.asset)
 
     def _cancel_linked_asset_repair(self):
         repair_name = self.get("asset_repair")
@@ -431,6 +455,11 @@ class AssetWorkOrder(Document):
         if self.get("asset_repair"):
             return
         if self.get("journal_entry"):
+            return
+        if not self.asset:
+            # شكوى عامة بلا أصل مرتبط: لا يوجد Asset Category Account لتحديد
+            # حسابات المصروف/الالتزام منه، فلا يمكن ترحيل قيد محاسبي تلقائي —
+            # تكلفتها (إن أُدخلت) تبقى رقماً مرجعياً على أمر العمل نفسه فقط.
             return
 
         total_cost = flt(self.actual_cost) or flt(self.labor_cost)

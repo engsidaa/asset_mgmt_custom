@@ -143,13 +143,17 @@ def scan_asset(identifier):
 
 
 @frappe.whitelist()
-def create_complaint(asset, problem_description, work_type=None, priority=None, photo_file_url=None, requires_permit=False):
+def create_complaint(asset=None, problem_description=None, work_type=None, priority=None, photo_file_url=None, requires_permit=False):
     """
     بلاغ عطل فوري — يفوِّض بالكامل لنفس create_maintenance_request
     المُستخدَمة في بوابة مدير الفرع (إنشاء + تسليم أمر عمل في استدعاء
     واحد). photo_file_url اختياري: رابط ملف مرفوع مسبقاً عبر
     /api/method/upload_file من قِبل العميل (Base64/Multipart في التطبيق
     نفسه)، يُربَط بحقل fault_photo بعد الإنشاء مباشرة.
+
+    asset اختياري: شكوى عامة غير مرتبطة بأصل محدد — نفس مسار الإنشاء/
+    التسليم بالضبط (انظر create_maintenance_request)، فقط بلا ربط بأصل؛
+    الفرع يُستنتَج حينها من فرع المستخدم نفسه.
     """
     result = create_maintenance_request(
         asset, problem_description, work_type=work_type, priority=priority, requires_permit=requires_permit

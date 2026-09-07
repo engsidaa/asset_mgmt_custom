@@ -457,7 +457,7 @@ def get_new_requisition_context(asset_category=None):
 
 
 @frappe.whitelist()
-def create_maintenance_request(asset, problem_description, work_type=None, priority=None, requires_permit=False):
+def create_maintenance_request(asset=None, problem_description=None, work_type=None, priority=None, requires_permit=False):
     """
     يُنشئ ويُسلِّم (Submit) Asset Work Order في استدعاء واحد — أنسب
     لتطبيق موبايل من مسار إنشاء-ثم-تسليم منفصل. صورة العطل تُرفَع بعد
@@ -473,15 +473,34 @@ def create_maintenance_request(asset, problem_description, work_type=None, prior
     قبل أن تُتاح للمستخدم فرصة إنشاء وربط التصريح أصلاً. تطبيق الموبايل
     يستدعي submit لاحقاً بنفسه (بعد اكتمال التصريح إن لزم) عبر
     frappe.client.submit القياسي.
+
+    asset اختياري: شكوى عامة غير مرتبطة بأصل محدد (مثلاً ملاحظة عن
+    المرفق نفسه لا عن جهاز بعينه) — تُعامَل بنفس مسار الإنشاء/التسليم/
+    التوزيع تماماً، فقط بدون ربط بأصل. الفرع في هذه الحالة يُستنتَج من
+    فرع المستخدم مباشرة (نفس نمط create_physical_audit) بدل جلبه من
+    الأصل.
     """
-    _check_read("Asset", asset)
+    if not problem_description or not str(problem_description).strip():
+        frappe.throw(_("Please describe the problem."))
+
+    if asset:
+        _check_read("Asset", asset)
+        doc_title = _("Maintenance Request: {0}").format(
+            frappe.db.get_value("Asset", asset, "asset_name") or asset
+        )
+        branch = frappe.db.get_value("Asset", asset, "custom_branch")
+    else:
+        doc_title = None
+        branch = (
+            frappe.db.get_value("User Permission", {"user": frappe.session.user, "allow": "Branch"}, "for_value")
+            or frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "branch")
+        )
 
     doc = frappe.new_doc("Asset Work Order")
-    doc.title = _("Maintenance Request: {0}").format(
-        frappe.db.get_value("Asset", asset, "asset_name") or asset
-    )
-    doc.asset = asset
-    doc.branch = frappe.db.get_value("Asset", asset, "custom_branch")
+    if doc_title:
+        doc.title = doc_title
+    doc.asset = asset or None
+    doc.branch = branch
     doc.work_type = work_type or "إصلاح"
     doc.priority = priority or "عادي"
     doc.problem_description = problem_description
