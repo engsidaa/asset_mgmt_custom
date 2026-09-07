@@ -264,14 +264,22 @@ def update_job_status(
 def submit_physical_audit(audit_id, items):
     """
     تحديث جماعي (Bulk) لبنود جرد مادي بمسودة Asset Physical Audit موجودة
-    بالفعل (أُنشئت وعُبِّئت مبدئياً عبر fetch_assets)، ثم تسليمها —
-    بدل إرسال كل بند بنداء API منفصل. items: قائمة
-    {asset, audit_result, actual_location?, remarks?}.
+    بالفعل (أُنشئت وعُبِّئت مبدئياً عبر create_physical_audit في
+    branch_manager.py)، ثم تسليمها — بدل إرسال كل بند بنداء API منفصل.
+    items: قائمة {asset, audit_result, actual_location?, remarks?}.
+
+    save()/submit() بـ ignore_permissions=True عمداً بعد التحقق من ملكية
+    هذا الجرد تحديداً (audited_by == المستخدم الحالي) — صلاحية الكتابة
+    الأساسية على هذا الدكتايب مقصورة على أدوار معيّنة (Asset
+    Technician/User/Manager) قد لا يملكها مدير الفرع الذي أنشأ الجرد أصلاً
+    عبر create_physical_audit (التي تتجاوز نفس القيد لنفس السبب).
     """
     if isinstance(items, str):
         items = json.loads(items)
 
     doc = frappe.get_doc("Asset Physical Audit", audit_id)
+    if doc.audited_by != frappe.session.user:
+        frappe.throw(_("You are not the owner of this audit."), frappe.PermissionError)
     if doc.docstatus != 0:
         frappe.throw(_("Audit {0} is not in draft status.").format(audit_id))
 
@@ -284,7 +292,7 @@ def submit_physical_audit(audit_id, items):
         row.actual_location = item.get("actual_location") or row.actual_location
         row.remarks = item.get("remarks") or row.remarks
 
-    doc.save()
+    doc.save(ignore_permissions=True)
     doc.submit()
 
     return {

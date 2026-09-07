@@ -354,6 +354,30 @@ def _get_work_order_history(asset):
 
 
 @frappe.whitelist()
+def list_pending_asset_requisitions():
+    """
+    كل طلبات الأصول المعلَّقة لفرع المستخدم — نفس الفلتر الحرفي المستخدَم
+    في عدّاد "طلبات أصول معلّقة" بـ get_dashboard_summary أعلاه، حتى يفتح
+    الرقم في شاشة الموبايل قائمة حقيقية مطابقة له بدل أن تكون الأيقونة
+    بلا وجهة إطلاقاً.
+    """
+    return frappe.get_list(
+        "Asset Requisition",
+        filters={
+            "docstatus": 1,
+            "status": ["in", [
+                "Pending Finance Approval",
+                "Pending Branch Manager Approval",
+                "Pending Asset Manager Approval",
+            ]],
+        },
+        fields=["name", "asset_category", "item_code", "quantity", "status", "request_date", "required_by", "employee"],
+        order_by="request_date desc",
+        limit_page_length=0,
+    )
+
+
+@frappe.whitelist()
 def get_new_requisition_context(asset_category=None):
     """
     يُستدعى قبل إنشاء Asset Requisition جديد — يعرض لمدير الفرع كل ما هو
@@ -462,6 +486,56 @@ def list_my_work_orders(status=None, branch=None):
         order_by="creation desc",
         limit_page_length=0,
     )
+
+
+@frappe.whitelist()
+def create_physical_audit():
+    """
+    ينشئ جرداً فعلياً جديداً (Asset Physical Audit) لفرع المستخدم الحالي
+    ويعبّئه تلقائياً بكل أصوله النشطة (نفس منطق fetch_assets الموجود
+    أصلاً على الدكتايب نفسه، مُستدعى هنا مباشرة بلا تكرار). كانت هذه
+    نقطة الدخول الوحيدة الناقصة لتشغيل تدفّق الجرد من الموبايل كاملاً —
+    submit_physical_audit (أدناه في api/v1/mobile.py) يفترض أصلاً وجود
+    مسودة جاهزة بلا أي وسيلة لإنشائها من هناك.
+
+    الإدراج هنا بـ ignore_permissions=True عمداً (نفس نمط بقية هذا
+    الملف): صلاحية الكتابة الأساسية على Asset Physical Audit ممنوحة فقط
+    لأدوار Asset Technician/Asset User/Asset Manager (asset_physical_audit.json)
+    وليس بالضرورة لكل مدير فرع، رغم أن الصلاحية الحقيقية المطلوبة هنا هي
+    فقط "هل لهذا المستخدم فرع فعلاً؟" — محقَّقة أعلاه.
+    """
+    branch = (
+        frappe.db.get_value("User Permission", {"user": frappe.session.user, "allow": "Branch"}, "for_value")
+        or frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "branch")
+    )
+    if not branch:
+        frappe.throw(_("No branch is associated with your account."))
+
+    cost_center = frappe.db.get_value("Branch", branch, "custom_cost_center")
+    if not cost_center:
+        frappe.throw(_("Branch {0} has no linked Cost Center — cannot start a physical audit.").format(branch))
+
+    doc = frappe.new_doc("Asset Physical Audit")
+    doc.cost_center = cost_center
+    doc.audit_date = today()
+    doc.audited_by = frappe.session.user
+    doc.fetch_assets()
+    doc.insert(ignore_permissions=True)
+
+    return {
+        "name": doc.name,
+        "cost_center": doc.cost_center,
+        "total_assets": doc.total_assets,
+        "items": [
+            {
+                "asset": r.asset,
+                "asset_name": r.asset_name,
+                "asset_category": r.asset_category,
+                "expected_location": r.expected_location,
+            }
+            for r in doc.items
+        ],
+    }
 
 
 @frappe.whitelist()
