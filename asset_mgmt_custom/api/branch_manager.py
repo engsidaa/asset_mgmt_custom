@@ -330,6 +330,33 @@ def attach_file_to_asset(asset, file_url):
     return {"file_url": file_url}
 
 
+@frappe.whitelist()
+def update_asset_coding(asset, tag_type, code_field, code_value, before_photo=None, after_photo=None):
+    """
+    تحديث حقول ترميز أصل (نوع الترميز + كود الملصق/الحديد + صورتا قبل/بعد
+    اللصق) من شاشة "إضافة/تفعيل أصل" بالموبايل — عبر frappe.client.set_value
+    العام كانت العملية تفشل بـ UpdateAfterSubmitError دائماً على أي أصل
+    مُسلَّم بالفعل (docstatus=1، وهي الحالة الطبيعية لأي أصل موجود يُعاد
+    ترميزه) لأن custom_tag_type/الحقول المرتبطة ليست allow_on_submit في
+    تعريفها. db.set_value هنا يتجاوز هذا القيد عمداً (يكتب مباشرة على
+    قاعدة البيانات بلا المرور بدورة حياة المستند/submit lock)، وليس فقط
+    فحص الصلاحية كبقية الدوال أعلاه — إعادة الترميز على أصل مُسلَّم فعل
+    مقصود هنا، وليس تحايلاً على قيد يُفترض احترامه.
+    """
+    if code_field not in ("custom_iron_code", "custom_sticker_code"):
+        frappe.throw(_("Invalid code field."))
+    _check_read("Asset", asset)
+
+    values = {"custom_tag_type": tag_type, code_field: code_value}
+    if before_photo:
+        values["custom_tagging_photo_before"] = before_photo
+    if after_photo:
+        values["custom_tagging_photo"] = after_photo
+
+    frappe.db.set_value("Asset", asset, values, update_modified=False)
+    return {"ok": 1}
+
+
 def _get_work_order_history(asset):
     """
     كل طلبات الصيانة السابقة لنفس الجهاز (وليس فقط المفتوحة منها كما في
