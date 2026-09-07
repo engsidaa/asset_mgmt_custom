@@ -115,6 +115,24 @@ def get_app_context():
 
 
 @frappe.whitelist()
+def register_fcm_token(token):
+    """
+    يُسجَّل مرة عند بدء التطبيق (وعند أي تحديث لاحق لرمز الجهاز من
+    Firebase — onTokenRefresh) ليعرف الخادم أي جهاز يخص هذا المستخدم عند
+    إرسال تنبيه Push حقيقي (انظر utils/fcm.py). مُقيَّد صراحة بحساب
+    المستخدم الحالي فقط — نفس نمط update_my_profile_picture أعلاه؛ لا
+    صلاحية "write" عامة على User مطلوبة لمجرد تحديث رمز جهاز المستخدم
+    نفسه (مقصورة أصلاً على System Manager في صلاحيات هذا الدكتايب).
+
+    جهاز واحد نشط لكل مستخدم عمداً (يستبدل القيمة القديمة بالكامل) — هذا
+    التطبيق مصمَّم لجهاز ميداني واحد لكل فني/مستخدم، وليس عدة أجهزة معاً.
+    """
+    if not token:
+        frappe.throw(_("token is required."))
+    frappe.db.set_value("User", frappe.session.user, "custom_fcm_token", token, update_modified=False)
+
+
+@frappe.whitelist()
 def update_my_profile_picture(file_url):
     """
     يحدِّث صورة حساب المستخدم الحالي فقط — لا يوجد لدى الأدوار الميدانية

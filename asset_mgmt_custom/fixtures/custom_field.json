@@ -1056,5 +1056,17 @@
   "label": "قراءة العداد عند آخر استحقاق",
   "read_only": 1,
   "insert_after": "custom_meter_trigger_value"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "User-custom_fcm_token",
+  "dt": "User",
+  "fieldname": "custom_fcm_token",
+  "fieldtype": "Small Text",
+  "label": "FCM Push Token",
+  "insert_after": "mobile_no",
+  "no_copy": 1,
+  "read_only": 1,
+  "description": "رمز جهاز تطبيق الموبايل الحالي لإرسال تنبيهات نظام Firebase Cloud Messaging له — يُسجَّل تلقائياً بعد تسجيل الدخول (register_fcm_token)، ويُمسَح تلقائياً لو رفضته Firebase كرمز غير صالح (تطبيق أُزيل/أُعيد تثبيته)"
  }
 ]
