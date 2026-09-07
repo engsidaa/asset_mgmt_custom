@@ -315,18 +315,14 @@ def set_operational(asset_name):
 @frappe.whitelist()
 def toggle_asset_running(asset_name):
     """
-    تبديل حالة "يعمل/متوقف" اليومية لأصل مُفعَّل تشغيلياً بالفعل — مُستقلة
-    تماماً عن custom_operational_status (بوابة تفعيل تُضبط مرة واحدة فقط
-    وتُشغّل بداية الإهلاك). يُستخدم من حركة سحب بطاقة الأصل يميناً بتطبيق
-    الموبايل، ولا معنى لتشغيل/إيقاف أصل لم يُفعَّل تشغيلياً بعد.
+    تبديل حالة "يعمل/متوقف" اليومية لأي أصل — مُستقلة تماماً عن
+    custom_operational_status (بوابة تفعيل تُضبط مرة واحدة فقط وتُشغّل
+    بداية الإهلاك). يُستخدم من حركة سحب بطاقة الأصل يميناً بتطبيق الموبايل،
+    ومتاحة لكل الأصول بلا استثناء (وليس فقط المُفعَّلة تشغيلياً) — طلب
+    صريح من المستخدم بعد أن كان القيد السابق يمنع ظهور المؤشر/السحب على
+    أغلب الأصول في القائمة.
     """
     doc = frappe.get_doc("Asset", asset_name)
-
-    if doc.custom_operational_status != "Operational":
-        frappe.throw(
-            _("Asset must be set Operational before its running status can be toggled."),
-            title=_("Asset Not Operational"),
-        )
 
     currently_running = doc.custom_is_running != 0
     new_value = 0 if currently_running else 1
