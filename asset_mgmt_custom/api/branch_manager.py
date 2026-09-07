@@ -473,7 +473,7 @@ def get_new_requisition_context(asset_category=None):
 @frappe.whitelist()
 def create_maintenance_request(
     asset=None, problem_description=None, work_type=None, priority=None, requires_permit=False,
-    complaint_department=None,
+    complaint_department=None, it_device_type=None, it_full_outage=False,
 ):
     """
     يُنشئ ويُسلِّم (Submit) Asset Work Order في استدعاء واحد — أنسب
@@ -498,7 +498,9 @@ def create_maintenance_request(
     الأصل. complaint_department ("تقنية المعلومات"/"صيانة عامة") إجباري
     حينها — Asset Work Order.validate() يرفض حفظها بدونه — لأن التوزيع
     التلقائي للفني بلا أصل يعتمد عليه بدل فئة الأصل (انظر
-    _auto_dispatch_technician).
+    _auto_dispatch_technician). it_device_type/it_full_outage تُضبَطان
+    فقط لو complaint_department == "تقنية المعلومات" (تُتجاهَلان بصمت
+    لأي حالة أخرى، بما فيها شكوى مرتبطة بأصل).
     """
     if not problem_description or not str(problem_description).strip():
         frappe.throw(_("Please describe the problem."))
@@ -522,6 +524,9 @@ def create_maintenance_request(
     doc.asset = asset or None
     doc.branch = branch
     doc.complaint_department = complaint_department or None
+    if not asset and complaint_department == "تقنية المعلومات":
+        doc.it_device_type = it_device_type or None
+        doc.it_full_outage = frappe.utils.cint(it_full_outage)
     doc.work_type = work_type or "إصلاح"
     doc.priority = priority or "عادي"
     doc.problem_description = problem_description

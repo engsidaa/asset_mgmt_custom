@@ -1097,8 +1097,33 @@ def check_overdue_allocations():
 # Daily: software license expiry alerts
 # ---------------------------------------------------------------------------
 
+def _get_it_department_users():
+    """
+    فنيّو تقنية المعلومات (custom_complaint_department == 'تقنية
+    المعلومات' على Maintenance Team Member) — نفس المعيار المستخدم في
+    التوزيع التلقائي لأمر عمل IT (انظر AssetWorkOrder._auto_dispatch_technician)،
+    يُستخدَم هنا ليصل تنبيه انتهاء ترخيص برنامج لفريق IT مباشرة، وليس
+    فقط لأصحاب دور "Asset Manager" العام.
+    """
+    return [r[0] for r in frappe.db.sql("""
+        SELECT DISTINCT mtm.team_member
+        FROM `tabMaintenance Team Member` mtm
+        WHERE mtm.custom_complaint_department = 'تقنية المعلومات'
+    """)]
+
+
 def check_software_license_expiry():
-    """Daily: notify when software licenses are expiring in 30, 14, or 7 days."""
+    """
+    Daily: notify when software licenses are expiring in 30, 14, or 7 days.
+    يصل التنبيه لأصحاب دور "Asset Manager" وفنيّي تقنية المعلومات معاً،
+    وعبر notify_user (بدل enqueue_create_notification المباشرة) حتى يصل
+    Push حقيقي (FCM) لتطبيق الموبايل أيضاً — وليس فقط جرس التنبيهات في
+    واجهة Desk.
+    """
+    from asset_mgmt_custom.utils.notify import notify_user
+
+    recipients = sorted(set(_get_manager_users()) | set(_get_it_department_users()))
+
     for days_ahead in [30, 14, 7]:
         target = add_days(today(), days_ahead)
         records = frappe.db.sql("""
@@ -1109,18 +1134,14 @@ def check_software_license_expiry():
               AND status NOT IN ('Expired', 'Terminated')
         """, {"target": target}, as_dict=True)
 
-        if not records:
+        if not records or not recipients:
             continue
 
-        manager_users = _get_manager_users()
         for r in records:
             subject = _("Software License Expiring in {0} days: {1}").format(
                 days_ahead, r.software_name)
-            content = _("Software license <b>{0}</b> ({1}) linked to asset "
-                        "<b>{2}</b> will expire on <b>{3}</b>.").format(
-                r.software_name, r.license_type or "N/A",
-                r.asset_name or r.asset or "N/A", r.expiry_date)
-            _create_notification(subject, content, "Asset Software License", r.name, manager_users)
+            for user in recipients:
+                notify_user(user, subject, reference_doctype="Asset Software License", reference_name=r.name)
 
     # Auto-expire past due licenses
     frappe.db.sql("""

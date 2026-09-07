@@ -107,9 +107,24 @@ class AssetWorkOrder(Document):
             )
 
     def before_insert(self):
+        self._set_naming_series_by_department()
         self._apply_sla_policy()
         if not self.assigned_technician:
             self._auto_dispatch_technician()
+
+    def _set_naming_series_by_department(self):
+        """
+        شكوى تقنية معلومات عامة تحصل على رقم "IT-YYYY-####" بدل "AWO-..."
+        القياسي، وشكوى الصيانة العامة على "GC-YYYY-####" — حتى يتضح نوع
+        الطلب من رقمه مباشرة في القوائم والإشعارات، دون فتح المستند. أمر
+        عمل مرتبط بأصل يبقى AWO كالمعتاد (القيمة الافتراضية للحقل).
+        """
+        if self.asset or not self.complaint_department:
+            return
+        if self.complaint_department == "تقنية المعلومات":
+            self.naming_series = "IT-.YYYY.-.####"
+        else:
+            self.naming_series = "GC-.YYYY.-.####"
 
     def after_insert(self):
         if self.priority == "حرج":
@@ -595,28 +610,59 @@ class AssetWorkOrder(Document):
         if je.docstatus == 1:
             je.cancel()
 
+    # مهلة قصوى (ساعات) عند "تعطيل كامل للعمل" في شكوى IT — تُطبَّق كحدٍّ
+    # أعلى فوق أي سياسة SLA أخرى، وليس بدلاً منها بالكامل، حتى لا يمتد
+    # تعطيل يوقف عمل الفرع بالكامل لمهلة يوم/يومين المعتادة لأولوية عادية.
+    IT_FULL_OUTAGE_RESPONSE_HOURS_CAP = 0.5
+    IT_FULL_OUTAGE_RESOLUTION_HOURS_CAP = 2
+
     def _apply_sla_policy(self):
         """
         تُحدَّد مواعيد الاستجابة/الحل المستحقة مرة واحدة عند الإنشاء بناءً
         على سياسة SLA المطابقة لأولوية أمر العمل، بدل الثوابت الثابتة
         (48 ساعة/3 أيام) التي كانت مكتوبة مباشرة في الكود سابقاً.
+
+        شكوى تقنية معلومات عامة (بلا أصل): تُفضَّل سياسة باسم "IT" لو
+        كانت مُعرَّفة (يضبطها مدير الأصول يدوياً من نفس شاشة سياسات SLA
+        العادية — بلا حاجة لأي إعداد افتراضي من الكود) بدل السياسة
+        المطابقة للأولوية المختارة يدوياً، فمشاكل IT عادة أعجل من صيانة
+        فيزيائية بنفس مستوى الأولوية الاسمي. "تعطيل كامل للعمل" يفرض حداً
+        أقصى صارماً فوق ذلك بصرف النظر عن أي سياسة.
         """
-        if not self.priority:
+        is_it_general = not self.asset and self.complaint_department == "تقنية المعلومات"
+        full_outage = is_it_general and cint(self.get("it_full_outage"))
+
+        policy = None
+        if is_it_general:
+            policy = frappe.db.get_value(
+                "Asset Maintenance SLA Policy", "IT",
+                ["name", "response_hours", "resolution_hours"], as_dict=True,
+            )
+        if not policy and self.priority:
+            policy = frappe.db.get_value(
+                "Asset Maintenance SLA Policy", self.priority,
+                ["name", "response_hours", "resolution_hours"], as_dict=True,
+            )
+
+        if not policy and not full_outage:
             return
 
-        policy = frappe.db.get_value(
-            "Asset Maintenance SLA Policy",
-            self.priority,
-            ["name", "response_hours", "resolution_hours"],
-            as_dict=True,
-        )
-        if not policy:
-            return
+        response_hours = flt(policy.response_hours) if policy else None
+        resolution_hours = flt(policy.resolution_hours) if policy else None
+
+        if full_outage:
+            response_hours = min(response_hours, self.IT_FULL_OUTAGE_RESPONSE_HOURS_CAP) if response_hours \
+                else self.IT_FULL_OUTAGE_RESPONSE_HOURS_CAP
+            resolution_hours = min(resolution_hours, self.IT_FULL_OUTAGE_RESOLUTION_HOURS_CAP) if resolution_hours \
+                else self.IT_FULL_OUTAGE_RESOLUTION_HOURS_CAP
 
         base = now_datetime()
-        self.sla_policy = policy.name
-        self.response_due_by = add_to_date(base, hours=flt(policy.response_hours))
-        self.resolution_due_by = add_to_date(base, hours=flt(policy.resolution_hours))
+        if policy:
+            self.sla_policy = policy.name
+        if response_hours:
+            self.response_due_by = add_to_date(base, hours=response_hours)
+        if resolution_hours:
+            self.resolution_due_by = add_to_date(base, hours=resolution_hours)
 
     def _auto_dispatch_technician(self):
         """

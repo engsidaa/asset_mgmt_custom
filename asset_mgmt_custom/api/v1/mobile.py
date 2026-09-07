@@ -213,7 +213,7 @@ def scan_asset(identifier):
 @frappe.whitelist()
 def create_complaint(
     asset=None, problem_description=None, work_type=None, priority=None, photo_file_url=None, requires_permit=False,
-    complaint_department=None,
+    complaint_department=None, it_device_type=None, it_full_outage=False,
 ):
     """
     بلاغ عطل فوري — يفوِّض بالكامل لنفس create_maintenance_request
@@ -226,11 +226,14 @@ def create_complaint(
     التسليم بالضبط (انظر create_maintenance_request)، فقط بلا ربط بأصل؛
     الفرع يُستنتَج حينها من فرع المستخدم نفسه. complaint_department
     ("تقنية المعلومات"/"صيانة عامة") إجباري في هذه الحالة — يُحدِّد الجهة
-    التي يجب أن تستلم الشكوى.
+    التي يجب أن تستلم الشكوى. it_device_type/it_full_outage: خاصان
+    بشكوى تقنية المعلومات فقط (نوع الجهاز، وهل تعطيل كامل يستحق مهلة
+    استجابة أسرع — انظر AssetWorkOrder._apply_sla_policy)، يُتجاهَلان
+    بصمت لأي شكوى أخرى.
     """
     result = create_maintenance_request(
         asset, problem_description, work_type=work_type, priority=priority, requires_permit=requires_permit,
-        complaint_department=complaint_department,
+        complaint_department=complaint_department, it_device_type=it_device_type, it_full_outage=it_full_outage,
     )
     if photo_file_url:
         frappe.db.set_value(

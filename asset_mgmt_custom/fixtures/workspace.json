@@ -194,6 +194,11 @@
    },
    {
     "type": "Page",
+    "link_to": "it-support-dashboard",
+    "label": "لوحة دعم تقنية المعلومات"
+   },
+   {
+    "type": "Page",
     "link_to": "bulk-barcode-label-printing",
     "label": "طباعة ملصقات الباركود دفعة واحدة"
    }

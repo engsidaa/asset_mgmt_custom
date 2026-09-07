@@ -12,8 +12,9 @@
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "سلسلة الترقيم",
-   "options": "AWO-.YYYY.-.####",
-   "default": "AWO-.YYYY.-.####"
+   "options": "AWO-.YYYY.-.####\nIT-.YYYY.-.####\nGC-.YYYY.-.####",
+   "default": "AWO-.YYYY.-.####",
+   "description": "تُضبَط تلقائياً حسب نوع الطلب — AWO لأمر عمل مرتبط بأصل، IT لشكوى تقنية معلومات عامة، GC لشكوى صيانة عامة (انظر AssetWorkOrder._set_naming_series_by_department)"
   },
   {
    "fieldname": "title",
@@ -65,6 +66,21 @@
    "mandatory_depends_on": "eval:!doc.asset",
    "in_list_view": 1,
    "description": "لشكوى عامة غير مرتبطة بأصل فقط — الجهة التي يجب أن تستلمها (تقنية المعلومات أو صيانة عامة)، تُستخدَم أيضاً في التوزيع التلقائي للفني بدل فئة الأصل"
+  },
+  {
+   "fieldname": "it_device_type",
+   "fieldtype": "Select",
+   "label": "نوع الجهاز",
+   "options": "\nكمبيوتر\nطابعة\nشبكة/إنترنت\nنظام (ERP)\nهاتف/جهاز محمول\nأخرى",
+   "depends_on": "eval:!doc.asset && doc.complaint_department==\"تقنية المعلومات\"",
+   "description": "خاص بشكاوى تقنية المعلومات فقط — يساعد فريق IT على الفرز السريع دون فتح الوصف الكامل"
+  },
+  {
+   "fieldname": "it_full_outage",
+   "fieldtype": "Check",
+   "label": "تعطيل كامل للعمل؟",
+   "depends_on": "eval:!doc.asset && doc.complaint_department==\"تقنية المعلومات\"",
+   "description": "معطِّل تماماً وليس مجرد بطء/خلل جزئي — يرفع الاستعجال ويُقلِّص مهلة SLA المستهدفة تلقائياً (انظر AssetWorkOrder._apply_sla_policy)"
   },
   {
    "fieldname": "col_break_1",

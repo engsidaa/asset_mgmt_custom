@@ -1,0 +1,21 @@
+{
+ "content": null,
+ "docstatus": 0,
+ "doctype": "Page",
+ "module": "Asset Mgmt Custom",
+ "name": "it-support-dashboard",
+ "owner": "Administrator",
+ "page_name": "it-support-dashboard",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Asset Manager"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "title": "لوحة دعم تقنية المعلومات"
+}
