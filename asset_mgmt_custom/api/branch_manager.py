@@ -182,7 +182,7 @@ def list_my_assets(asset_category=None):
         filters=filters,
         fields=[
             "name", "asset_name", "asset_category", "image", "status",
-            "custom_operational_status", "custom_under_warranty",
+            "custom_operational_status", "custom_is_running", "custom_under_warranty",
             "custom_warranty_expiry", "custom_next_maintenance_date",
         ],
         order_by="asset_name asc",
@@ -204,7 +204,7 @@ def get_asset_detail(asset):
         "Asset", asset,
         [
             "name", "asset_name", "asset_category", "image", "status",
-            "custom_operational_status", "custom_branch", "location",
+            "custom_operational_status", "custom_is_running", "custom_branch", "location",
             "purchase_date", "available_for_use_date", "gross_purchase_amount",
             "value_after_depreciation", "custom_under_warranty", "custom_warranty_expiry",
             "custom_activation_date", "custom_total_maintenance_cost",

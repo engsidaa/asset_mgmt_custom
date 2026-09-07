@@ -31,6 +31,7 @@ def validate(doc, method=None):
     _apply_used_depreciation_rate(doc)
     _auto_set_incomplete_status(doc)
     _auto_set_uncoded_status(doc)
+    _auto_set_running_default(doc)
 
 
 # ---------------------------------------------------------------------------
@@ -138,6 +139,12 @@ def _auto_set_uncoded_status(doc):
     """نضمن أن الأصل الجديد يبدأ بحالة ترميز Uncoded إن لم تُضبط."""
     if not doc.get("custom_coding_status"):
         doc.custom_coding_status = "Uncoded"
+
+
+def _auto_set_running_default(doc):
+    """نضمن أن الأصل الجديد يبدأ بحالة 'يعمل' افتراضياً إن لم تُضبط."""
+    if doc.get("custom_is_running") is None:
+        doc.custom_is_running = 1
 
 
 # ---------------------------------------------------------------------------
@@ -299,6 +306,39 @@ def set_operational(asset_name):
     _log_activity(asset_name, "Asset set to Operational by {0}".format(frappe.session.user))
 
     return "Operational"
+
+
+# ---------------------------------------------------------------------------
+# Toggle Running/Stopped (daily on/off — distinct from Set Operational)
+# ---------------------------------------------------------------------------
+
+@frappe.whitelist()
+def toggle_asset_running(asset_name):
+    """
+    تبديل حالة "يعمل/متوقف" اليومية لأصل مُفعَّل تشغيلياً بالفعل — مُستقلة
+    تماماً عن custom_operational_status (بوابة تفعيل تُضبط مرة واحدة فقط
+    وتُشغّل بداية الإهلاك). يُستخدم من حركة سحب بطاقة الأصل يميناً بتطبيق
+    الموبايل، ولا معنى لتشغيل/إيقاف أصل لم يُفعَّل تشغيلياً بعد.
+    """
+    doc = frappe.get_doc("Asset", asset_name)
+
+    if doc.custom_operational_status != "Operational":
+        frappe.throw(
+            _("Asset must be set Operational before its running status can be toggled."),
+            title=_("Asset Not Operational"),
+        )
+
+    currently_running = doc.custom_is_running != 0
+    new_value = 0 if currently_running else 1
+
+    frappe.db.set_value("Asset", asset_name, "custom_is_running", new_value, update_modified=True)
+
+    _log_activity(
+        asset_name,
+        "Asset marked as {0} by {1}".format("Running" if new_value else "Stopped", frappe.session.user),
+    )
+
+    return {"custom_is_running": new_value}
 
 
 # ---------------------------------------------------------------------------

@@ -235,6 +235,19 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset-custom_is_running",
+  "dt": "Asset",
+  "fieldname": "custom_is_running",
+  "fieldtype": "Check",
+  "label": "Asset Is Running (الأصل يعمل)",
+  "insert_after": "custom_activated_by",
+  "default": "1",
+  "in_list_view": 1,
+  "read_only": 1,
+  "description": "تشغيل/إيقاف يومي يدوي (سحب بطاقة الأصل يميناً بالتطبيق) — منفصل تماماً عن custom_operational_status، وهي بوابة تفعيل تُضبط مرة واحدة فقط."
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset-custom_warranty_section",
   "dt": "Asset",
   "fieldname": "custom_warranty_section",

@@ -172,7 +172,7 @@ def get_branch_assets(branch):
         },
         fields=[
             "name", "asset_name", "asset_category", "location", "status",
-            "custom_operational_status", "custom_coding_status", "image",
+            "custom_operational_status", "custom_is_running", "custom_coding_status", "image",
         ],
         order_by="asset_category, asset_name",
         limit_page_length=0,

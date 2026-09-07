@@ -153,3 +153,27 @@ def sync_branch_manager_user_permissions():
             frappe.log_error(title=f"sync_branch_manager_user_permissions failed for {branch_name}")
 
     frappe.db.commit()
+
+
+def backfill_asset_running_status():
+    """
+    custom_is_running (المفتاح اليومي تشغيل/إيقاف على بطاقة الأصل بالتطبيق)
+    حقل جديد بقيمة افتراضية 1 — لكن الافتراضي عند إضافة عمود Check جديد
+    لا يُطبَّق ضمانياً على كل الصفوف القديمة في كل نسخ MariaDB. أي أصل
+    مُفعَّل تشغيلياً بالفعل (Operational) ولسه القيمة فاضية عنده يُعتبر
+    "يعمل" افتراضياً، بدل ما يظهر فجأة "متوقف" لأصول كانت تعمل طبيعي قبل
+    هذا التحديث.
+    """
+    if not frappe.db.has_column("Asset", "custom_is_running"):
+        return
+
+    frappe.db.sql(
+        """
+        UPDATE `tabAsset`
+        SET custom_is_running = 1
+        WHERE custom_operational_status = 'Operational'
+          AND custom_is_running IS NULL
+        """
+    )
+
+    frappe.db.commit()
