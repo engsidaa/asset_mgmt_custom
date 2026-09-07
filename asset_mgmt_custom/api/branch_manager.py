@@ -85,6 +85,12 @@ def get_dashboard_summary():
     completed_work_orders = len(frappe.get_list(
         "Asset Work Order", filters={"docstatus": 1, "status": "مكتمل"}, pluck="name",
     ))
+    # إجمالي كل أوامر العمل المُسلَّمة بأي حالة — لأيقونة "كل الصيانة" في
+    # الرئيسية (لا تُحسَب بجمع الأعداد أعلاه لأن open_work_orders يشمل
+    # حالات (مفتوح/قيد التنفيذ/معلق) تتقاطع جزئياً مع pending_work_orders).
+    total_work_orders = len(frappe.get_list(
+        "Asset Work Order", filters={"docstatus": 1}, pluck="name",
+    ))
 
     incomplete_assets = len(frappe.get_list(
         "Asset",
@@ -114,6 +120,7 @@ def get_dashboard_summary():
         "pending_work_orders": pending_work_orders,
         "rejected_work_orders": rejected_work_orders,
         "completed_work_orders": completed_work_orders,
+        "total_work_orders": total_work_orders,
         "incomplete_or_in_transit_assets": incomplete_assets,
         "upcoming_maintenance_tasks": upcoming_maintenance,
     }
