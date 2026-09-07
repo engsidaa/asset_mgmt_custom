@@ -294,3 +294,27 @@ def submit_physical_audit(audit_id, items):
         "missing_count": doc.missing_count,
         "damaged_count": doc.damaged_count,
     }
+
+
+@frappe.whitelist()
+def get_work_order_comments(work_order):
+    """
+    تعليقات المتابعة على أمر عمل — عبر هذا الاستدعاء المخصص بدل REST
+    العام (/api/resource/Comment) مباشرة، لأن صلاحيات doctype Comment
+    الأساسية في Frappe نفسه مقصورة على System Manager/Website Manager
+    فقط (core/doctype/comment/comment.json) — أي دور ميداني آخر (فني/مدير
+    فرع/مسؤول صيانة) كان يحصل على PermissionError دائماً عند القراءة عبر
+    REST العام، رغم أن الإضافة (add_comment القياسي) تتجاوز هذا القيد
+    صراحة عبر ignore_permissions=True عند الحفظ. الصلاحية الحقيقية
+    المطلوبة هنا هي قدرة المستخدم على قراءة أمر العمل نفسه (مفحوصة أدناه
+    عبر check_permission، والتي تطبّق أصلاً has_permission المخصصة لـ
+    Asset Work Order)، وليس أي قيد منفصل على Comment.
+    """
+    frappe.get_doc("Asset Work Order", work_order).check_permission()
+    return frappe.get_all(
+        "Comment",
+        filters={"reference_doctype": "Asset Work Order", "reference_name": work_order, "comment_type": "Comment"},
+        fields=["name", "content", "comment_email", "comment_by", "creation"],
+        order_by="creation desc",
+        ignore_permissions=True,
+    )
