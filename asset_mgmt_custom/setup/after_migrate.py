@@ -177,3 +177,45 @@ def backfill_asset_running_status():
     )
 
     frappe.db.commit()
+
+
+def repair_broken_asset_gl_references():
+    """
+    إصدار سابق من _post_maintenance_cost_gl_entry (asset_work_order.py)
+    كان يضبط reference_type="Asset"/reference_name=<اسم الأصل> على صفوف
+    قيد اليومية — Frappe ينسخ هذين الحقلين حرفياً إلى
+    against_voucher_type/against_voucher على كل GL Entry ناتج (حقل
+    DynamicLink)، فلو حُذف الأصل لاحقاً يفشل أي محاولة إلغاء لاحقة لنفس
+    القيد برسالة "Could not find Against Voucher: <اسم الأصل>" (القيود
+    العكسية الجديدة الناتجة عن الإلغاء تخضع لنفس فحص الروابط)، ويصبح أمر
+    العمل المرتبط عالقاً بلا إمكانية إلغاء أو حذف نهائياً.
+
+    الكود الحالي لم يعد يضبط هذين الحقلين إطلاقاً (لا فائدة حقيقية منهما
+    أصلاً — اسم الأصل موجود بالفعل في user_remark القيد للتتبع)، لكن هذا
+    لا يُصلح القيود القديمة المُنشأة قبل هذا التعديل. هذه الدالة تُفرِّغ
+    الربط فقط في الصفوف التي تشير فعلاً لأصل محذوف (وليس أي أصل ما زال
+    موجوداً)، فتصبح عمليات الإلغاء/الحذف العالقة ممكنة مجدداً. آمنة
+    للتشغيل في كل مرة.
+    """
+    if not frappe.db.has_column("Journal Entry Account", "reference_type"):
+        return
+
+    frappe.db.sql(
+        """
+        UPDATE `tabJournal Entry Account` jea
+        LEFT JOIN `tabAsset` a ON a.name = jea.reference_name
+        SET jea.reference_type = NULL, jea.reference_name = NULL
+        WHERE jea.reference_type = 'Asset' AND a.name IS NULL
+        """
+    )
+
+    frappe.db.sql(
+        """
+        UPDATE `tabGL Entry` gle
+        LEFT JOIN `tabAsset` a ON a.name = gle.against_voucher
+        SET gle.against_voucher_type = NULL, gle.against_voucher = NULL
+        WHERE gle.against_voucher_type = 'Asset' AND a.name IS NULL
+        """
+    )
+
+    frappe.db.commit()

@@ -119,11 +119,12 @@ class AssetWriteoffRequest(Document):
         if cost_center:
             je.cost_center = cost_center
 
-        # ملاحظة: reference_type لازم يكون واحداً من القيم المسموحة في
-        # Journal Entry Account (Sales/Purchase Invoice، Asset، إلخ) —
-        # "Asset Write Off Request" (self.doctype) مش من ضمنها، وكانت
-        # بتُفشل هذا القيد دايماً. نرجع للأصل نفسه كمرجع بدلاً منه.
-        asset_reference = {"reference_type": "Asset", "reference_name": self.asset}
+        # ملاحظة: بلا reference_type/reference_name هنا عمداً — أي قيمة
+        # DynamicLink كهذه (كانت "Asset" سابقاً) تُنسَخ لـ against_voucher
+        # على GL Entry، وتفشل إلغاء القيد لاحقاً لو حُذف الأصل نهائياً من
+        # النظام (انظر نفس القرار في asset_work_order.py/asset_repair.py
+        # وrepair_broken_asset_gl_references في setup/after_migrate.py).
+        # اسم الأصل موجود بالفعل في user_remark أعلاه للتتبع.
 
         if accumulated_depreciation > 0:
             # Debit: يُقفل مجمع الإهلاك المتراكم على هذا الأصل بالكامل
@@ -131,7 +132,6 @@ class AssetWriteoffRequest(Document):
                 "account": accumulated_depreciation_account,
                 "debit_in_account_currency": accumulated_depreciation,
                 "cost_center": cost_center,
-                **asset_reference,
             })
 
         # Debit: خسارة الشطب (القيمة الدفترية المتبقية فقط)
@@ -139,7 +139,6 @@ class AssetWriteoffRequest(Document):
             "account": writeoff_account,
             "debit_in_account_currency": book_value,
             "cost_center": cost_center,
-            **asset_reference,
         })
 
         # Credit: يُقفل حساب الأصول الثابتة على قيمته الإجمالية الكاملة
@@ -149,7 +148,6 @@ class AssetWriteoffRequest(Document):
             "account": asset_account,
             "credit_in_account_currency": gross_amount,
             "cost_center": cost_center,
-            **asset_reference,
         })
 
         je.insert(ignore_permissions=True)

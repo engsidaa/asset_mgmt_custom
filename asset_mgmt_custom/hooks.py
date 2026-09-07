@@ -187,4 +187,5 @@ after_migrate = [
     "asset_mgmt_custom.setup.after_migrate.remove_old_asset_requisition_workflow",
     "asset_mgmt_custom.setup.after_migrate.sync_branch_manager_user_permissions",
     "asset_mgmt_custom.setup.after_migrate.backfill_asset_running_status",
+    "asset_mgmt_custom.setup.after_migrate.repair_broken_asset_gl_references",
 ]

@@ -255,19 +255,20 @@ def _post_repair_cost_gl_entry(doc):
         je.user_remark = _("Capitalized repair cost for Asset {0} via {1}").format(
             asset.asset_name, doc.name
         )
+        # لا reference_type/reference_name = "Asset" هنا عمداً — يُنسَخ
+        # لـ against_voucher (DynamicLink) على GL Entry، فيمنع إلغاء
+        # القيد لاحقاً لو حُذف الأصل (انظر نفس القرار في asset_work_order.py
+        # / repair_broken_asset_gl_references في setup/after_migrate.py).
+        # اسم الأصل موجود بالفعل في user_remark أعلاه للتتبع.
         je.append("accounts", {
             "account": category_account.fixed_asset_account,
             "debit_in_account_currency": total_cost,
             "cost_center": cost_center,
-            "reference_type": "Asset",
-            "reference_name": doc.asset,
         })
         je.append("accounts", {
             "account": wip_account,
             "credit_in_account_currency": total_cost,
             "cost_center": cost_center,
-            "reference_type": "Asset",
-            "reference_name": doc.asset,
         })
     else:
         expense_account = category_account.custom_maintenance_expense_account
@@ -302,15 +303,11 @@ def _post_repair_cost_gl_entry(doc):
             "account": expense_account,
             "debit_in_account_currency": total_cost,
             "cost_center": cost_center,
-            "reference_type": "Asset",
-            "reference_name": doc.asset,
         })
         je.append("accounts", {
             "account": accrued_account,
             "credit_in_account_currency": total_cost,
             "cost_center": cost_center,
-            "reference_type": "Asset",
-            "reference_name": doc.asset,
         })
 
     je.insert(ignore_permissions=True)

@@ -582,19 +582,25 @@ class AssetWorkOrder(Document):
             asset.asset_name, self.name
         )
 
+        # ملاحظة: عمداً بلا reference_type/reference_name = "Asset" على
+        # صفوف القيد — Frappe ينسخ هذين الحقلين حرفياً إلى
+        # against_voucher_type/against_voucher على كل GL Entry ناتج
+        # (journal_entry.py: get_gl_dict)، وهو حقل DynamicLink يُعاد
+        # التحقق من وجوده عند أي محاولة لاحقة لإلغاء القيد (يُنشئ قيود
+        # عكسية جديدة تخضع لنفس التحقق). لو الأصل حُذف لاحقاً، يفشل
+        # الإلغاء برسالة "Could not find Against Voucher: <اسم الأصل>"
+        # ويصبح القيد (وبالتالي أمر العمل) عالقاً بلا إمكانية إلغاء أو
+        # حذف نهائياً. اسم الأصل موجود بالفعل في je.user_remark أعلاه
+        # للتتبع، فلا حاجة فعلية لهذا الربط الهش أصلاً.
         je.append("accounts", {
             "account": category_account.custom_maintenance_expense_account,
             "debit_in_account_currency": total_cost,
             "cost_center": cost_center,
-            "reference_type": "Asset",
-            "reference_name": self.asset,
         })
         je.append("accounts", {
             "account": category_account.custom_maintenance_accrued_liability_account,
             "credit_in_account_currency": total_cost,
             "cost_center": cost_center,
-            "reference_type": "Asset",
-            "reference_name": self.asset,
         })
 
         je.insert(ignore_permissions=True)
