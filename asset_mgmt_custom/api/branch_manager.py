@@ -520,7 +520,31 @@ def create_physical_audit():
 
     cost_center = frappe.db.get_value("Branch", branch, "custom_cost_center")
     if not cost_center:
-        frappe.throw(_("Branch {0} has no linked Cost Center — cannot start a physical audit.").format(branch))
+        # فروع قديمة (من قبل معالج فتح الفرع الجديد الذي يربط Cost Center
+        # تلقائياً) قد لا تملك custom_cost_center — بدل رفض الجرد كلياً
+        # وإجبار الإداري على إعداد يدوي منفصل، نُنشئ واحداً هنا بنفس منطق
+        # onboard_new_branch (setup/branch_onboarding.py) بالضبط ونربطه
+        # بالفرع، حتى يعمل الجرد فوراً ويستفيد أي حقل آخر يعتمد على نفس
+        # الحقل (أوامر العمل/طلبات قطع الغيار) من هذا الربط لاحقاً أيضاً.
+        company = frappe.defaults.get_global_default("company")
+        if not company:
+            frappe.throw(
+                _("Branch {0} has no linked Cost Center, and no default company is configured to create one automatically.").format(branch)
+            )
+        parent_cost_center = frappe.db.get_value(
+            "Cost Center", {"is_group": 1, "company": company}, "name", order_by="lft asc"
+        )
+        if not parent_cost_center:
+            frappe.throw(
+                _("Branch {0} has no linked Cost Center, and no root Cost Center exists for company {1} to create one under.").format(branch, company)
+            )
+        cc = frappe.new_doc("Cost Center")
+        cc.cost_center_name = branch
+        cc.company = company
+        cc.parent_cost_center = parent_cost_center
+        cc.insert(ignore_permissions=True)
+        cost_center = cc.name
+        frappe.db.set_value("Branch", branch, "custom_cost_center", cost_center)
 
     doc = frappe.new_doc("Asset Physical Audit")
     doc.cost_center = cost_center
