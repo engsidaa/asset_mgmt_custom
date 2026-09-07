@@ -270,6 +270,27 @@ def get_asset_detail(asset):
     }
 
 
+@frappe.whitelist()
+def update_asset_image(asset, file_url):
+    """
+    تحديث صورة أصل واحد من شاشة تفاصيل الأصل بالموبايل — صلاحية الكتابة
+    الأساسية على doctype Asset مقصورة على "Accounts User"/"Quality
+    Manager" (core) بالإضافة لـ Branch Manager بصلاحية قراءة فقط
+    (custom_docperm.json)، فأي دور ميداني آخر (فني/مدير فرع/حتى Asset
+    Manager) كان سيفشل بصلاحية عبر المسار العام (frappe.client.set_value
+    الذي يمر عبر doc.save() الكامل). نفس نمط update_my_profile_picture
+    بالضبط: نتحقق من صلاحية قراءة هذا الأصل تحديداً (مُقيَّدة أصلاً بفرع
+    المستخدم عبر User Permission)، ثم db_set تتجاوز فحص الكتابة الصارم
+    عمداً — الصلاحية الحقيقية هنا هي "هل يقدر يرى هذا الأصل أصلاً؟" وليس
+    قيداً عاماً منفصلاً على الكتابة.
+    """
+    if not file_url:
+        frappe.throw(_("file_url is required."))
+    _check_read("Asset", asset)
+    frappe.db.set_value("Asset", asset, "image", file_url, update_modified=False)
+    return {"image": file_url}
+
+
 def _get_work_order_history(asset):
     """
     كل طلبات الصيانة السابقة لنفس الجهاز (وليس فقط المفتوحة منها كما في
