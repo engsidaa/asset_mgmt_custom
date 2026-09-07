@@ -22,6 +22,44 @@ from asset_mgmt_custom.api.branch_manager import create_maintenance_request, get
 
 
 @frappe.whitelist()
+def generate_my_api_keys():
+    """
+    توليد (أو إعادة توليد) مفتاح API الخاص بالمستخدم الحالي لنفسه فقط —
+    خطوة تسجيل الدخول باسم مستخدم/كلمة مرور في التطبيق (auth_repository.dart)
+    تستدعي هذه الدالة عبر جلسة الكوكيز المؤقتة بعد /api/method/login
+    الناجح، لتحويلها فوراً لمصادقة API Key/Secret القياسية.
+
+    لماذا لا نستدعي frappe.core.doctype.user.user.generate_keys الأصلية
+    مباشرة: تلك الدالة مقيَّدة صراحة بـ frappe.only_for("System Manager")
+    (هي أصلاً إجراء إداري يُنفَّذه مسؤول من داخل نموذج User لمستخدم آخر،
+    وليست ميزة "توليد مفتاحي الخاص" ذاتية الخدمة كما افتُرض خطأً عند بناء
+    هذه الشاشة أول مرة) — ما كان يعني عملياً أن أي حساب فني/مدير فرع بلا
+    دور System Manager يفشل تسجيل دخوله بكلمة المرور بصمت عند هذه الخطوة
+    تحديداً. الحل هنا: نفس منطق الدالة الأصلية بالضبط، لكن عبر
+    frappe.db.set_value (يتجاوز فحص الصلاحية العام تماماً كما في
+    update_my_profile_picture أعلاه) ومُقيَّد صراحة بـ frappe.session.user
+    فقط — لا يقدر أي مستخدم عبر هذا الاستدعاء توليد أو قراءة مفتاح مستخدم
+    آخر مهما كانت أدواره، فلا يوجد تصعيد صلاحيات حقيقي هنا.
+
+    يُعيد api_key وapi_secret معاً في استدعاء واحد (خلافاً للدالة
+    الأصلية التي تُعيد api_secret فقط وتترك api_key ليُقرأ لاحقاً عبر
+    /api/resource/User — وهو حقل بمستوى صلاحية (permlevel) أعلى مقصور
+    أيضاً على System Manager، فكان سيفشل بنفس السبب حتى لو نجح التوليد).
+    """
+    user = frappe.session.user
+    if user == "Guest":
+        frappe.throw(_("Invalid or missing API credentials."), frappe.AuthenticationError)
+
+    api_key = frappe.db.get_value("User", user, "api_key")
+    if not api_key:
+        api_key = frappe.generate_hash(length=15)
+    api_secret = frappe.generate_hash(length=15)
+    frappe.db.set_value("User", user, {"api_key": api_key, "api_secret": api_secret}, update_modified=False)
+
+    return {"api_key": api_key, "api_secret": api_secret}
+
+
+@frappe.whitelist()
 def get_app_context():
     """
     استدعاء واحد عند فتح تطبيق الموبايل (بعد المصادقة بـ API Key/Secret
