@@ -349,4 +349,22 @@ def confirm_receipt(movement_name):
     if confirmed:
         frappe.db.set_value("Asset Movement", movement_name, "custom_receipt_confirmed", 1, update_modified=False)
 
+        # لو نشأت هذه الحركة من طلب نقل جهاز (Asset Transfer Request)، نُخبر
+        # مقدِّم الطلب أن الجهاز وصل واستُلم فعلياً — لا نُخبره شيئاً لو كانت
+        # حركة يدوية مباشرة بلا طلب أصلاً (تراجع الحلقة أدناه بلا أثر).
+        from asset_mgmt_custom.utils.notify import notify_user
+
+        transfer_request = frappe.db.get_value(
+            "Asset Transfer Request", {"asset_movement": movement_name}, ["name", "employee"], as_dict=True
+        )
+        if transfer_request:
+            requester_user = frappe.db.get_value("Employee", transfer_request.employee, "user_id")
+            if requester_user:
+                notify_user(
+                    requester_user,
+                    _("تم تأكيد استلام الجهاز في الفرع المستقبِل."),
+                    reference_doctype="Asset Transfer Request",
+                    reference_name=transfer_request.name,
+                )
+
     return confirmed

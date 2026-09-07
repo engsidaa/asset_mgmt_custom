@@ -3,6 +3,8 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import today
 
+from asset_mgmt_custom.utils.notify import notify_user
+
 APPROVER_ROLES = ("Asset Manager", "System Manager")
 
 
@@ -77,4 +79,14 @@ class AssetTransferRequest(Document):
 
         self.db_set("asset_movement", mv.name, update_modified=False)
         self.db_set("status", "Completed", update_modified=False)
+
+        to_branch_manager = frappe.db.get_value("Branch", self.to_branch, "custom_branch_manager")
+        if to_branch_manager:
+            notify_user(
+                to_branch_manager,
+                _("جهاز في طريقه إلى فرعك ({0}) — بانتظار تأكيد الاستلام.").format(self.asset),
+                reference_doctype="Asset Movement",
+                reference_name=mv.name,
+            )
+
         return mv.name

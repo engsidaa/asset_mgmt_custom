@@ -395,13 +395,25 @@ def get_work_order_comments(work_order):
 # asset_mgmt_custom.utils.notify.notify_user يظهر هنا مباشرة لنفس
 # المستخدم على تطبيق الموبايل، بحقل read الحقيقي (وليس عدّاداً مُشتقاً
 # من أرقام لوحة التحكم كما كانت شاشة "التنبيهات" سابقاً).
+#
+# لكن Notification Log جدول عام في Frappe نفسه — يستقبل أيضاً تنبيهات لا
+# علاقة لها بهذا التطبيق إطلاقاً (إشارة (@mention) في تعليق على أي مستند
+# آخر بالنظام، تكليف ToDo، مشاركة مستند، نقاط طاقة...)، فتظهر مختلطة مع
+# تنبيهات التطبيق نفسه لو قُرئت بلا تصفية. كل دكتايبات هذا التطبيق
+# (وكل استدعاءات notify_user/enqueue_create_notification المُستخدَمة فيه،
+# هنا وفي tasks.py) مُسمّاة بادئتها "Asset" دائماً بلا استثناء — فالتصفية
+# بـ document_type LIKE 'Asset%' تعزل تنبيهات هذا التطبيق فقط عن أي شيء
+# آخر في النظام، بلا حاجة لصيانة قائمة صريحة بكل دكتايب كلما أُضيف جديد.
 # ---------------------------------------------------------------------------
+
+_APP_NOTIFICATION_FILTERS = [["document_type", "like", "Asset%"]]
+
 
 @frappe.whitelist()
 def list_my_notifications(only_unread=None, limit=50):
-    filters = {"for_user": frappe.session.user}
+    filters = [["for_user", "=", frappe.session.user], *_APP_NOTIFICATION_FILTERS]
     if frappe.utils.cint(only_unread):
-        filters["read"] = 0
+        filters.append(["read", "=", 0])
     return frappe.get_list(
         "Notification Log",
         filters=filters,
@@ -414,7 +426,10 @@ def list_my_notifications(only_unread=None, limit=50):
 
 @frappe.whitelist()
 def get_unread_notification_count():
-    return frappe.db.count("Notification Log", {"for_user": frappe.session.user, "read": 0})
+    return frappe.db.count(
+        "Notification Log",
+        {"for_user": frappe.session.user, "read": 0, "document_type": ["like", "Asset%"]},
+    )
 
 
 @frappe.whitelist()
@@ -429,5 +444,7 @@ def mark_notification_read(name):
 @frappe.whitelist()
 def mark_all_notifications_read():
     frappe.db.set_value(
-        "Notification Log", {"for_user": frappe.session.user, "read": 0}, "read", 1, update_modified=False
+        "Notification Log",
+        {"for_user": frappe.session.user, "read": 0, "document_type": ["like", "Asset%"]},
+        "read", 1, update_modified=False,
     )

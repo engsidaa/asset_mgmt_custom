@@ -97,6 +97,12 @@ doc_events = {
         "on_submit": "asset_mgmt_custom.overrides.asset_movement.on_submit",
         "on_cancel": "asset_mgmt_custom.overrides.asset_movement.on_cancel",
     },
+    "Comment": {
+        "after_insert": "asset_mgmt_custom.overrides.work_order_activity.notify_on_comment",
+    },
+    "File": {
+        "after_insert": "asset_mgmt_custom.overrides.work_order_activity.notify_on_file_attach",
+    },
     "Asset Repair": {
         "validate": "asset_mgmt_custom.overrides.asset_repair.validate",
         "on_submit": "asset_mgmt_custom.overrides.asset_repair.on_submit",

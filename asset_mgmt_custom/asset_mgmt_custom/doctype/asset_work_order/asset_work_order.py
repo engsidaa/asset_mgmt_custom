@@ -420,6 +420,13 @@ class AssetWorkOrder(Document):
                     reference_doctype="Asset Work Order",
                     reference_name=self.follow_up_work_order,
                 )
+        elif self.assigned_technician:
+            notify_user(
+                self.assigned_technician,
+                _("أكَّد الفرع أن {0} يعمل بشكل سليم — أُغلق الأمر.").format(self.title),
+                reference_doctype="Asset Work Order",
+                reference_name=self.name,
+            )
 
         self.save()
         return {

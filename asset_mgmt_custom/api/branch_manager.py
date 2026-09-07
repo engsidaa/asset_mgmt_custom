@@ -30,6 +30,8 @@ import frappe
 from frappe import _
 from frappe.utils import add_days, cint, date_diff, getdate, today
 
+from asset_mgmt_custom.utils.notify import notify_user
+
 
 ALLOWED_REMINDER_DOCTYPES = ("Asset Work Order", "Asset", "Asset Requisition")
 
@@ -354,6 +356,18 @@ def update_asset_coding(asset, tag_type, code_field, code_value, before_photo=No
         values["custom_tagging_photo"] = after_photo
 
     frappe.db.set_value("Asset", asset, values, update_modified=False)
+
+    branch = frappe.db.get_value("Asset", asset, "custom_branch")
+    branch_manager = branch and frappe.db.get_value("Branch", branch, "custom_branch_manager")
+    if branch_manager and branch_manager != frappe.session.user:
+        asset_name = frappe.db.get_value("Asset", asset, "asset_name") or asset
+        notify_user(
+            branch_manager,
+            _("تم ترميز/تفعيل الأصل {0}.").format(asset_name),
+            reference_doctype="Asset",
+            reference_name=asset,
+        )
+
     return {"ok": 1}
 
 
@@ -628,6 +642,15 @@ def create_physical_audit():
             "expected_location": a.location,
         })
     doc.insert(ignore_permissions=True)
+
+    branch_manager = frappe.db.get_value("Branch", branch, "custom_branch_manager")
+    if branch_manager and branch_manager != frappe.session.user:
+        notify_user(
+            branch_manager,
+            _("بدأ جرد فعلي جديد لأصول فرعك ({0} أصل).").format(doc.total_assets),
+            reference_doctype="Asset Physical Audit",
+            reference_name=doc.name,
+        )
 
     return {
         "name": doc.name,
