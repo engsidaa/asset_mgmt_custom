@@ -582,6 +582,18 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset Category-custom_complaint_department",
+  "dt": "Asset Category",
+  "fieldname": "custom_complaint_department",
+  "fieldtype": "Select",
+  "label": "الجهة المعنية (Complaint Department)",
+  "options": "\nتقنية المعلومات\nصيانة عامة",
+  "insert_after": "custom_max_safe_temperature",
+  "description": "تُستخدَم لتقييد فنيّي تقنية المعلومات على فئات/أصول قسمهم فقط في تطبيق الموبايل (إجمالي الأصول، طلب صيانة، مرحلة اعتماد إضافية في طلب الأصل) — اتركه فارغاً لأي فئة عادية غير خاصة بتقنية المعلومات.",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Category-custom_spare_parts_section",
   "dt": "Asset Category",
   "fieldname": "custom_spare_parts_section",

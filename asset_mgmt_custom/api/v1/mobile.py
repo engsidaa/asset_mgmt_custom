@@ -20,6 +20,15 @@ from frappe import _
 from frappe.utils.password import set_encrypted_password
 
 from asset_mgmt_custom.api.branch_manager import create_maintenance_request, get_asset_detail
+from asset_mgmt_custom.utils.it_scope import is_it_technician, get_it_asset_categories
+from asset_mgmt_custom.utils.notify import notify_user
+
+
+def _require_it_technician():
+    if not is_it_technician() and "System Manager" not in frappe.get_roles():
+        frappe.throw(
+            _("This action is limited to IT department technicians."), frappe.PermissionError
+        )
 
 
 @frappe.whitelist()
@@ -104,11 +113,11 @@ def get_app_context():
     # فني مُعيَّن صراحةً لجهة "تقنية المعلومات" ضمن أي فريق صيانة — نفس
     # المعيار المستخدم في التوزيع التلقائي لشكاوى IT
     # (AssetWorkOrder._auto_dispatch_technician) وتنبيهات تراخيص البرامج
-    # (tasks._get_it_department_users). يُستخدَم في العميل لإظهار عناصر
-    # خاصة بقسم IT (تراخيص البرامج مثلاً) لفنيّي هذا القسم فقط.
-    is_it_technician = bool(frappe.db.exists(
-        "Maintenance Team Member", {"team_member": user, "custom_complaint_department": "تقنية المعلومات"}
-    ))
+    # (tasks._get_it_department_users)، مُجمَّع الآن في utils/it_scope.py.
+    # يُستخدَم في العميل لإظهار عناصر خاصة بقسم IT (تراخيص البرامج،
+    # تضييق نطاق الأصول/الفئات، مرحلة اعتماد إضافية في طلب الأصل) لفنيّي
+    # هذا القسم فقط.
+    user_is_it_technician = is_it_technician(user)
 
     return {
         "user": user,
@@ -120,7 +129,7 @@ def get_app_context():
         "employee": employee,
         "managed_branches": managed_branches,
         "default_branch": default_branch,
-        "is_it_technician": is_it_technician,
+        "is_it_technician": user_is_it_technician,
     }
 
 
@@ -172,14 +181,23 @@ def get_branch_assets(branch):
     فقط على صلاحية قراءة Asset العادية (ممنوحة أصلاً لدور Asset
     Technician)، وليس على User Permission الخاصة بـ Branch (تلك مخصصة
     لمدراء الفروع أنفسهم، وليس فنيّي الصيانة المتنقلين بين عدة فروع).
+
+    فني تقنية المعلومات مُقيَّد هنا أيضاً على فئات/أصول قسمه فقط (نفس
+    القيد المُطبَّق في list_my_assets — انظر utils/it_scope.py) — لا معنى
+    لعرض ثلاجات/مكيفات الفرع لفني IT موفَد لإصلاح جهاز كمبيوتر فيه.
     """
+    filters = {
+        "custom_branch": branch,
+        "docstatus": 1,
+        "status": ["not in", ["Scrapped", "Sold"]],
+    }
+    if is_it_technician():
+        it_categories = get_it_asset_categories()
+        filters["asset_category"] = ["in", it_categories or ["__none__"]]
+
     return frappe.get_list(
         "Asset",
-        filters={
-            "custom_branch": branch,
-            "docstatus": 1,
-            "status": ["not in", ["Scrapped", "Sold"]],
-        },
+        filters=filters,
         fields=[
             "name", "asset_name", "asset_category", "location", "status",
             "custom_operational_status", "custom_is_running", "custom_coding_status", "image",
@@ -324,6 +342,109 @@ def list_software_licenses(only_expiring=False):
         order_by="expiry_date asc",
         limit_page_length=0,
     )
+
+
+@frappe.whitelist()
+def create_software_license(
+    software_name, license_type=None, asset=None, vendor=None, license_key=None,
+    purchase_date=None, expiry_date=None, total_seats=None, used_seats=None,
+    annual_cost=None, notes=None,
+):
+    """
+    إنشاء ترخيص برنامج جديد من تطبيق الموبايل — مقصور على فنيّي تقنية
+    المعلومات (صلاحية الكتابة الأساسية على Asset Software License مقصورة
+    على System/Asset/Finance Manager؛ Asset Technician للقراءة فقط —
+    انظر permissions في الدكتايب نفسه)، فـ insert(ignore_permissions=True)
+    هنا يتجاوز ذلك عمداً بعد التحقق الصريح أعلاه من _require_it_technician.
+    """
+    _require_it_technician()
+    if not software_name or not str(software_name).strip():
+        frappe.throw(_("Software name is required."))
+
+    doc = frappe.new_doc("Asset Software License")
+    doc.software_name = software_name
+    doc.license_type = license_type or None
+    doc.asset = asset or None
+    doc.vendor = vendor or None
+    doc.license_key = license_key or None
+    doc.purchase_date = purchase_date or None
+    doc.expiry_date = expiry_date or None
+    doc.total_seats = frappe.utils.cint(total_seats) if total_seats else None
+    doc.used_seats = frappe.utils.cint(used_seats) if used_seats else None
+    doc.annual_cost = frappe.utils.flt(annual_cost) if annual_cost else None
+    doc.notes = notes or None
+    doc.insert(ignore_permissions=True)
+    return {"name": doc.name}
+
+
+@frappe.whitelist()
+def update_software_license(
+    name, software_name=None, license_type=None, asset=None, vendor=None, license_key=None,
+    purchase_date=None, expiry_date=None, total_seats=None, used_seats=None,
+    annual_cost=None, notes=None, status=None,
+):
+    """
+    تعديل ترخيص موجود — نفس نمط الكتابة المباشرة (db.set_value) المُتَّبَع
+    في بقية هذا الملف بدل doc.save() الكامل: فقط الحقول المُرسَلة فعلياً
+    (غير None) تُحدَّث، وaudit التعديل يبقى في Version تلقائياً من Frappe.
+    """
+    _require_it_technician()
+    if not frappe.db.exists("Asset Software License", name):
+        frappe.throw(_("Software License {0} not found.").format(name))
+
+    values = {
+        k: v for k, v in {
+            "software_name": software_name, "license_type": license_type, "asset": asset,
+            "vendor": vendor, "license_key": license_key, "purchase_date": purchase_date,
+            "expiry_date": expiry_date,
+            "total_seats": frappe.utils.cint(total_seats) if total_seats is not None else None,
+            "used_seats": frappe.utils.cint(used_seats) if used_seats is not None else None,
+            "annual_cost": frappe.utils.flt(annual_cost) if annual_cost is not None else None,
+            "notes": notes, "status": status,
+        }.items() if v is not None
+    }
+    if not values:
+        return {"name": name}
+
+    frappe.db.set_value("Asset Software License", name, values, update_modified=True)
+    return {"name": name}
+
+
+@frappe.whitelist()
+def request_license_renewal(name, note=None):
+    """
+    طلب تجديد ترخيص — فني تقنية المعلومات لا يملك صلاحية اعتماد شراء
+    التجديد نفسه (مسألة مالية)، فهذا الاستدعاء لا يُجدِّد الترخيص فعلياً؛
+    فقط يُنبِّه (Notification Log + Push حقيقي عبر notify_user) مدراء
+    الأصول والشؤون المالية، ويُسجِّل الطلب في حقل الملاحظات كأثر واضح.
+    """
+    _require_it_technician()
+    if not frappe.db.exists("Asset Software License", name):
+        frappe.throw(_("Software License {0} not found.").format(name))
+
+    software_name = frappe.db.get_value("Asset Software License", name, "software_name")
+    subject = _("طلب تجديد ترخيص برنامج: {0} ({1})").format(software_name or name, name)
+    if note:
+        subject += " — " + note
+
+    recipients = set(frappe.get_all(
+        "Has Role",
+        filters={"role": ["in", ["Asset Manager", "Asset Finance Manager"]], "parenttype": "User"},
+        pluck="parent",
+    ))
+    for user in recipients:
+        notify_user(user, subject, reference_doctype="Asset Software License", reference_name=name)
+
+    existing_notes = frappe.db.get_value("Asset Software License", name, "notes") or ""
+    log_line = _("[{0}] طلب تجديد من {1}: {2}").format(
+        frappe.utils.now(), frappe.session.user, note or "-"
+    )
+    frappe.db.set_value(
+        "Asset Software License", name, "notes",
+        (existing_notes + "\n" + log_line).strip(),
+        update_modified=False,
+    )
+    return {"ok": 1, "notified": len(recipients)}
 
 
 @frappe.whitelist()

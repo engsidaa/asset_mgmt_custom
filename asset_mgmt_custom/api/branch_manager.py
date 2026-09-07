@@ -31,6 +31,7 @@ from frappe import _
 from frappe.utils import add_days, cint, date_diff, getdate, today
 
 from asset_mgmt_custom.utils.notify import notify_user
+from asset_mgmt_custom.utils.it_scope import is_it_technician, get_it_asset_categories
 
 
 ALLOWED_REMINDER_DOCTYPES = ("Asset Work Order", "Asset", "Asset Requisition")
@@ -44,6 +45,27 @@ def _check_read(doctype, name):
         )
 
 
+def _apply_it_category_scope(filters, asset_category=None):
+    """
+    فني تقنية المعلومات مُقيَّد على فئات/أصول قسمه فقط (Asset
+    Category.custom_complaint_department = "تقنية المعلومات") — في كل
+    مكان يعرض له قائمة أصول (قائمة أصولي، اختيار أصل عند طلب صيانة،
+    إجمالي الأصول في الرئيسية). لأي مستخدم آخر لا تغيّر هذه الدالة شيئاً.
+    تُعيد True لو أصبح الاستعلام "بلا نتائج مضمونة" (فني IT بلا فئات
+    مُعرَّفة له إطلاقاً)، حتى يتفادى المستدعي استعلاماً غير ضروري.
+    """
+    if not is_it_technician():
+        return False
+
+    it_categories = get_it_asset_categories()
+    if asset_category:
+        if asset_category not in it_categories:
+            return True
+    else:
+        filters["asset_category"] = ["in", it_categories or ["__none__"]]
+    return False
+
+
 @frappe.whitelist()
 def get_dashboard_summary():
     """
@@ -54,7 +76,14 @@ def get_dashboard_summary():
     رجوع القيم اللي يقدر يشوفها فعلاً حسب دوره العادي (صفر لو معندهوش
     صلاحية أصلاً).
     """
-    total_assets = len(frappe.get_list("Asset", filters={"docstatus": ["<", 2]}, pluck="name"))
+    # فني تقنية المعلومات: "إجمالي الأصول" يعني أصول فئاته (أجهزته) فقط،
+    # وليس كل أصول الفرع — نفس التقييد المُطبَّق على قوائم الأصول (انظر
+    # _apply_it_category_scope).
+    total_assets_filters = {"docstatus": ["<", 2]}
+    if _apply_it_category_scope(total_assets_filters):
+        total_assets = 0
+    else:
+        total_assets = len(frappe.get_list("Asset", filters=total_assets_filters, pluck="name"))
 
     pending_requisitions = len(frappe.get_list(
         "Asset Requisition",
@@ -63,6 +92,7 @@ def get_dashboard_summary():
             "status": ["in", [
                 "Pending Finance Approval",
                 "Pending Branch Manager Approval",
+                "Pending Category Approval",
                 "Pending Asset Manager Approval",
             ]],
         },
@@ -172,6 +202,47 @@ def get_upcoming_maintenance_tasks(window_days=30):
 
 
 @frappe.whitelist()
+def update_maintenance_task_schedule(task_name, next_due_date=None, periodicity=None):
+    """
+    يسمح للفني المُسنَد لبند صيانة دورية معيّن — أو لفني تقنية المعلومات
+    على أي بند يخص فئة من فئاته — بتعديل موعد الاستحقاق (وضبط الدورية)
+    بنفسه من التطبيق، بدل الاقتصار على العرض فقط. نفس نمط الكتابة
+    المباشرة (db.set_value يتجاوز غياب صلاحية "write" لدور Asset
+    Technician على Asset Maintenance) المُتَّبَع أصلاً في
+    tasks._advance_next_due_date_for_covered_task — بلا تكرار منطق
+    الصلاحية العام لمستند submitted بالكامل.
+    """
+    task = frappe.db.get_value(
+        "Asset Maintenance Task", task_name, ["parent", "assign_to"], as_dict=True
+    )
+    if not task:
+        frappe.throw(_("Maintenance task {0} not found.").format(task_name))
+
+    is_assigned = task.assign_to == frappe.session.user
+    allowed = is_assigned or "System Manager" in frappe.get_roles()
+    if not allowed and is_it_technician():
+        maintenance_asset = frappe.db.get_value("Asset Maintenance", task.parent, "asset_name")
+        category = maintenance_asset and frappe.db.get_value("Asset", maintenance_asset, "asset_category")
+        allowed = category in get_it_asset_categories()
+
+    if not allowed:
+        frappe.throw(
+            _("You are not allowed to reschedule this maintenance task."), frappe.PermissionError
+        )
+
+    values = {}
+    if next_due_date:
+        values["next_due_date"] = next_due_date
+    if periodicity:
+        values["periodicity"] = periodicity
+    if not values:
+        frappe.throw(_("Nothing to update."))
+
+    frappe.db.set_value("Asset Maintenance Task", task_name, values, update_modified=False)
+    return {"name": task_name, **values}
+
+
+@frappe.whitelist()
 def list_my_assets(asset_category=None):
     """
     قائمة أصول الفرع — الحقول المختارة هنا فقط هي اللي تطبيق موبايل محتاجها
@@ -180,6 +251,8 @@ def list_my_assets(asset_category=None):
     filters = {"docstatus": ["<", 2]}
     if asset_category:
         filters["asset_category"] = asset_category
+    if _apply_it_category_scope(filters, asset_category):
+        return []
 
     return frappe.get_list(
         "Asset",
@@ -420,10 +493,38 @@ def list_pending_asset_requisitions():
             "status": ["in", [
                 "Pending Finance Approval",
                 "Pending Branch Manager Approval",
+                "Pending Category Approval",
                 "Pending Asset Manager Approval",
             ]],
         },
         fields=["name", "asset_category", "item_code", "quantity", "status", "request_date", "required_by", "employee", "creation"],
+        order_by="request_date desc",
+        limit_page_length=0,
+    )
+
+
+@frappe.whitelist()
+def list_pending_category_approvals():
+    """
+    طلبات أصول من فئات تقنية المعلومات بانتظار اعتماد "مسؤول الفئة" —
+    عبر كل الفروع عمداً (get_all وليس get_list): فني تقنية المعلومات
+    ليس مدير فرع، ولا توجد لديه User Permission تُقيِّده بفرع واحد؛
+    نطاقه الحقيقي هو فئته (IT) بغضّ النظر عن الفرع الطالب — بالضبط
+    "طلبات فئته من الفروع" كما طُلِب. الفحص الحقيقي (هل هو فني IT
+    فعلاً) يتم صراحة هنا، وأيضاً مرة أخرى عند تنفيذ الاعتماد نفسه
+    (AssetRequisition.approve_category) فلا اعتماد ممكن حتى لو استُدعيت
+    هذه القائمة مباشرة بلا فحص.
+    """
+    if not is_it_technician() and "System Manager" not in frappe.get_roles():
+        return []
+
+    return frappe.get_all(
+        "Asset Requisition",
+        filters={"docstatus": 1, "status": "Pending Category Approval"},
+        fields=[
+            "name", "asset_category", "item_code", "quantity", "branch", "status",
+            "request_date", "required_by", "employee", "creation",
+        ],
         order_by="request_date desc",
         limit_page_length=0,
     )
@@ -441,6 +542,7 @@ def get_new_requisition_context(asset_category=None):
         "status": ["in", [
             "Pending Finance Approval",
             "Pending Branch Manager Approval",
+            "Pending Category Approval",
             "Pending Asset Manager Approval",
             "Approved",
         ]],

@@ -12,8 +12,19 @@ Asset Requisition — مصفوفة اعتماد من 3 مراحل متتالية
     Draft
       → (تقديم/Submit) → Pending Finance Approval
       → (approve_finance، دور Asset Finance Manager) → Pending Branch Manager Approval
-      → (approve_branch_manager، المستخدم المحدد في مدير الفرع) → Pending Asset Manager Approval
+      → (approve_branch_manager، المستخدم المحدد في مدير الفرع) →
+          Pending Category Approval (فقط لو فئة الأصل من فئات تقنية
+          المعلومات — Asset Category.custom_complaint_department؛ وإلا
+          تُتخطَّى هذه المرحلة تماماً وينتقل مباشرة لما يليها كالسابق)
+      → (approve_category، أي فني تقنية معلومات — is_it_technician) → Pending Asset Manager Approval
       → (approve_asset_manager، دور Asset Manager) → Approved
+
+مرحلة "مسؤول الفئة" (Category Owner) أُضيفت لاحقاً خصيصاً لطلبات فئات
+تقنية المعلومات — تسمح لأي فني IT (وليس دوراً وظيفياً واحداً محدداً،
+لأن أي فني في القسم يملك نفس الخبرة الفنية لتقييم الطلب) بتعميد طلبات
+فئته القادمة من أي فرع، قبل الاعتماد المالي/الإداري النهائي من إدارة
+الأصول. لا تُغيَّر أي مرحلة سابقة لأي فئة أخرى — طلبات الفئات العادية
+تسلك بالضبط نفس المسار الثلاثي القديم بلا أي تغيير في السلوك.
 
 الرفض (reject) متاح في أي مرحلة "Pending" لصاحب الصلاحية في تلك المرحلة
 تحديداً — يضبط الحالة "Rejected" مع السبب والمُرفِض، ويبقى المستند
@@ -39,11 +50,13 @@ from frappe.model.document import Document
 
 from asset_mgmt_custom.approvals import is_delegated_for_branch_manager, is_delegated_for_role
 from asset_mgmt_custom.utils.notify import notify_user
+from asset_mgmt_custom.utils.it_scope import is_it_technician, IT_DEPARTMENT_LABEL
 
 
 APPROVAL_CHAIN = {
     "Pending Finance Approval": "finance",
     "Pending Branch Manager Approval": "branch_manager",
+    "Pending Category Approval": "category",
     "Pending Asset Manager Approval": "asset_manager",
 }
 
@@ -149,12 +162,50 @@ class AssetRequisition(Document):
                     ),
                     title=_("Not Authorized"),
                 )
+        next_status = "Pending Category Approval" if self._is_it_category() else "Pending Asset Manager Approval"
         self.db_set({
             "approved_by_branch_manager": frappe.session.user,
             "branch_manager_approved_on": now_datetime(),
+            "status": next_status,
+        })
+        return self.status
+
+    # ------------------------------------------------------------------
+    # المرحلة 2.5 (اختيارية): اعتماد مسؤول الفئة — فقط لفئات تقنية المعلومات
+    # ------------------------------------------------------------------
+
+    @frappe.whitelist()
+    def approve_category(self):
+        if self.status != "Pending Category Approval":
+            frappe.throw(
+                _("This requisition is not currently at the Category Owner approval stage."),
+                title=_("Wrong Stage"),
+            )
+        if not self._is_system_manager() and not self._is_category_owner():
+            frappe.throw(
+                _("Only an IT department technician can approve requests for this asset category."),
+                title=_("Not Authorized"),
+            )
+        self.db_set({
+            "approved_by_category_owner": frappe.session.user,
+            "category_owner_approved_on": now_datetime(),
             "status": "Pending Asset Manager Approval",
         })
         return self.status
+
+    def _is_it_category(self):
+        if not self.asset_category:
+            return False
+        return frappe.db.get_value(
+            "Asset Category", self.asset_category, "custom_complaint_department"
+        ) == IT_DEPARTMENT_LABEL
+
+    @staticmethod
+    def _is_category_owner():
+        # حالياً القسم المُصنَّف الوحيد هو تقنية المعلومات — أي فني منه
+        # مخوَّل لهذه المرحلة (انظر ملاحظة الاعتماد أعلى الملف). المرحلة
+        # أصلاً لا تُفعَّل إلا لطلبات فئة IT عبر _is_it_category أعلاه.
+        return is_it_technician()
 
     # ------------------------------------------------------------------
     # المرحلة 3: اعتماد إدارة الأصول (نهائي)
@@ -195,6 +246,11 @@ class AssetRequisition(Document):
             self._check_stage(self.status, "Asset Finance Manager")
         elif stage == "asset_manager":
             self._check_stage(self.status, "Asset Manager")
+        elif stage == "category" and not self._is_system_manager() and not self._is_category_owner():
+            frappe.throw(
+                _("Only an IT department technician can reject at the Category Owner approval stage."),
+                title=_("Not Authorized"),
+            )
         elif stage == "branch_manager" and not self._is_system_manager():
             if not self.branch_manager or (
                 frappe.session.user != self.branch_manager
