@@ -574,15 +574,6 @@
     "onboard": 1
    },
    {
-    "type": "Link",
-    "label": "توزيع الأصول على الورديات",
-    "link_to": "Asset Shift Allocation",
-    "link_type": "DocType",
-    "is_query_report": 0,
-    "hidden": 0,
-    "onboard": 0
-   },
-   {
     "type": "Card Break",
     "label": "الحالة والأداء",
     "hidden": 0
@@ -732,6 +723,15 @@
     "type": "Card Break",
     "label": "أوامر العمل والتصاريح",
     "hidden": 0
+   },
+   {
+    "type": "Link",
+    "label": "أمر عمل",
+    "link_to": "Asset Work Order",
+    "link_type": "DocType",
+    "is_query_report": 0,
+    "hidden": 0,
+    "onboard": 1
    },
    {
     "type": "Link",

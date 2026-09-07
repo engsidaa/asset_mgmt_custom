@@ -162,7 +162,6 @@ scheduler_events = {
         "asset_mgmt_custom.tasks.check_safety_inspection_due",
         "asset_mgmt_custom.tasks.check_overdue_allocations",
         "asset_mgmt_custom.tasks.check_software_license_expiry",
-        "asset_mgmt_custom.tasks.check_pm_schedule_due",
         "asset_mgmt_custom.tasks.check_meter_triggered_pm",
         "asset_mgmt_custom.tasks.check_overdue_bookings",
         "asset_mgmt_custom.tasks.check_expired_work_permits",

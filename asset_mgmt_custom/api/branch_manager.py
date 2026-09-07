@@ -145,12 +145,16 @@ def get_upcoming_maintenance_tasks(window_days=30):
     rows = frappe.db.sql(
         """
         SELECT mt.name, mt.maintenance_task, mt.periodicity, mt.next_due_date,
-               mt.maintenance_status, am.name AS maintenance_schedule,
+               mt.maintenance_status, mt.assign_to AS assigned_technician,
+               am.name AS maintenance_schedule,
                am.asset_name AS asset, a.asset_name AS asset_display_name,
-               a.custom_branch AS branch, a.asset_category AS asset_category
+               a.custom_branch AS branch, a.asset_category AS asset_category,
+               wo.name AS work_order, wo.status AS work_order_status
         FROM `tabAsset Maintenance Task` mt
         JOIN `tabAsset Maintenance` am ON am.name = mt.parent
         JOIN `tabAsset` a ON a.name = am.asset_name
+        LEFT JOIN `tabAsset Work Order` wo
+               ON wo.source_maintenance_task = mt.name AND wo.docstatus < 2
         WHERE am.name IN %(schedules)s
           AND mt.maintenance_status != 'Completed'
           AND mt.next_due_date IS NOT NULL

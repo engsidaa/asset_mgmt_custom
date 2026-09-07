@@ -96,11 +96,21 @@ def send_incomplete_asset_alerts():
 
 def send_maintenance_due_alerts():
     """
-    Daily: notify Asset Managers of maintenance tasks due in <= 7 days or
-    overdue. Tasks that are actually due (days_left <= 0) also get an Asset
-    Work Order auto-generated, instead of only a notification — nothing
-    used to act on this alert beyond a human reading it.
+    Daily: notify managers, the assigned technician, and the asset's branch
+    manager of maintenance tasks due in <= 7 days or overdue — عبر
+    notify_user (Push حقيقي + جرس Desk معاً)، بدل _create_notification
+    القديمة (جرس Desk فقط) التي كانت تصل لأصحاب دور "Asset Manager" حصراً،
+    رغم أن assign_to (الفني المُكلَّف) كان يُجلب من الاستعلام بالفعل ولم
+    يُستخدم إطلاقاً. تُحل محل check_pm_schedule_due المحذوفة (كانت مكرِّرة
+    تماماً — تنبيه ثانٍ لنفس المهام لنفس دور Asset Manager فقط بصيغة
+    مختلفة، بلا فائدة إضافية حقيقية).
+
+    Tasks that are actually due (days_left <= 0) also get an Asset Work
+    Order auto-generated, instead of only a notification — نفس المنطق
+    السابق بلا تغيير.
     """
+    from asset_mgmt_custom.utils.notify import notify_user
+
     cutoff = add_days(today(), 7)
 
     tasks = frappe.db.sql("""
@@ -131,16 +141,24 @@ def send_maintenance_due_alerts():
         asset_display = frappe.db.get_value("Asset", task.asset, "asset_name") or task.asset
         days = task.days_left or 0
         if days < 0:
-            subject = _("Overdue Maintenance: {0}").format(asset_display)
-            content = _("Maintenance task for <b>{0}</b> was due on <b>{1}</b> ({2} days ago). "
-                        "Please take action immediately.").format(
+            subject = _("صيانة دورية متأخرة: {0} — كانت مستحقة في {1} (منذ {2} يوم)").format(
                 asset_display, task.next_due_date, abs(days))
+        elif days == 0:
+            subject = _("صيانة دورية مستحقة اليوم: {0}").format(asset_display)
         else:
-            subject = _("Maintenance Due in {0} days: {1}").format(days, asset_display)
-            content = _("Maintenance task for <b>{0}</b> is due on <b>{1}</b>.").format(
-                asset_display, task.next_due_date)
+            subject = _("صيانة دورية مستحقة خلال {0} يوم: {1} (بتاريخ {2})").format(
+                days, asset_display, task.next_due_date)
 
-        _create_notification(subject, content, "Asset Maintenance Task", task.task_name, manager_users)
+        recipients = set(manager_users)
+        if task.assign_to:
+            recipients.add(task.assign_to)
+        branch = frappe.db.get_value("Asset", task.asset, "custom_branch") if task.asset else None
+        branch_manager = frappe.db.get_value("Branch", branch, "custom_branch_manager") if branch else None
+        if branch_manager:
+            recipients.add(branch_manager)
+
+        for user in recipients:
+            notify_user(user, subject, reference_doctype="Asset Maintenance Task", reference_name=task.task_name)
 
         if days <= 0:
             _auto_create_work_order_from_task(task)
@@ -250,6 +268,24 @@ def _auto_create_work_order_from_task(task):
             title="Auto Work Order creation failed",
             message=frappe.get_traceback(),
         )
+        return
+
+    # AssetWorkOrder.after_insert() يُبلِّغ الفني المُكلَّف تلقائياً لو
+    # تحدَّد (إما من assign_to أعلاه أو التوزيع التلقائي في before_insert)
+    # — لكن لو لم يتوفر فني مؤهل متاح إطلاقاً، لا يصل أي تنبيه لأي أحد
+    # (الأولوية "عادي" هنا، فتنبيه الأولوية الحرجة في after_insert لا
+    # ينطبق أيضاً)، ويبقى أمر عمل صيانة وقائية مسودة معلَّقاً بصمت حتى
+    # يكتشفه أحد يدوياً. نُبلِّغ مدير الفرع كحل احتياطي في هذه الحالة تحديداً.
+    if not wo.assigned_technician and branch:
+        branch_manager = frappe.db.get_value("Branch", branch, "custom_branch_manager")
+        if branch_manager:
+            from asset_mgmt_custom.utils.notify import notify_user
+            notify_user(
+                branch_manager,
+                _("أمر صيانة وقائية جديد بلا فني مُكلَّف — {0}").format(wo.title),
+                reference_doctype="Asset Work Order",
+                reference_name=wo.name,
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -1150,44 +1186,6 @@ def check_software_license_expiry():
         WHERE expiry_date < %(today)s
           AND status NOT IN ('Expired', 'Terminated')
     """, {"today": today()})
-
-
-# ---------------------------------------------------------------------------
-# Daily: preventive maintenance schedule due alerts
-# ---------------------------------------------------------------------------
-
-def check_pm_schedule_due():
-    """Daily: notify when ERPNext Asset Maintenance tasks are due (uses built-in Asset Maintenance Task)."""
-    manager_users = _get_manager_users()
-    for days_ahead in [7, 3, 1]:
-        target = add_days(today(), days_ahead)
-        records = frappe.db.sql("""
-            SELECT
-                t.name AS task_name,
-                t.maintenance_task,
-                t.maintenance_type,
-                t.next_due_date,
-                t.assign_to_name AS assigned_to,
-                am.name AS schedule_name,
-                am.asset_name
-            FROM `tabAsset Maintenance Task` t
-            JOIN `tabAsset Maintenance` am ON am.name = t.parent
-            WHERE t.next_due_date = %(target)s
-              AND t.maintenance_status IN ('Pending', 'Overdue')
-              AND am.docstatus = 1
-        """, {"target": target}, as_dict=True)
-
-        if not records:
-            continue
-
-        for r in records:
-            subject = _("PM موعده بعد {0} يوم: {1} - {2}").format(
-                days_ahead, r.asset_name or r.schedule_name, r.maintenance_task)
-            content = _("مهمة الصيانة الوقائية <b>{0}</b> للأصل "
-                        "<b>{1}</b> موعدها <b>{2}</b> ({3}).").format(
-                r.maintenance_task, r.asset_name,
-                r.next_due_date, r.maintenance_type)
-            _create_notification(subject, content, "Asset Maintenance", r.schedule_name, manager_users)
 
 
 # ---------------------------------------------------------------------------
