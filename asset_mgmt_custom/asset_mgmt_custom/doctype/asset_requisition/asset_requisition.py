@@ -38,6 +38,7 @@ from frappe.utils import today, now_datetime
 from frappe.model.document import Document
 
 from asset_mgmt_custom.approvals import is_delegated_for_branch_manager, is_delegated_for_role
+from asset_mgmt_custom.utils.notify import notify_user
 
 
 APPROVAL_CHAIN = {
@@ -167,7 +168,13 @@ class AssetRequisition(Document):
             "asset_manager_approved_on": now_datetime(),
             "status": "Approved",
         })
+        self._notify_requester(_("تمت الموافقة على طلب الأصل {0}.").format(self.name))
         return self.status
+
+    def _notify_requester(self, subject):
+        user = self.employee and frappe.db.get_value("Employee", self.employee, "user_id")
+        if user:
+            notify_user(user, subject, reference_doctype="Asset Requisition", reference_name=self.name)
 
     # ------------------------------------------------------------------
     # الرفض — في أي مرحلة، بواسطة صاحب الصلاحية في تلك المرحلة تحديداً
@@ -203,6 +210,7 @@ class AssetRequisition(Document):
             "rejection_reason": reason,
             "rejected_by": frappe.session.user,
         })
+        self._notify_requester(_("تم رفض طلب الأصل {0}: {1}").format(self.name, reason))
         return self.status
 
     # ------------------------------------------------------------------

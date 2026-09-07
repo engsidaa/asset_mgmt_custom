@@ -5,6 +5,7 @@ from frappe.utils import add_to_date, cint, flt, now_datetime, today
 
 from asset_mgmt_custom.overrides.asset_repair import _update_asset_maintenance_summary
 from asset_mgmt_custom.notifications import send_critical_alert
+from asset_mgmt_custom.utils.notify import notify_user
 
 
 PRIORITY_RANK = {"عادي": 1, "متوسط": 2, "عاجل": 3, "حرج": 4}
@@ -129,6 +130,13 @@ class AssetWorkOrder(Document):
                 reference_doctype="Asset Work Order",
                 reference_name=self.name,
             )
+        if self.assigned_technician:
+            notify_user(
+                self.assigned_technician,
+                _("تم تكليفك بأمر عمل جديد: {0}").format(self.title),
+                reference_doctype="Asset Work Order",
+                reference_name=self.name,
+            )
 
     def _set_default_title(self):
         """
@@ -209,6 +217,13 @@ class AssetWorkOrder(Document):
         if self.get("cost_classification") == "Capitalized Overhaul":
             self._escalate_to_asset_repair()
         self.save()
+        if self.requested_by:
+            notify_user(
+                self.requested_by,
+                _("اكتمل طلب الصيانة {0} — يمكنك تأكيد حل المشكلة الآن.").format(self.title),
+                reference_doctype="Asset Work Order",
+                reference_name=self.name,
+            )
         return self.status
 
     def _escalate_to_asset_repair(self):
@@ -355,6 +370,13 @@ class AssetWorkOrder(Document):
         self.rejected_by = frappe.session.user
         self.rejected_on = now_datetime()
         self.save()
+        if self.requested_by:
+            notify_user(
+                self.requested_by,
+                _("تم رفض طلب الصيانة {0}: {1}").format(self.title, reason),
+                reference_doctype="Asset Work Order",
+                reference_name=self.name,
+            )
         return self.status
 
     @frappe.whitelist()
@@ -389,6 +411,15 @@ class AssetWorkOrder(Document):
 
         if not confirmed_working:
             self.follow_up_work_order = self._create_follow_up_work_order()
+            if self.assigned_technician:
+                notify_user(
+                    self.assigned_technician,
+                    _("الفرع أكَّد استمرار المشكلة في {0} — أُنشئ أمر متابعة {1}.").format(
+                        self.title, self.follow_up_work_order
+                    ),
+                    reference_doctype="Asset Work Order",
+                    reference_name=self.follow_up_work_order,
+                )
 
         self.save()
         return {

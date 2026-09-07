@@ -336,3 +336,48 @@ def get_work_order_comments(work_order):
         order_by="creation desc",
         ignore_permissions=True,
     )
+
+
+# ---------------------------------------------------------------------------
+# التنبيهات — Notification Log القياسي في Frappe (نفس الجدول الذي يُغذّي
+# جرس التنبيهات في Desk)، وليس مصدر بيانات مُختلَق: أي حدث يُنشئ تنبيهاً
+# لمستخدم بعينه (تكليف فني بأمر عمل، اعتماد/رفض طلب أصل...) عبر
+# asset_mgmt_custom.utils.notify.notify_user يظهر هنا مباشرة لنفس
+# المستخدم على تطبيق الموبايل، بحقل read الحقيقي (وليس عدّاداً مُشتقاً
+# من أرقام لوحة التحكم كما كانت شاشة "التنبيهات" سابقاً).
+# ---------------------------------------------------------------------------
+
+@frappe.whitelist()
+def list_my_notifications(only_unread=None, limit=50):
+    filters = {"for_user": frappe.session.user}
+    if frappe.utils.cint(only_unread):
+        filters["read"] = 0
+    return frappe.get_list(
+        "Notification Log",
+        filters=filters,
+        fields=["name", "subject", "document_type", "document_name", "read", "creation", "type"],
+        order_by="creation desc",
+        limit_page_length=frappe.utils.cint(limit) or 50,
+        ignore_permissions=True,
+    )
+
+
+@frappe.whitelist()
+def get_unread_notification_count():
+    return frappe.db.count("Notification Log", {"for_user": frappe.session.user, "read": 0})
+
+
+@frappe.whitelist()
+def mark_notification_read(name):
+    """يتحقق من ملكية التنبيه (for_user) قبل التعليم كمقروء — لا صلاحية Notification Log القياسية تكفي بمفردها لمنع مستخدم من تعليم تنبيه مستخدم آخر."""
+    owner = frappe.db.get_value("Notification Log", name, "for_user")
+    if owner != frappe.session.user:
+        frappe.throw(_("This notification does not belong to you."), frappe.PermissionError)
+    frappe.db.set_value("Notification Log", name, "read", 1, update_modified=False)
+
+
+@frappe.whitelist()
+def mark_all_notifications_read():
+    frappe.db.set_value(
+        "Notification Log", {"for_user": frappe.session.user, "read": 0}, "read", 1, update_modified=False
+    )
