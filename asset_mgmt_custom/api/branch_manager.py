@@ -577,7 +577,30 @@ def create_physical_audit():
     doc.cost_center = cost_center
     doc.audit_date = today()
     doc.audited_by = frappe.session.user
-    doc.fetch_assets()
+
+    # لا نستخدم doc.fetch_assets() الجاهزة على الدكتايب (تُصفِّي عبر
+    # Asset.cost_center حرفياً) — أصول فرع أُنشئت قبل ربط الفرع بمركز
+    # تكلفة (أو بمصدر مختلف تماماً) قد لا تحمل نفس قيمة custom_cost_center
+    # المُنشَأة للتو أعلاه، فتُرجِع القائمة فارغة رغم وجود أصول نشطة
+    # فعلاً في الفرع. هنا نستخدم بدلاً منها frappe.get_list (نفس نمط
+    # list_my_assets في هذا الملف)، الذي يُطبِّق التقييد الجغرافي الصحيح
+    # تلقائياً عبر User Permission على فرع المستخدم — نفس المصدر الموثوق
+    # المستخدَم في كل شاشات الأصول الأخرى بالتطبيق.
+    assets = frappe.get_list(
+        "Asset",
+        filters={"docstatus": 1, "status": ["not in", ["Scrapped", "Sold"]]},
+        fields=["name", "asset_name", "asset_category", "location"],
+        order_by="asset_category asc, name asc",
+        limit_page_length=0,
+    )
+    doc.items = []
+    for a in assets:
+        doc.append("items", {
+            "asset": a.name,
+            "asset_name": a.asset_name,
+            "asset_category": a.asset_category,
+            "expected_location": a.location,
+        })
     doc.insert(ignore_permissions=True)
 
     return {
