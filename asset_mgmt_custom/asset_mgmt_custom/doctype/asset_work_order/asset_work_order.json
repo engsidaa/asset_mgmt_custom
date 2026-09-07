@@ -57,6 +57,16 @@
    "description": "الفرع الذي يتبعه الأصل"
   },
   {
+   "fieldname": "complaint_department",
+   "fieldtype": "Select",
+   "label": "الجهة المعنية",
+   "options": "\nتقنية المعلومات\nصيانة عامة",
+   "depends_on": "eval:!doc.asset",
+   "mandatory_depends_on": "eval:!doc.asset",
+   "in_list_view": 1,
+   "description": "لشكوى عامة غير مرتبطة بأصل فقط — الجهة التي يجب أن تستلمها (تقنية المعلومات أو صيانة عامة)، تُستخدَم أيضاً في التوزيع التلقائي للفني بدل فئة الأصل"
+  },
+  {
    "fieldname": "col_break_1",
    "fieldtype": "Column Break"
   },

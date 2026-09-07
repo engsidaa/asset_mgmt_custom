@@ -457,7 +457,10 @@ def get_new_requisition_context(asset_category=None):
 
 
 @frappe.whitelist()
-def create_maintenance_request(asset=None, problem_description=None, work_type=None, priority=None, requires_permit=False):
+def create_maintenance_request(
+    asset=None, problem_description=None, work_type=None, priority=None, requires_permit=False,
+    complaint_department=None,
+):
     """
     يُنشئ ويُسلِّم (Submit) Asset Work Order في استدعاء واحد — أنسب
     لتطبيق موبايل من مسار إنشاء-ثم-تسليم منفصل. صورة العطل تُرفَع بعد
@@ -478,7 +481,10 @@ def create_maintenance_request(asset=None, problem_description=None, work_type=N
     المرفق نفسه لا عن جهاز بعينه) — تُعامَل بنفس مسار الإنشاء/التسليم/
     التوزيع تماماً، فقط بدون ربط بأصل. الفرع في هذه الحالة يُستنتَج من
     فرع المستخدم مباشرة (نفس نمط create_physical_audit) بدل جلبه من
-    الأصل.
+    الأصل. complaint_department ("تقنية المعلومات"/"صيانة عامة") إجباري
+    حينها — Asset Work Order.validate() يرفض حفظها بدونه — لأن التوزيع
+    التلقائي للفني بلا أصل يعتمد عليه بدل فئة الأصل (انظر
+    _auto_dispatch_technician).
     """
     if not problem_description or not str(problem_description).strip():
         frappe.throw(_("Please describe the problem."))
@@ -501,6 +507,7 @@ def create_maintenance_request(asset=None, problem_description=None, work_type=N
         doc.title = doc_title
     doc.asset = asset or None
     doc.branch = branch
+    doc.complaint_department = complaint_department or None
     doc.work_type = work_type or "إصلاح"
     doc.priority = priority or "عادي"
     doc.problem_description = problem_description

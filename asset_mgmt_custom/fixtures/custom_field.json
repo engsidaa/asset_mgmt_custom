@@ -984,6 +984,18 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Maintenance Team Member-custom_complaint_department",
+  "dt": "Maintenance Team Member",
+  "fieldname": "custom_complaint_department",
+  "fieldtype": "Select",
+  "options": "\nتقنية المعلومات\nصيانة عامة",
+  "label": "يستلم شكاوى (Complaint Routing)",
+  "insert_after": "custom_max_concurrent_orders",
+  "description": "لتوزيع الشكاوى العامة غير المرتبطة بأصل تلقائياً — حدِّد الجهة إذا كان هذا الفني مختصاً بتقنية المعلومات أو الصيانة العامة، أو اتركه فارغاً إذا كان لا يستلم شكاوى عامة إطلاقاً (يبقى مخصصاً لأوامر العمل المرتبطة بأصل فقط)",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Movement-custom_driver",
   "dt": "Asset Movement",
   "fieldname": "custom_driver",

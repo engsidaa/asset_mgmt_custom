@@ -30,6 +30,24 @@ class AssetWorkOrder(Document):
         self._set_default_title()
         self._apply_criticality_priority_floor()
         self._validate_capitalized_overhaul_requires_asset()
+        self._validate_general_complaint_department()
+
+    def _validate_general_complaint_department(self):
+        """
+        الجهة المعنية (complaint_department) إجبارية فقط لشكوى عامة بلا
+        أصل — أمر عمل مرتبط بأصل يُوجَّه أصلاً عبر فئة الأصل نفسها، فلا
+        داعي لملء هذا الحقل. reqd في الـ JSON مشروط بنفس الفحص من جهة
+        الواجهة (mandatory_depends_on)، وهذا الفحص هو الحارس الفعلي على
+        مستوى الخادم لأي استدعاء API مباشر يتجاوز الواجهة.
+        """
+        if not self.asset and not self.complaint_department:
+            frappe.throw(
+                _("Please select which department this general complaint (not linked to an asset) "
+                  "should go to: IT or General Maintenance."),
+                title=_("Department Required"),
+            )
+        if self.asset:
+            self.complaint_department = None
 
     def _validate_capitalized_overhaul_requires_asset(self):
         """
@@ -565,29 +583,47 @@ class AssetWorkOrder(Document):
     def _auto_dispatch_technician(self):
         """
         توزيع تلقائي لأمر العمل على الفني الأقل تحميلاً حالياً من بين
-        الفنيين المؤهلين (المسجَّلين ضمن Asset Maintenance Team بنفس شركة
-        الأصل، وتخصصهم (custom_skill_category) يطابق فئة الأصل أو عام بلا
-        تخصص محدد) — بدل ترك أمر العمل بلا فني مُكلَّف دائماً حتى يُسند
-        يدوياً. لا يفعل شيئاً إذا لم يوجد أي فني مؤهل متاح (تحت الحد
+        الفنيين المؤهلين — بدل ترك أمر العمل بلا فني مُكلَّف دائماً حتى
+        يُسند يدوياً. لا يفعل شيئاً إذا لم يوجد أي فني مؤهل متاح (تحت الحد
         الأقصى للتحميل المتزامن)، فيبقى التكليف اليدوي كما كان.
+
+        مسار أمر عمل مرتبط بأصل: الفنيون ضمن Asset Maintenance Team بنفس
+        شركة الأصل، وتخصصهم (custom_skill_category) يطابق فئة الأصل أو
+        عام بلا تخصص محدد.
+
+        مسار شكوى عامة (بلا أصل): لا توجد فئة أصل لمطابقتها، فنستخدم
+        complaint_department بدلاً منها — فقط الفنيون الذين حدَّدوا صراحة
+        هذه الجهة عبر custom_complaint_department (اختيار صريح، وليس
+        "فارغ = عام" كما في التخصص بالأصل، حتى لا يُسنَد لفني تخصصه صيانة
+        أجهزة مثلاً بلاغ تقنية معلومات لمجرد ترك الحقل فارغاً).
         """
-        if not self.asset:
-            return
-
-        asset_info = frappe.db.get_value("Asset", self.asset, ["asset_category", "company"], as_dict=True)
-        if not asset_info:
-            return
-
-        candidates = frappe.db.sql("""
-            SELECT mtm.team_member AS technician, mtm.custom_max_concurrent_orders AS max_orders
-            FROM `tabMaintenance Team Member` mtm
-            JOIN `tabAsset Maintenance Team` amt ON amt.name = mtm.parent
-            WHERE amt.company = %(company)s
-              AND (
-                  IFNULL(mtm.custom_skill_category, '') = ''
-                  OR mtm.custom_skill_category = %(category)s
-              )
-        """, {"company": asset_info.company, "category": asset_info.asset_category}, as_dict=True)
+        if self.asset:
+            asset_info = frappe.db.get_value("Asset", self.asset, ["asset_category", "company"], as_dict=True)
+            if not asset_info:
+                return
+            candidates = frappe.db.sql("""
+                SELECT mtm.team_member AS technician, mtm.custom_max_concurrent_orders AS max_orders
+                FROM `tabMaintenance Team Member` mtm
+                JOIN `tabAsset Maintenance Team` amt ON amt.name = mtm.parent
+                WHERE amt.company = %(company)s
+                  AND (
+                      IFNULL(mtm.custom_skill_category, '') = ''
+                      OR mtm.custom_skill_category = %(category)s
+                  )
+            """, {"company": asset_info.company, "category": asset_info.asset_category}, as_dict=True)
+        else:
+            if not self.complaint_department:
+                return
+            company = frappe.defaults.get_global_default("company")
+            if not company:
+                return
+            candidates = frappe.db.sql("""
+                SELECT mtm.team_member AS technician, mtm.custom_max_concurrent_orders AS max_orders
+                FROM `tabMaintenance Team Member` mtm
+                JOIN `tabAsset Maintenance Team` amt ON amt.name = mtm.parent
+                WHERE amt.company = %(company)s
+                  AND mtm.custom_complaint_department = %(department)s
+            """, {"company": company, "department": self.complaint_department}, as_dict=True)
         if not candidates:
             return
 

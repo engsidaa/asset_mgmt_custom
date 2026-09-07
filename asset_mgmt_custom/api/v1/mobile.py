@@ -143,7 +143,10 @@ def scan_asset(identifier):
 
 
 @frappe.whitelist()
-def create_complaint(asset=None, problem_description=None, work_type=None, priority=None, photo_file_url=None, requires_permit=False):
+def create_complaint(
+    asset=None, problem_description=None, work_type=None, priority=None, photo_file_url=None, requires_permit=False,
+    complaint_department=None,
+):
     """
     بلاغ عطل فوري — يفوِّض بالكامل لنفس create_maintenance_request
     المُستخدَمة في بوابة مدير الفرع (إنشاء + تسليم أمر عمل في استدعاء
@@ -153,10 +156,13 @@ def create_complaint(asset=None, problem_description=None, work_type=None, prior
 
     asset اختياري: شكوى عامة غير مرتبطة بأصل محدد — نفس مسار الإنشاء/
     التسليم بالضبط (انظر create_maintenance_request)، فقط بلا ربط بأصل؛
-    الفرع يُستنتَج حينها من فرع المستخدم نفسه.
+    الفرع يُستنتَج حينها من فرع المستخدم نفسه. complaint_department
+    ("تقنية المعلومات"/"صيانة عامة") إجباري في هذه الحالة — يُحدِّد الجهة
+    التي يجب أن تستلم الشكوى.
     """
     result = create_maintenance_request(
-        asset, problem_description, work_type=work_type, priority=priority, requires_permit=requires_permit
+        asset, problem_description, work_type=work_type, priority=priority, requires_permit=requires_permit,
+        complaint_department=complaint_department,
     )
     if photo_file_url:
         frappe.db.set_value(
