@@ -32,6 +32,19 @@ class AssetWorkOrder(Document):
         self._apply_criticality_priority_floor()
         self._validate_capitalized_overhaul_requires_asset()
         self._validate_general_complaint_department()
+        self._compute_is_preventive_maintenance()
+
+    def _compute_is_preventive_maintenance(self):
+        """
+        work_type ("نوع العمل") حقل اختيار حر يُدخله المستخدم يدوياً بلا أي
+        تحقق — أي أمر عمل يدوي أو مُولَّد من واجهة الموبايل يقدر يُسمَّى
+        "صيانة وقائية" حتى لو كان بلاغ عطل حقيقي، والعكس. is_preventive_maintenance
+        (محسوب هنا تلقائياً، read_only) هو المصدر الموثوق الوحيد فعلياً:
+        وقائية فقط لو صادرة عن جدول صيانة حقيقي (maintenance_schedule/
+        source_maintenance_task مضبوطان بالفعل — كما تفعل
+        tasks.py::_auto_create_work_order_from_task عند الإنشاء التلقائي).
+        """
+        self.is_preventive_maintenance = 1 if (self.maintenance_schedule or self.source_maintenance_task) else 0
 
     def _validate_general_complaint_department(self):
         """

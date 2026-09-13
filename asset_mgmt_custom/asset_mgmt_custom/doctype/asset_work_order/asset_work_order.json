@@ -439,6 +439,15 @@
    "description": "المعرّف (name) الداخلي لبند الصيانة الوقائية (صف في جدول Asset Maintenance Task) الذي وَلَّد هذا الأمر تلقائياً عند استحقاقه — Asset Maintenance Task جدول فرعي وليس مستنداً مستقلاً، فلا يصلح كحقل Link"
   },
   {
+   "fieldname": "is_preventive_maintenance",
+   "fieldtype": "Check",
+   "label": "صيانة وقائية (محسوبة تلقائياً)",
+   "read_only": 1,
+   "in_list_view": 1,
+   "default": "0",
+   "description": "تُحسَب تلقائياً من وجود maintenance_schedule/source_maintenance_task فعلياً — بخلاف حقل 'نوع العمل' (work_type) الحر الذي يختاره أي مستخدم يدوياً بلا أي تحقق، هذا الحقل هو المصدر الموثوق لأي تقرير يحتاج يفصل تكلفة/امتثال الصيانة الوقائية عن التصحيحية."
+  },
+  {
    "fieldname": "incident_report",
    "fieldtype": "Link",
    "label": "تقرير الحادث",
