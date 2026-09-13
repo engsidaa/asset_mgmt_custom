@@ -217,6 +217,53 @@ def _advance_next_due_date_for_covered_task(task_name, periodicity):
         )
 
 
+def _sync_maintenance_log(task):
+    """
+    جدول Asset Maintenance Log الأساسي في core كان متروكاً تماماً: آلية
+    الـcore الوحيدة لتحديثه (AssetMaintenance.on_update -> sync_maintenance_
+    tasks) لا تعمل أبداً هنا، لأن next_due_date/maintenance_status تُحدَّث
+    بـ frappe.db.set_value مباشرة على صف الجدول الفرعي (لأسباب أداء) بدل
+    تحميل مستند Asset Maintenance الأب وحفظه — فأي on_update عليه لا يُطلَق
+    إطلاقاً. بدل تكرار منطق core أو تحميل/حفظ الأب المُكلِف، نستدعي دالة
+    core نفسها (update_maintenance_log) مباشرة بنفس المدخلات التي كانت
+    ستُمرَّر لها لو عمل المسار الأصلي — فيُنشأ/يُحدَّث سجل زيارة واحد فقط
+    لكل بند صيانة، بلا أي أثر على منطق الجدولة الفعلي (مُغلَّف بالكامل في
+    try/except حتى لا يوقف فشل هنا أي شيء آخر).
+    """
+    try:
+        from erpnext.assets.doctype.asset_maintenance.asset_maintenance import update_maintenance_log
+
+        if not task.get("maintenance_schedule"):
+            return
+
+        am = frappe.db.get_value(
+            "Asset Maintenance", task.maintenance_schedule, ["item_code", "item_name"], as_dict=True
+        )
+        if not am:
+            return
+
+        task_doc = frappe.db.get_value(
+            "Asset Maintenance Task", task.task_name,
+            ["name", "certificate_required", "description", "assign_to_name", "assign_to",
+             "periodicity", "maintenance_type", "next_due_date"],
+            as_dict=True,
+        )
+        if not task_doc:
+            return
+
+        update_maintenance_log(
+            asset_maintenance=task.maintenance_schedule,
+            item_code=am.item_code,
+            item_name=am.item_name,
+            task=task_doc,
+        )
+    except Exception:
+        frappe.log_error(
+            title="Asset Maintenance Log sync failed",
+            message=frappe.get_traceback(),
+        )
+
+
 def _auto_create_work_order_from_task(task):
     """
     ينشئ Asset Work Order تلقائياً (كمسودة، لم يُسلَّم بعد) من بند صيانة
@@ -225,6 +272,8 @@ def _auto_create_work_order_from_task(task):
     source_maintenance_task، ثم من عدم وجود مهمة صيانة أعلى مستوى مُستحَقة
     لنفس الأصل في نفس اليوم (انظر _higher_level_pm_due_same_day أعلاه).
     """
+    _sync_maintenance_log(task)
+
     existing = frappe.db.exists(
         "Asset Work Order",
         {"source_maintenance_task": task.task_name, "docstatus": ["<", 2]},

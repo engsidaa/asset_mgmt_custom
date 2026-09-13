@@ -273,6 +273,7 @@ class AssetWorkOrder(Document):
         if self.get("cost_classification") == "Capitalized Overhaul":
             self._escalate_to_asset_repair()
         self.save()
+        self._complete_maintenance_log()
         if self.requested_by:
             notify_user(
                 self.requested_by,
@@ -281,6 +282,43 @@ class AssetWorkOrder(Document):
                 reference_name=self.name,
             )
         return self.status
+
+    def _complete_maintenance_log(self):
+        """
+        جدول Asset Maintenance Log الأساسي في core (انظر tasks.py::
+        _sync_maintenance_log لسبب تعطُّل مزامنته التلقائية) يُنشأ/يُحدَّث
+        بحالة 'Planned'/'Overdue' فقط عند استحقاق البند — لا شيء يُغلقه
+        أبداً كـ'Completed'. هذا يُغلقه فعلياً لحظة إتمام أمر العمل الوقائي
+        المرتبط به (source_maintenance_task مضبوط)، فيعكس زيارة صيانة
+        حقيقية اكتملت بدل البقاء 'مخطَّط' إلى الأبد — مُغلَّف بالكامل في
+        try/except لأن هذا السجل غير مقروء من أي مكان آخر في النظام حالياً،
+        فلا يجوز لفشل هنا أن يمنع إتمام أمر العمل نفسه.
+        """
+        if not self.source_maintenance_task or not self.maintenance_schedule:
+            return
+        try:
+            log_name = frappe.db.get_value(
+                "Asset Maintenance Log",
+                {
+                    "asset_maintenance": self.maintenance_schedule,
+                    "task": self.source_maintenance_task,
+                    "maintenance_status": ("in", ["Planned", "Overdue"]),
+                    "docstatus": 0,
+                },
+            )
+            if not log_name:
+                return
+            log = frappe.get_doc("Asset Maintenance Log", log_name)
+            log.maintenance_status = "Completed"
+            log.completion_date = self.completion_date or today()
+            log.actions_performed = self.get("completion_notes") or self.get("problem_description")
+            log.save(ignore_permissions=True)
+            log.submit()
+        except Exception:
+            frappe.log_error(
+                title="Asset Maintenance Log completion failed",
+                message=frappe.get_traceback(),
+            )
 
     def _check_sla_breach_on_completion(self):
         """
