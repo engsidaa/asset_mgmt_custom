@@ -1073,11 +1073,15 @@ def check_safety_inspection_due():
                    si.next_inspection_date, si.inspector
             FROM `tabAsset Safety Inspection` si
             INNER JOIN (
-                SELECT asset, MAX(inspection_date) AS max_date
+                -- ترتيب بالتاريخ ثم بالاسم (name) كفاصل تعادل — بدون هذا،
+                -- فحصان لنفس الأصل في نفس اليوم كانا يُنتجان صفَّين مكررين
+                -- (تنبيهين لنفس الأصل بدل واحد).
+                SELECT asset, MAX(CONCAT(inspection_date, '|', name)) AS max_key
                 FROM `tabAsset Safety Inspection`
+                WHERE docstatus = 1
                 GROUP BY asset
-            ) latest ON latest.asset = si.asset AND latest.max_date = si.inspection_date
-            WHERE si.next_inspection_date = %(target)s
+            ) latest ON latest.asset = si.asset AND latest.max_key = CONCAT(si.inspection_date, '|', si.name)
+            WHERE si.docstatus = 1 AND si.next_inspection_date = %(target)s
         """, {"target": target}, as_dict=True)
 
         if not records:

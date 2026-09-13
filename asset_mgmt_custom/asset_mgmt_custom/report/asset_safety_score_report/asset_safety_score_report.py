@@ -42,11 +42,14 @@ def execute(filters=None):
             cnt.inspection_count
         FROM `tabAsset Safety Inspection` s1
         JOIN (
-            SELECT asset, MAX(inspection_date) AS max_date
+            -- ترتيب بالتاريخ ثم بالاسم (name) كفاصل تعادل — بدون هذا، لو
+            -- وُجد أكثر من فحص سلامة لنفس الأصل في نفس اليوم، كان الـ JOIN
+            -- بمطابقة التاريخ وحده ينتج صفاً مكرراً لكل فحص مطابق لهذا اليوم.
+            SELECT asset, MAX(CONCAT(inspection_date, '|', name)) AS max_key
             FROM `tabAsset Safety Inspection`
             WHERE docstatus = 1
             GROUP BY asset
-        ) latest ON s1.asset = latest.asset AND s1.inspection_date = latest.max_date
+        ) latest ON s1.asset = latest.asset AND CONCAT(s1.inspection_date, '|', s1.name) = latest.max_key
         JOIN (
             SELECT asset, COUNT(*) AS inspection_count
             FROM `tabAsset Safety Inspection`
