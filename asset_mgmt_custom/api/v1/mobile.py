@@ -15,14 +15,15 @@ Headless API — تطبيق Flutter الميداني (فنيّي/مورِّدي 
 
 import json
 import math
+from collections import Counter
 
 import frappe
 from frappe import _
-from frappe.utils import cint, flt, now_datetime
+from frappe.utils import add_days, cint, flt, get_first_day, getdate, now_datetime, time_diff_in_hours, today
 from frappe.utils.password import set_encrypted_password
 
 from asset_mgmt_custom.api.branch_manager import create_maintenance_request, get_asset_detail
-from asset_mgmt_custom.utils.it_scope import is_it_technician, get_it_asset_categories
+from asset_mgmt_custom.utils.it_scope import IT_DEPARTMENT_LABEL, is_it_technician, get_it_asset_categories
 from asset_mgmt_custom.utils.notify import notify_user
 
 
@@ -668,6 +669,141 @@ def suggest_diagnosis(asset, problem_code):
         {"asset_category": asset_category, "problem_code": problem_code},
         as_dict=True,
     )
+
+
+@frappe.whitelist()
+def get_my_statistics():
+    """
+    حزمة إحصائيات احترافية واحدة لشاشة "الإحصائيات" في تطبيق الموبايل —
+    محتواها يختلف حسب دور المستدعي فعلياً، بلا استدعاءات منفصلة يحتاجها
+    العميل لكل قسم؛ حساب يحمل أكثر من دور يحصل على أكثر من قسم معاً:
+
+      - "technician": فني/مورِّد صيانة — أداء شخصي بحت (assigned_technician
+        = المستخدم الحالي فقط، نفس فلتر get_technician_jobs بالضبط).
+      - "branch": مدير فرع/مسؤول صيانة — على مستوى ما يراه هذا المستخدم
+        فعلياً؛ مُقيَّد تلقائياً بفرع مدير الفرع عبر User Permission
+        القياسي في frappe.get_list (نفس آلية get_dashboard_summary)،
+        بلا فلتر فرع صريح هنا.
+      - "it": فني تقنية معلومات — مؤشرات إضافية خاصة بقسمه فقط.
+
+    الحساب كله في بايثون بعد الجلب عبر get_list (وليس SQL خام) عمداً —
+    حتى تُطبَّق طبقة الصلاحيات القياسية لكل doctype تلقائياً بلا تكرارها
+    يدوياً هنا.
+    """
+    roles = set(frappe.get_roles())
+    result = {}
+
+    if roles & {"Asset Technician", "Maintenance Vendor"}:
+        result["technician"] = _get_technician_statistics()
+
+    if roles & {"Branch Manager", "Asset Manager", "System Manager"}:
+        result["branch"] = _get_branch_statistics()
+
+    if is_it_technician():
+        result["it"] = _get_it_statistics()
+
+    return result
+
+
+def _work_order_performance_fields():
+    return [
+        "status", "creation", "closed_at", "sla_breached", "actual_cost", "labor_cost",
+        "is_preventive_maintenance", "completion_date", "asset", "asset_name",
+    ]
+
+
+def _summarize_work_orders(rows, month_start):
+    completed = [r for r in rows if r.status == "مكتمل"]
+    completed_this_month = [
+        r for r in completed if r.completion_date and getdate(r.completion_date) >= getdate(month_start)
+    ]
+    resolution_hours = [
+        time_diff_in_hours(r.closed_at, r.creation) for r in completed if r.closed_at
+    ]
+    breached = sum(1 for r in completed if r.sla_breached)
+    cost_this_month = sum(flt(r.actual_cost) or flt(r.labor_cost) for r in completed_this_month)
+
+    return {
+        "total": len(rows),
+        "completed_total": len(completed),
+        "completed_this_month": len(completed_this_month),
+        "open": len([r for r in rows if r.status not in ("مكتمل", "ملغي", "مرفوض")]),
+        "avg_resolution_hours": round(sum(resolution_hours) / len(resolution_hours), 1) if resolution_hours else 0,
+        "sla_breach_rate_pct": round((breached / len(completed)) * 100, 1) if completed else 0,
+        "cost_this_month": cost_this_month,
+    }
+
+
+def _get_technician_statistics():
+    rows = frappe.get_list(
+        "Asset Work Order",
+        filters={"assigned_technician": frappe.session.user, "docstatus": 1},
+        fields=_work_order_performance_fields(),
+    )
+    summary = _summarize_work_orders(rows, get_first_day(today()))
+    completed = [r for r in rows if r.status == "مكتمل"]
+    summary["preventive_count"] = sum(1 for r in completed if r.get("is_preventive_maintenance"))
+    summary["corrective_count"] = len(completed) - summary["preventive_count"]
+    return summary
+
+
+def _get_branch_statistics():
+    rows = frappe.get_list(
+        "Asset Work Order",
+        filters={"docstatus": 1},
+        fields=_work_order_performance_fields(),
+    )
+    summary = _summarize_work_orders(rows, get_first_day(today()))
+
+    # أكثر 5 أصول تكراراً في طلبات الصيانة — مرشَّح أول لفحص أعمق (عطل
+    # متكرر بدل عطل عشوائي)، وليس مجرد رقم إجمالي عام.
+    counter = Counter(r.asset_name or r.asset for r in rows if r.asset)
+    summary["top_problem_assets"] = [{"asset": a, "count": c} for a, c in counter.most_common(5)]
+
+    summary["total_assets"] = len(frappe.get_list("Asset", filters={"docstatus": 1}, pluck="name"))
+    summary["operational_assets"] = len(frappe.get_list(
+        "Asset", filters={"docstatus": 1, "custom_operational_status": "Operational"}, pluck="name"
+    ))
+    return summary
+
+
+def _get_it_statistics():
+    """
+    complaint_department يُملأ فقط لشكوى عامة بلا أصل (انظر
+    AssetWorkOrder._validate_general_complaint_department) — أوامر عمل
+    IT المرتبطة فعلياً بأصل تُصنَّف بدلاً من ذلك عبر فئة الأصل نفسها
+    (Asset Category.custom_complaint_department، انظر it_scope). عدد
+    شكاوى IT المفتوحة الحقيقي = مجموع الحالتين معاً.
+    """
+    open_status_filter = ["not in", ["مكتمل", "ملغي", "مرفوض"]]
+
+    general_open = len(frappe.get_list(
+        "Asset Work Order",
+        filters={"docstatus": 1, "complaint_department": IT_DEPARTMENT_LABEL, "status": open_status_filter},
+        pluck="name",
+    ))
+
+    asset_linked_open = 0
+    it_categories = get_it_asset_categories()
+    if it_categories:
+        it_assets = frappe.get_all(
+            "Asset", filters={"asset_category": ["in", it_categories], "docstatus": 1}, pluck="name"
+        )
+        if it_assets:
+            asset_linked_open = len(frappe.get_list(
+                "Asset Work Order",
+                filters={"docstatus": 1, "asset": ["in", it_assets], "status": open_status_filter},
+                pluck="name",
+            ))
+
+    return {
+        "licenses_expiring_30d": len(frappe.get_list(
+            "Asset Software License",
+            filters={"expiry_date": ["<=", add_days(today(), 30)], "status": ["not in", ["Terminated"]]},
+            pluck="name",
+        )),
+        "it_complaints_open": general_open + asset_linked_open,
+    }
 
 
 @frappe.whitelist()
