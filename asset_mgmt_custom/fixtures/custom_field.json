@@ -594,6 +594,18 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Asset Category-custom_requires_loto",
+  "dt": "Asset Category",
+  "fieldname": "custom_requires_loto",
+  "fieldtype": "Check",
+  "label": "تتطلب عزل طاقة (LOTO) قبل الصيانة",
+  "insert_after": "custom_complaint_department",
+  "default": "0",
+  "description": "فعِّلها على فئات الأصول الخطرة (كهربائية عالية الجهد، آلات ذات أجزاء متحركة، ضغط...) — أي أمر عمل على أصل من هذه الفئة سيُمنَع من التسليم بدون تصريح عمل (Asset Work Permit) موقَّع عليه باكتمال عزل الطاقة.",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Category-custom_spare_parts_section",
   "dt": "Asset Category",
   "fieldname": "custom_spare_parts_section",

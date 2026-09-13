@@ -86,17 +86,41 @@ class AssetWorkOrder(Document):
         """
         تسليم أمر العمل (submit) هو اللحظة التي تتحول فيها حالته تلقائياً
         إلى "قيد التنفيذ" (on_submit) — أي بدء العمل الفعلي على الأصل.
-        لو مرتبط بتصريح عمل (work_permit) يتطلب عزل طاقة (requires_loto)،
-        يُمنَع التسليم حتى يُوقَّع اكتمال قائمة العزل فعلياً
-        (Asset Work Permit.complete_loto_checklist) — لا يمكن بدء العمل
-        على معدة خطرة بدون توثيق العزل أولاً.
+
+        كانت هذه البوابة اختيارية بالكامل: تُفعَّل فقط لو المستخدم اختار
+        إرفاق work_permit من الأساس، وليس هناك ما يفرض إرفاقه لمعدة خطرة —
+        أي عدم إرفاق تصريح (وهو الوضع الافتراضي لأي أمر عمل يدوي أو
+        مُولَّد تلقائياً من صيانة دورية) كان يتخطى قائمة العزل بالكامل.
+
+        الآن: فئة الأصل (Asset Category.custom_requires_loto) تحدِّد ما إذا
+        كانت المعدة خطرة بحكم تصنيفها — إن كانت كذلك، لا بد من تصريح عمل
+        موقَّع باكتمال العزل قبل التسليم، لا مجرد تصريح اختياري.
         """
+        category_requires_loto = False
+        if self.asset:
+            asset_category = frappe.db.get_value("Asset", self.asset, "asset_category")
+            category_requires_loto = bool(
+                asset_category
+                and frappe.db.get_value("Asset Category", asset_category, "custom_requires_loto")
+            )
+
         if not self.get("work_permit"):
+            if category_requires_loto:
+                frappe.throw(
+                    _(
+                        "The asset's category is flagged as requiring energy isolation (LOTO). "
+                        "This work order cannot start without a linked Asset Work Permit with a "
+                        "completed and signed-off isolation checklist."
+                    ),
+                    title=_("Work Permit Required"),
+                )
             return
+
         permit = frappe.db.get_value(
             "Asset Work Permit", self.work_permit, ["requires_loto", "loto_verified"], as_dict=True
         )
-        if permit and permit.requires_loto and not permit.loto_verified:
+        requires_loto = bool(permit and permit.requires_loto) or category_requires_loto
+        if requires_loto and not (permit and permit.loto_verified):
             frappe.throw(
                 _(
                     "The linked Work Permit {0} requires energy isolation (LOTO) sign-off before "
