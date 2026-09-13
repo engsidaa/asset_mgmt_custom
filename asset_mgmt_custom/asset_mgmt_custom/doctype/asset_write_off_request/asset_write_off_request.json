@@ -40,7 +40,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "الحالة",
-   "options": "Draft\nPending Approval\nApproved\nRejected",
+   "options": "Draft\nPending Approval\nApproved\nRejected\nExecuted",
    "default": "Draft",
    "read_only": 1,
    "in_list_view": 1,

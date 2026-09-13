@@ -21,7 +21,7 @@ def execute(filters=None):
 
     cutoff = add_days(today(), days)
 
-    conditions = "mt.next_due_date IS NOT NULL AND mt.next_due_date <= %(cutoff)s AND mt.maintenance_status != 'Completed'"
+    conditions = "mt.next_due_date IS NOT NULL AND mt.next_due_date <= %(cutoff)s AND mt.maintenance_status != 'Cancelled'"
     values = {"cutoff": cutoff, "today": today()}
 
     if filters.get("asset_category"):

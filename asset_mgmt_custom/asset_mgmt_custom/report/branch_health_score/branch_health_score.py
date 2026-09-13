@@ -104,8 +104,7 @@ def get_data(filters):
             FROM `tabAsset Maintenance Task` mt
             JOIN `tabAsset Maintenance` am ON am.name = mt.parent
             JOIN `tabAsset` a ON a.name = am.asset_name
-            WHERE am.docstatus = 1
-              AND mt.maintenance_status != 'Completed'
+            WHERE mt.maintenance_status != 'Cancelled'
               AND mt.next_due_date IS NOT NULL
               AND a.custom_branch IS NOT NULL AND a.custom_branch != ''
             GROUP BY a.custom_branch

@@ -128,7 +128,7 @@ def send_maintenance_due_alerts():
         JOIN `tabAsset Maintenance` am ON am.name = mt.parent
         WHERE mt.next_due_date IS NOT NULL
           AND mt.next_due_date <= %(cutoff)s
-          AND mt.maintenance_status != 'Completed'
+          AND mt.maintenance_status != 'Cancelled'
         ORDER BY mt.next_due_date ASC
     """, {"cutoff": cutoff}, as_dict=True)
 
@@ -185,10 +185,9 @@ def _higher_level_pm_due_same_day(asset, periodicity, exclude_task, target_date)
         FROM `tabAsset Maintenance Task` mt
         JOIN `tabAsset Maintenance` am ON am.name = mt.parent
         WHERE am.asset_name = %(asset)s
-          AND am.docstatus = 1
           AND mt.name != %(exclude_task)s
           AND mt.next_due_date <= %(target_date)s
-          AND mt.maintenance_status != 'Completed'
+          AND mt.maintenance_status != 'Cancelled'
     """, {"asset": asset, "exclude_task": exclude_task, "target_date": target_date}, as_dict=True)
 
     return any(PM_PERIODICITY_RANK.get(s.periodicity, 0) > my_rank for s in siblings)
@@ -315,8 +314,7 @@ def check_meter_triggered_pm():
             IFNULL(mt.custom_last_triggered_meter_value, 0) AS last_triggered_value
         FROM `tabAsset Maintenance Task` mt
         JOIN `tabAsset Maintenance` am ON am.name = mt.parent
-        WHERE am.docstatus = 1
-          AND mt.maintenance_status != 'Completed'
+        WHERE mt.maintenance_status != 'Cancelled'
           AND mt.custom_meter_trigger_type IS NOT NULL
           AND mt.custom_meter_trigger_type != ''
           AND IFNULL(mt.custom_meter_trigger_value, 0) > 0

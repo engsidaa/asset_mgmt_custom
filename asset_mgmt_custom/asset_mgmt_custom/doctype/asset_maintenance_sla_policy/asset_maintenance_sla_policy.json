@@ -38,6 +38,14 @@
    "description": "عدد الساعات المسموح بها من إنشاء أمر العمل حتى إتمامه (مكتمل)"
   },
   {
+   "fieldname": "is_it_general_policy",
+   "fieldtype": "Check",
+   "label": "سياسة شكاوى تقنية المعلومات العامة",
+   "default": "0",
+   "in_list_view": 1,
+   "description": "فعِّلها على سياسة واحدة فقط لتُستخدَم لشكاوى تقنية المعلومات العامة (غير المرتبطة بأصل) بدل السياسة المطابقة للأولوية المختارة يدوياً — راجع AssetWorkOrder._apply_sla_policy. لا علاقة لها بحقل الأولوية أعلاه (الذي يجب أن يبقى مطابقاً تماماً لخيارات Asset Work Order)."
+  },
+  {
    "fieldname": "sec_break_escalation",
    "fieldtype": "Section Break",
    "label": "التصعيد عند الخرق"

@@ -138,7 +138,7 @@ def get_dashboard_summary():
             """
             SELECT COUNT(*) FROM `tabAsset Maintenance Task`
             WHERE parent IN %(schedules)s
-              AND maintenance_status != 'Completed'
+              AND maintenance_status != 'Cancelled'
               AND next_due_date IS NOT NULL
               AND next_due_date <= %(cutoff)s
             """,
@@ -186,7 +186,7 @@ def get_upcoming_maintenance_tasks(window_days=30):
         LEFT JOIN `tabAsset Work Order` wo
                ON wo.source_maintenance_task = mt.name AND wo.docstatus < 2
         WHERE am.name IN %(schedules)s
-          AND mt.maintenance_status != 'Completed'
+          AND mt.maintenance_status != 'Cancelled'
           AND mt.next_due_date IS NOT NULL
           AND mt.next_due_date <= %(cutoff)s
         ORDER BY mt.next_due_date ASC
@@ -276,6 +276,20 @@ def get_asset_detail(asset):
     واحد بدل عدة استدعاءات متفرقة.
     """
     _check_read("Asset", asset)
+
+    # نفس تقييد فني تقنية المعلومات المُطبَّق على list_my_assets/
+    # get_branch_assets (انظر _apply_it_category_scope) — بدونه، كان فني
+    # IT يقدر يفتح تفاصيل أي أصل خارج فئاته (المالية والضمان والتاريخ
+    # الكامل) طالما عرف/خمَّن اسمه أو مسح كوده، رغم أن كل قوائم الأصول لا
+    # تُظهره له إطلاقاً — نفس القاعدة يجب أن تنطبق على الوصول المباشر
+    # بالاسم كذلك، وليس فقط على القوائم.
+    if is_it_technician():
+        category = frappe.db.get_value("Asset", asset, "asset_category")
+        if category not in get_it_asset_categories():
+            frappe.throw(
+                _("You do not have permission to access {0} {1}.").format(_("Asset"), asset),
+                frappe.PermissionError,
+            )
 
     asset_doc = frappe.db.get_value(
         "Asset", asset,
@@ -497,7 +511,7 @@ def list_pending_asset_requisitions():
                 "Pending Asset Manager Approval",
             ]],
         },
-        fields=["name", "asset_category", "item_code", "quantity", "status", "request_date", "required_by", "employee", "creation"],
+        fields=["name", "asset_category", "item_code", "quantity", "status", "request_date", "required_by", "employee", "creation", "branch"],
         order_by="request_date desc",
         limit_page_length=0,
     )
