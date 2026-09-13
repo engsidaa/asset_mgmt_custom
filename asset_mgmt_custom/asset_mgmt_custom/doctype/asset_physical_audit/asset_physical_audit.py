@@ -29,6 +29,43 @@ class AssetPhysicalAudit(frappe.model.document.Document):
         self.db_set("audit_status", "Completed")
         self._log_audit_activity()
         self._notify_managers_of_issues()
+        self._create_corrective_work_orders_for_damaged()
+
+    def _create_corrective_work_orders_for_damaged(self):
+        """
+        نفس نمط Asset Safety Inspection._create_corrective_work_orders: أي
+        بند بنتيجة 'تالف' ولم يُنشأ له أمر عمل تصحيحي بعد، يُولِّد تلقائياً
+        Asset Work Order بأولوية 'حرج'. بخلاف فحص السلامة (أصل واحد لكل
+        مستند)، الجرد الفعلي يغطي أصولاً كثيرة — كل بند "تالف" له أصله
+        الخاص (row.asset)، فأمر العمل يُنشأ لكل بند على حدة.
+        """
+        for row in self.items or []:
+            if row.audit_result != "Damaged" or row.get("corrective_work_order") or not row.asset:
+                continue
+
+            branch = frappe.db.get_value("Asset", row.asset, "custom_branch")
+            wo = frappe.new_doc("Asset Work Order")
+            wo.asset = row.asset
+            wo.branch = branch
+            wo.work_type = "إصلاح"
+            wo.priority = "حرج"
+            wo.request_date = frappe.utils.today()
+            wo.problem_description = _(
+                "Auto-generated from a physical audit finding: asset marked 'Damaged' in "
+                "audit {0}. {1}"
+            ).format(self.name, row.remarks or "")
+
+            try:
+                wo.insert(ignore_permissions=True)
+                frappe.db.set_value(
+                    "Asset Physical Audit Item", row.name, "corrective_work_order", wo.name,
+                    update_modified=False,
+                )
+            except Exception:
+                frappe.log_error(
+                    title="Auto corrective Work Order creation failed (Physical Audit)",
+                    message=frappe.get_traceback(),
+                )
 
     def _compute_summary(self):
         self.total_assets = len(self.items)

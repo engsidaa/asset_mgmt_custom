@@ -12,7 +12,8 @@
   "audit_result",
   "actual_location",
   "remarks",
-  "photo"
+  "photo",
+  "corrective_work_order"
  ],
  "fields": [
   {
@@ -74,6 +75,14 @@
    "label": "صورة توثيقية",
    "depends_on": "eval:['Missing', 'Damaged'].includes(doc.audit_result)",
    "description": "إلزامية لنتيجة 'مفقود' أو 'تالف' — نفس نمط التوثيق الحي المفروض في فحص السلامة."
+  },
+  {
+   "fieldname": "corrective_work_order",
+   "fieldtype": "Link",
+   "label": "أمر العمل التصحيحي",
+   "options": "Asset Work Order",
+   "read_only": 1,
+   "description": "يُنشأ تلقائياً عند تسليم الجرد لأي بند بنتيجة 'تالف'."
   }
  ],
  "istable": 1,
