@@ -1370,7 +1370,8 @@ def check_capex_budget_overrun():
 
     نفس منطق حساب "الفعلي" الموجود بالضبط في تقرير capex_budget_vs_actual
     (إجمالي gross_purchase_amount لأصول الفرع المُشتراة خلال السنة
-    المالية) — بلا تكرار.
+    المالية، زائد تكلفة أي إصلاح مُرسمَل Completed خلال نفس المدى) — بلا
+    تكرار.
     """
     budgets = frappe.db.sql("""
         SELECT name, branch, fiscal_year, total_capex_budget
@@ -1393,17 +1394,35 @@ def check_capex_budget_overrun():
         if not fy_dates:
             continue
 
-        actual = flt(frappe.db.sql("""
+        query_params = {
+            "branch": b.branch,
+            "from_date": fy_dates.year_start_date,
+            "to_date": fy_dates.year_end_date,
+        }
+        actual_acquisition = flt(frappe.db.sql("""
             SELECT SUM(gross_purchase_amount)
             FROM `tabAsset`
             WHERE docstatus = 1
               AND custom_branch = %(branch)s
               AND purchase_date BETWEEN %(from_date)s AND %(to_date)s
-        """, {
-            "branch": b.branch,
-            "from_date": fy_dates.year_start_date,
-            "to_date": fy_dates.year_end_date,
-        })[0][0] or 0)
+        """, query_params)[0][0] or 0)
+
+        # نفس إضافة الإصلاحات المُرسمَلة الموجودة الآن في تقرير
+        # capex_budget_vs_actual — بدون هذا، فرع يقدر يتخطى ميزانيته
+        # الرأسمالية بالكامل عبر عُمَر كبرى (Capitalized Overhaul) من غير
+        # ما هذا التنبيه ينتبه إطلاقاً.
+        actual_capitalized_repairs = flt(frappe.db.sql("""
+            SELECT SUM(ar.repair_cost)
+            FROM `tabAsset Repair` ar
+            JOIN `tabAsset` a ON a.name = ar.asset
+            WHERE ar.docstatus = 1
+              AND ar.repair_status = 'Completed'
+              AND ar.capitalize_repair_cost = 1
+              AND a.custom_branch = %(branch)s
+              AND ar.completion_date BETWEEN %(from_date)s AND %(to_date)s
+        """, query_params)[0][0] or 0)
+
+        actual = actual_acquisition + actual_capitalized_repairs
 
         pct_used = round(actual * 100 / flt(b.total_capex_budget), 1)
         if pct_used < 80:

@@ -18,6 +18,7 @@ def get_columns():
         {"label": _("Replacement Budget"), "fieldname": "replacement_budget", "fieldtype": "Currency", "width": 150},
         {"label": _("Upgrade Budget"), "fieldname": "upgrade_budget", "fieldtype": "Currency", "width": 140},
         {"label": _("Actual Acquisition Cost"), "fieldname": "actual_acquisition", "fieldtype": "Currency", "width": 170},
+        {"label": _("Actual Capitalized Repairs"), "fieldname": "actual_capitalized_repairs", "fieldtype": "Currency", "width": 180},
         {"label": _("Total Actual"), "fieldname": "total_actual", "fieldtype": "Currency", "width": 130},
         {"label": _("Variance"), "fieldname": "variance", "fieldtype": "Currency", "width": 130},
         {"label": _("% Used"), "fieldname": "pct_used", "fieldtype": "Percent", "width": 100},
@@ -73,10 +74,30 @@ def get_data(filters):
     """, dict(params, branches=branches), as_dict=True)
     actual_map = {r.branch: r.total or 0 for r in actuals}
 
+    # رأسملة إصلاح (Capitalized Overhaul) ترفع value_after_depreciation
+    # للأصل، مش gross_purchase_amount — فكانت تستهلك ميزانية رأسمالية
+    # فعلياً بدون أي أثر في هذا التقرير أو في تنبيه تجاوز الميزانية
+    # (check_capex_budget_overrun)، أي فرع يقدر يتخطى ميزانيته الرأسمالية
+    # بالكامل عبر عُمَر كبرى من غير أي إنذار.
+    capitalized_repairs = frappe.db.sql("""
+        SELECT a.custom_branch AS branch, SUM(ar.repair_cost) AS total
+        FROM `tabAsset Repair` ar
+        JOIN `tabAsset` a ON a.name = ar.asset
+        WHERE ar.docstatus = 1
+          AND ar.repair_status = 'Completed'
+          AND ar.capitalize_repair_cost = 1
+          AND a.custom_branch IN %(branches)s
+          AND ar.completion_date BETWEEN %(from_date)s AND %(to_date)s
+        GROUP BY a.custom_branch
+    """, dict(params, branches=branches), as_dict=True)
+    capitalized_map = {r.branch: r.total or 0 for r in capitalized_repairs}
+
     rows = []
     for b in budgets:
         total_budget = b.total_capex_budget or 0
-        actual = actual_map.get(b.branch, 0)
+        actual_acquisition = actual_map.get(b.branch, 0)
+        actual_capitalized_repairs = capitalized_map.get(b.branch, 0)
+        actual = actual_acquisition + actual_capitalized_repairs
         variance = total_budget - actual
         pct = round((actual / total_budget * 100), 1) if total_budget else 0
         rows.append({
@@ -86,7 +107,8 @@ def get_data(filters):
             "new_acquisition_budget": b.new_acquisition_budget or 0,
             "replacement_budget": b.replacement_budget or 0,
             "upgrade_budget": b.upgrade_budget or 0,
-            "actual_acquisition": actual,
+            "actual_acquisition": actual_acquisition,
+            "actual_capitalized_repairs": actual_capitalized_repairs,
             "total_actual": actual,
             "variance": variance,
             "pct_used": pct,

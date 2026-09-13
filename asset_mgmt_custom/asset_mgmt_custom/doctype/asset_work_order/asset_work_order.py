@@ -308,7 +308,14 @@ class AssetWorkOrder(Document):
             )
 
         asset = frappe.get_doc("Asset", self.asset)
-        total_cost = flt(self.actual_cost) or (flt(self.labor_cost) + flt(self.spare_parts_cost))
+        # spare_parts_cost مُستبعَدة عمداً هنا — تُصرَف قطع الغيار فعلياً عبر
+        # Stock Entry (_auto_issue_linked_spare_parts، أعلاه في نفس التدفق)
+        # التي تُنشئ قيدها المحاسبي الخاص بها تلقائياً (مدين مصروف الصيانة/
+        # دائن قيمة المخزون) لحظة تسليمها. تضمين spare_parts_cost هنا كان
+        # يُرحِّل نفس التكلفة مرة أخرى ضمن رسملة الإصلاح (مدين الأصل الثابت/
+        # دائن حساب WIP)، فتُحتسَب مرتين — بنفس المنطق الموثَّق فعلياً في
+        # _post_maintenance_cost_gl_entry لمسار OpEx غير المُرسمَل.
+        total_cost = flt(self.actual_cost) or flt(self.labor_cost)
 
         technician_name = None
         if self.assigned_technician:
