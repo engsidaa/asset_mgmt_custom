@@ -205,6 +205,26 @@ def _apply_used_depreciation_rate(doc):
 # Mark Coded whitelist API (step 1: tagging/coding)
 # ---------------------------------------------------------------------------
 
+def _check_coding_permission(asset_name):
+    """
+    لا mark_coded ولا set_operational كان عندهم أي تحقق صلاحية إطلاقاً —
+    أي مستخدم مسجَّل دخوله يقدر يستدعيهما مباشرة بأي asset_name ويرمِّز/
+    يفعِّل أي أصل في أي فرع، رغم أن صفحة الويزارد بالديسك مقصورة أصلاً على
+    System Manager/Asset Manager/Branch Manager (Page.roles لا يحمي
+    استدعاء RPC مباشراً). نفس أسلوب التحقق المستخدَم فعلياً في
+    Asset Movement._check_receipt_permission.
+    """
+    if "System Manager" in frappe.get_roles() or "Asset Manager" in frappe.get_roles():
+        return
+    branch = frappe.db.get_value("Asset", asset_name, "custom_branch")
+    if branch and frappe.db.exists("Branch", {"name": branch, "custom_branch_manager": frappe.session.user}):
+        return
+    frappe.throw(
+        _("Only the branch manager of this asset's branch (or Asset Manager) can code/activate it."),
+        frappe.PermissionError,
+    )
+
+
 @frappe.whitelist()
 def mark_coded(asset_name):
     """
@@ -216,6 +236,7 @@ def mark_coded(asset_name):
     (sticking the barcode/RFID/iron code and documenting it) and activating
     it for operational use are two distinct steps with two distinct gates.
     """
+    _check_coding_permission(asset_name)
     doc = frappe.get_doc("Asset", asset_name)
 
     if doc.custom_coding_status == "Coded":
@@ -280,6 +301,7 @@ def set_operational(asset_name):
     available_for_use_date = today — this is the exact moment ERPNext
     starts computing depreciation for the asset.
     """
+    _check_coding_permission(asset_name)
     doc = frappe.get_doc("Asset", asset_name)
 
     if doc.custom_operational_status == "Operational":
