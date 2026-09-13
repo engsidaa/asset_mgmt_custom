@@ -58,9 +58,11 @@ def get_data(filters):
 
     branches = [b.branch for b in budgets]
 
-    # Actual repair costs: sum from Asset Repair where asset's branch = branch
+    # Actual repair costs: sum from Asset Repair where asset's branch = branch.
+    # repair_cost وحدها كانت تُسقِط custom_labor_cost (مسجَّل بشكل منفصل)،
+    # وهو مصدر تكلفة إصلاح حقيقي زي ما تُعامَل في _update_asset_maintenance_summary.
     repair_costs = frappe.db.sql("""
-        SELECT a.custom_branch AS branch, SUM(ar.repair_cost) AS total
+        SELECT a.custom_branch AS branch, SUM(ar.repair_cost + IFNULL(ar.custom_labor_cost, 0)) AS total
         FROM `tabAsset Repair` ar
         JOIN `tabAsset` a ON a.name = ar.asset
         WHERE ar.docstatus = 1
@@ -69,6 +71,22 @@ def get_data(filters):
         GROUP BY a.custom_branch
     """, dict(params, branches=branches), as_dict=True)
     repair_map = {r.branch: r.total or 0 for r in repair_costs}
+
+    # الأغلبية الساحقة من الصيانة التصحيحية الفعلية بتمر عبر Asset Work
+    # Order (المستخدَم يومياً في تطبيق الموبايل)، مش Asset Repair — التقرير
+    # كان بيتجاهلها بالكامل فيقلِّل التكلفة الفعلية بشكل كبير. نفس منطق
+    # fallback المستخدَم في _update_asset_maintenance_summary (actual_cost
+    # إن وُجدت، وإلا labor_cost)؛ فلترة completion_date على المدى تستبعد
+    # ضمنياً أي أمر لم يكتمل بعد (تاريخه NULL).
+    wo_costs = frappe.db.sql("""
+        SELECT branch, SUM(IFNULL(NULLIF(actual_cost, 0), IFNULL(labor_cost, 0))) AS total
+        FROM `tabAsset Work Order`
+        WHERE docstatus = 1
+          AND branch IN %(branches)s
+          AND completion_date BETWEEN %(from_date)s AND %(to_date)s
+        GROUP BY branch
+    """, dict(params, branches=branches), as_dict=True)
+    wo_map = {r.branch: r.total or 0 for r in wo_costs}
 
     # Actual AMC costs: sum of contract_value from Asset Maintenance Contract where branch covered
     # ملاحظة: "Asset Maintenance Contract Item" مفهاش حقل custom_branch —
@@ -90,7 +108,7 @@ def get_data(filters):
 
     rows = []
     for b in budgets:
-        actual_repair = repair_map.get(b.branch, 0)
+        actual_repair = repair_map.get(b.branch, 0) + wo_map.get(b.branch, 0)
         actual_amc = amc_map.get(b.branch, 0)
         total_actual = actual_repair + actual_amc
         budget = b.total_budget or 0

@@ -109,13 +109,27 @@ def get_data(filters):
               AND u.log_date BETWEEN %(from_date)s AND %(to_date)s
         """, {"category": category, "from_date": month_start, "to_date": month_end}, as_dict=True)[0]
 
+        # repair_cost وحده (بلا custom_labor_cost) وبدون أي حساب لتكلفة Asset
+        # Work Order كان بيقلِّل التكلفة الفعلية الشهرية بشكل كبير — الأغلبية
+        # الساحقة من الصيانة التصحيحية اليومية تمر عبر Asset Work Order، مش
+        # Asset Repair، فتنبيه تجاوز الهدف المالي (breaches.append("cost"))
+        # كان نادراً ما يُفعَّل حتى مع تجاوز فعلي واضح.
         cost_row = frappe.db.sql("""
-            SELECT SUM(COALESCE(r.repair_cost, 0)) AS total_cost
+            SELECT SUM(COALESCE(r.repair_cost, 0) + COALESCE(r.custom_labor_cost, 0)) AS total_cost
             FROM `tabAsset Repair` r
             JOIN `tabAsset` a ON a.name = r.asset
             WHERE a.asset_category = %(category)s AND r.docstatus = 1
               AND r.failure_date BETWEEN %(from_date)s AND %(to_date)s
         """, {"category": category, "from_date": month_start, "to_date": month_end}, as_dict=True)[0]
+
+        wo_cost_row = frappe.db.sql("""
+            SELECT SUM(COALESCE(NULLIF(wo.actual_cost, 0), COALESCE(wo.labor_cost, 0))) AS total_cost
+            FROM `tabAsset Work Order` wo
+            JOIN `tabAsset` a ON a.name = wo.asset
+            WHERE a.asset_category = %(category)s AND wo.docstatus = 1
+              AND wo.completion_date BETWEEN %(from_date)s AND %(to_date)s
+        """, {"category": category, "from_date": month_start, "to_date": month_end}, as_dict=True)[0]
+        cost_row.total_cost = flt(cost_row.total_cost) + flt(wo_cost_row.total_cost)
 
         incident_count = frappe.db.sql("""
             SELECT COUNT(i.name)

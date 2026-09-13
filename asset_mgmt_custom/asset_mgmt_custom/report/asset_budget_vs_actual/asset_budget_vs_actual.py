@@ -120,11 +120,10 @@ def get_data(filters):
                 FROM `tabAsset`
                 WHERE asset_category = i.asset_category
                   AND docstatus = 1
-                  AND YEAR(purchase_date) = (
-                      SELECT YEAR(year_start_date)
-                      FROM `tabFiscal Year`
-                      WHERE name = b.fiscal_year
-                      LIMIT 1
+                  AND purchase_date BETWEEN (
+                      SELECT year_start_date FROM `tabFiscal Year` WHERE name = b.fiscal_year LIMIT 1
+                  ) AND (
+                      SELECT year_end_date FROM `tabFiscal Year` WHERE name = b.fiscal_year LIMIT 1
                   )
             ), 0) AS actual_spent,
             b.status
