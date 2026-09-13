@@ -28,6 +28,21 @@ def complete_refurbishment(spare_part, serial_no, refurbishment_cost=0):
     if flt(part.pending_refurbishment_qty) <= 0:
         frappe.throw(_("No units are currently pending refurbishment for {0}.").format(spare_part))
 
+    # تحقق مبكر (بدل الاعتماد على رسالة ERPNext العامة عند تسليم Stock Entry):
+    # الوحدة المُدخَلة يدوياً هنا لازم تكون فعلاً مستلَمة في مستودع استلام
+    # الأعطال — وإلا ممكن تُسجَّل عملية "تجديد" لوحدة لم تُستلَم أصلاً،
+    # فينتفخ رصيد المخزون الصالح للاستخدام بلا أي أصل فعلي وراءه.
+    current_warehouse = frappe.db.get_value("Serial No", serial_no, "warehouse")
+    if current_warehouse != part.core_return_warehouse:
+        frappe.throw(
+            _("Serial No {0} is not currently recorded in the core-return warehouse {1} "
+              "(it shows as {2}) — cannot complete refurbishment for a unit that was never "
+              "received back.").format(
+                serial_no, part.core_return_warehouse, current_warehouse or _("not received anywhere")
+            ),
+            title=_("Unit Not Received"),
+        )
+
     se = frappe.new_doc("Stock Entry")
     se.stock_entry_type = "Material Transfer"
     se.company = frappe.defaults.get_user_default("Company")
