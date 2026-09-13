@@ -8,6 +8,22 @@ from asset_mgmt_custom.api.v1.mobile import resolve_asset_identifier
 class AssetPhysicalAudit(frappe.model.document.Document):
     def validate(self):
         self._compute_summary()
+        self._require_photo_on_missing_or_damaged()
+
+    def _require_photo_on_missing_or_damaged(self):
+        """توثيق حي إلزامي — نفس نمط Asset Safety Inspection._require_photo_on_fail:
+        أي بند بنتيجة 'مفقود' أو 'تالف' بلا صورة يُرفَض الحفظ، بدل الاعتماد
+        على ملاحظة نصية وحدها كدليل على أصل مفقود أو تالف."""
+        missing = [
+            str(row.idx) for row in (self.items or [])
+            if row.audit_result in ("Missing", "Damaged") and not row.photo
+        ]
+        if missing:
+            frappe.throw(
+                _("A documentation photo is required for every 'Missing' or 'Damaged' result. "
+                  "Missing on row(s): {0}").format(", ".join(missing)),
+                title=_("Photo Required"),
+            )
 
     def on_submit(self):
         self.db_set("audit_status", "Completed")

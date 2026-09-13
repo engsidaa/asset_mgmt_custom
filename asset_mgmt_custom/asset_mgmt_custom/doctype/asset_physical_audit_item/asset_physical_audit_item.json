@@ -11,7 +11,8 @@
   "expected_location",
   "audit_result",
   "actual_location",
-  "remarks"
+  "remarks",
+  "photo"
  ],
  "fields": [
   {
@@ -66,6 +67,13 @@
    "fieldtype": "Data",
    "label": "ملاحظات",
    "in_list_view": 1
+  },
+  {
+   "fieldname": "photo",
+   "fieldtype": "Attach Image",
+   "label": "صورة توثيقية",
+   "depends_on": "eval:['Missing', 'Damaged'].includes(doc.audit_result)",
+   "description": "إلزامية لنتيجة 'مفقود' أو 'تالف' — نفس نمط التوثيق الحي المفروض في فحص السلامة."
   }
  ],
  "istable": 1,

@@ -510,7 +510,9 @@ def submit_physical_audit(audit_id, items):
     تحديث جماعي (Bulk) لبنود جرد مادي بمسودة Asset Physical Audit موجودة
     بالفعل (أُنشئت وعُبِّئت مبدئياً عبر create_physical_audit في
     branch_manager.py)، ثم تسليمها — بدل إرسال كل بند بنداء API منفصل.
-    items: قائمة {asset, audit_result, actual_location?, remarks?}.
+    items: قائمة {asset, audit_result, actual_location?, remarks?, photo?}.
+    photo إلزامية فعلياً (Asset Physical Audit.validate) لأي بند بنتيجة
+    'مفقود' أو 'تالف' — انظر AssetPhysicalAudit._require_photo_on_missing_or_damaged.
 
     save()/submit() بـ ignore_permissions=True عمداً بعد التحقق من ملكية
     هذا الجرد تحديداً (audited_by == المستخدم الحالي) — صلاحية الكتابة
@@ -535,6 +537,7 @@ def submit_physical_audit(audit_id, items):
         row.audit_result = item.get("audit_result") or row.audit_result
         row.actual_location = item.get("actual_location") or row.actual_location
         row.remarks = item.get("remarks") or row.remarks
+        row.photo = item.get("photo") or row.photo
 
     doc.save(ignore_permissions=True)
     doc.submit()
