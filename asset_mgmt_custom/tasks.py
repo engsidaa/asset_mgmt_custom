@@ -558,6 +558,41 @@ def check_insurance_expiry():
 
 
 # ---------------------------------------------------------------------------
+# Daily: asset document vault expiry (warranty cards, insurance policies,
+# certificates... stored in Asset Document Vault) — كل الأنواع الأضيق
+# المشابهة (Asset Insurance Renewal، Asset Compliance Certificate، Asset
+# Work Permit، Asset Software License) لها مهمة تنبيه انتهاء صلاحية
+# مخصصة، وهذا الدكتايب وحده — رغم امتلاكه expiry_date أيضاً — لم يكن له
+# أي تنبيه إطلاقاً.
+# ---------------------------------------------------------------------------
+
+def check_document_vault_expiry():
+    """Daily: notify when a stored Asset Document Vault entry (warranty
+    card, insurance policy, certificate...) is expiring in 30, 14, or 7 days."""
+    for days_ahead in [30, 14, 7]:
+        target = add_days(today(), days_ahead)
+        docs = frappe.db.sql("""
+            SELECT name, asset, asset_name, document_type, document_title, expiry_date
+            FROM `tabAsset Document Vault`
+            WHERE expiry_date IS NOT NULL
+              AND expiry_date = %(target)s
+        """, {"target": target}, as_dict=True)
+
+        if not docs:
+            continue
+
+        manager_users = _get_manager_users()
+        for d in docs:
+            subject = _("Document Expiring in {0} days: {1}").format(
+                days_ahead, d.document_title or d.document_type)
+            content = _("Document <b>{0}</b> ({1}) for asset <b>{2}</b> "
+                        "expires on <b>{3}</b>.").format(
+                d.document_title or d.name, d.document_type,
+                d.asset_name or d.asset or "-", d.expiry_date)
+            _create_notification(subject, content, "Asset Document Vault", d.name, manager_users)
+
+
+# ---------------------------------------------------------------------------
 # Daily: asset loan return reminders
 # ---------------------------------------------------------------------------
 

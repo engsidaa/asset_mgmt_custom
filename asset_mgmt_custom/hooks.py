@@ -148,6 +148,7 @@ scheduler_events = {
         "asset_mgmt_custom.tasks.check_overdue_transit",
         "asset_mgmt_custom.tasks.check_requisition_sla",
         "asset_mgmt_custom.tasks.check_insurance_expiry",
+        "asset_mgmt_custom.tasks.check_document_vault_expiry",
         "asset_mgmt_custom.tasks.check_overdue_loans",
         "asset_mgmt_custom.tasks.check_amc_expiry",
         "asset_mgmt_custom.tasks.check_compliance_expiry",
