@@ -22,6 +22,18 @@ async function get_my_branch() {
 	return null;
 }
 
+// "طالب الأصل" (employee) حقل مطلوب (reqd) في Asset Requisition ولم يكن
+// يُرسَل إطلاقاً من هنا — الإدراج كان يفشل دائماً بـ MandatoryError. نفس
+// الحل المطبَّق في تطبيق الموبايل: اشتقاقه من سجل الموظف المرتبط بالمستخدم.
+async function get_my_employee() {
+	try {
+		const { message } = await frappe.db.get_value('Employee', { user_id: frappe.session.user }, 'name');
+		return (message && message.name) || null;
+	} catch (e) {
+		return null;
+	}
+}
+
 function build_wizard(page) {
 	new asset_mgmt_custom.Wizard({
 		wrapper: page.body,
@@ -39,9 +51,9 @@ function build_wizard(page) {
 					}, 'asset_category');
 					if (wizard.state.asset_category) category.set_value(wizard.state.asset_category);
 
-					$body.append(`<label class="control-label" style="margin-top:15px;">${__('الصنف (اختياري)')}</label>`);
+					$body.append(`<label class="control-label" style="margin-top:15px;">${__('الصنف')} *</label>`);
 					const item = wizard.make_field($body, {
-						fieldtype: 'Link', fieldname: 'item_code', options: 'Item',
+						fieldtype: 'Link', fieldname: 'item_code', options: 'Item', reqd: 1,
 					}, 'item_code');
 					if (wizard.state.item_code) item.set_value(wizard.state.item_code);
 
@@ -70,6 +82,10 @@ function build_wizard(page) {
 
 					if (!wizard.state.asset_category) {
 						wizard.show_error(__('يرجى اختيار فئة الأصل.'));
+						return false;
+					}
+					if (!wizard.state.item_code) {
+						wizard.show_error(__('يرجى اختيار الصنف.'));
 						return false;
 					}
 					if (!wizard.state.branch) {
@@ -140,9 +156,15 @@ function build_wizard(page) {
 			},
 		],
 		async finish(wizard) {
+			const employee = await get_my_employee();
+			if (!employee) {
+				throw new Error(__('لا يوجد سجل موظف مرتبط بحسابك — لا يمكن تقديم طلب أصل بدونه.'));
+			}
+
 			const inserted = await frappe.xcall('frappe.client.insert', {
 				doc: {
 					doctype: 'Asset Requisition',
+					employee: employee,
 					asset_category: wizard.state.asset_category,
 					item_code: wizard.state.item_code,
 					quantity: wizard.state.quantity,
