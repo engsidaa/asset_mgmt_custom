@@ -81,7 +81,24 @@ class AssetSparePartRequest(Document):
             )
 
         qty = flt(self.quantity_requested)
-        if spare_part.quantity and qty > flt(spare_part.quantity):
+
+        # مستودع الصرف (EAM-4، مخزون العربة): source_warehouse اختياري —
+        # يسمح بالصرف من مستودع الفني الشخصي (عربته) بدل الاعتماد دائماً
+        # على المستودع المركزي الوحيد المُعرَّف على قطعة الغيار نفسها.
+        # نتحقق من رصيده الفعلي (Bin.actual_qty) هنا بدل ترك Stock Entry
+        # يفشل لاحقاً برسالة "Negative Stock" أقل وضوحاً للفني.
+        issue_warehouse = self.get("source_warehouse") or spare_part.warehouse
+        if self.get("source_warehouse"):
+            available_qty = flt(frappe.db.get_value(
+                "Bin", {"item_code": spare_part.item_code, "warehouse": issue_warehouse}, "actual_qty"
+            ))
+            if available_qty < qty:
+                frappe.throw(
+                    _("الكمية المطلوبة ({0}) أكبر من المتاح فعلياً ({1}) في مستودع الصرف المحدَّد ({2}).").format(
+                        qty, available_qty, issue_warehouse
+                    )
+                )
+        elif spare_part.quantity and qty > flt(spare_part.quantity):
             frappe.throw(
                 _("الكمية المطلوبة ({0}) أكبر من الكمية المتاحة فعلياً ({1}) لقطعة الغيار {2}.").format(
                     qty, spare_part.quantity, spare_part.name
@@ -114,7 +131,7 @@ class AssetSparePartRequest(Document):
         item_row = {
             "item_code": spare_part.item_code,
             "qty": qty,
-            "s_warehouse": spare_part.warehouse,
+            "s_warehouse": issue_warehouse,
         }
         if cost_center:
             item_row["cost_center"] = cost_center
@@ -129,9 +146,16 @@ class AssetSparePartRequest(Document):
         se.insert(ignore_permissions=True)
         se.submit()
 
-        frappe.db.set_value(
-            "Asset Spare Part", spare_part.name, "quantity", flt(spare_part.quantity) - qty
-        )
+        # Asset Spare Part.quantity يعكس رصيد المستودع المركزي تحديداً
+        # (متابَع يدوياً في هذا الحقل، وليس مُشتقاً تلقائياً من Bin) — لا
+        # يُخفَّض إلا لو صُرفت الكمية فعلياً من نفس هذا المستودع. الصرف من
+        # مستودع عربة فني (source_warehouse مختلف) لا يمس هذا الرصيد
+        # إطلاقاً؛ رصيد ذلك المستودع نفسه محفوظ بدقة في Bin عبر حركة
+        # المخزون أعلاه مباشرة.
+        if issue_warehouse == spare_part.warehouse:
+            frappe.db.set_value(
+                "Asset Spare Part", spare_part.name, "quantity", flt(spare_part.quantity) - qty
+            )
 
         self.db_set("stock_entry", se.name)
         self.db_set("quantity_issued", qty)
@@ -214,12 +238,17 @@ class AssetSparePartRequest(Document):
         if se.docstatus == 1:
             se.cancel()
 
+        # نفس قاعدة issue_spare_part بالضبط: لا نلمس Asset Spare Part.quantity
+        # إلا لو الصرف الأصلي كان فعلاً من نفس المستودع المركزي المُعرَّف على
+        # قطعة الغيار — إلغاء صرف من مستودع عربة فني لا يمس هذا الرصيد إطلاقاً.
         qty_to_restore = flt(self.get("quantity_issued"))
         if qty_to_restore and self.spare_part:
-            current_qty = flt(frappe.db.get_value("Asset Spare Part", self.spare_part, "quantity"))
-            frappe.db.set_value(
-                "Asset Spare Part", self.spare_part, "quantity", current_qty + qty_to_restore
-            )
+            central_warehouse = frappe.db.get_value("Asset Spare Part", self.spare_part, "warehouse")
+            if (self.get("source_warehouse") or central_warehouse) == central_warehouse:
+                current_qty = flt(frappe.db.get_value("Asset Spare Part", self.spare_part, "quantity"))
+                frappe.db.set_value(
+                    "Asset Spare Part", self.spare_part, "quantity", current_qty + qty_to_restore
+                )
 
         self._cancel_core_return_entry()
 

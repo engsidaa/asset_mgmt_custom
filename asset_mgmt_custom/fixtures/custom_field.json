@@ -1033,6 +1033,18 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Maintenance Team Member-custom_van_stock_warehouse",
+  "dt": "Maintenance Team Member",
+  "fieldname": "custom_van_stock_warehouse",
+  "fieldtype": "Link",
+  "options": "Warehouse",
+  "label": "مستودع مخزون العربة (Van Stock)",
+  "insert_after": "custom_complaint_department",
+  "description": "اختياري — لو حُدِّد مستودع مخصص لهذا الفني (عربة الصيانة الخاصة به)، تُقترَح قطع الغيار المتوفرة فيه تلقائياً في طلب قطعة غيار جديد من الموبايل بدل الاعتماد فقط على المستودع المركزي.",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Asset Movement-custom_driver",
   "dt": "Asset Movement",
   "fieldname": "custom_driver",

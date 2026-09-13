@@ -80,6 +80,13 @@
    "default": "1"
   },
   {
+   "fieldname": "source_warehouse",
+   "fieldtype": "Link",
+   "label": "مستودع الصرف",
+   "options": "Warehouse",
+   "description": "اختياري — اتركه فارغاً للصرف من المستودع المركزي المُعرَّف على قطعة الغيار نفسها. يُستخدَم لتفضيل الصرف من مخزون عربة الفني (Van Stock) عند توفر كمية كافية فيه."
+  },
+  {
    "fieldname": "quantity_issued",
    "fieldtype": "Float",
    "label": "الكمية الصادرة",

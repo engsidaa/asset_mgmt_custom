@@ -807,6 +807,51 @@ def _get_it_statistics():
 
 
 @frappe.whitelist()
+def get_my_van_stock():
+    """
+    EAM-4: مخزون عربة الفني — قطع الغيار المتوفرة فعلياً (عبر Bin
+    الأساسي في ERPNext، وليس Asset Spare Part.quantity اليدوي) في
+    المستودع الشخصي المُعرَّف على سجل Maintenance Team Member الخاص
+    بالمستخدم الحالي (custom_van_stock_warehouse). اختياري بالكامل —
+    warehouse يعود None لو لم يُحدَّد له مستودع أصلاً (لا خطأ).
+    """
+    warehouse = frappe.db.get_value(
+        "Maintenance Team Member", {"team_member": frappe.session.user}, "custom_van_stock_warehouse"
+    )
+    if not warehouse:
+        return {"warehouse": None, "items": []}
+
+    spare_parts = frappe.get_list(
+        "Asset Spare Part",
+        filters={"item_code": ["is", "set"]},
+        fields=["name", "item_name", "item_code", "unit"],
+    )
+    if not spare_parts:
+        return {"warehouse": warehouse, "items": []}
+
+    item_codes = [p.item_code for p in spare_parts]
+    bins = frappe.get_all(
+        "Bin",
+        filters={"warehouse": warehouse, "item_code": ["in", item_codes]},
+        fields=["item_code", "actual_qty"],
+    )
+    qty_by_item = {b.item_code: flt(b.actual_qty) for b in bins}
+
+    items = [
+        {
+            "spare_part": p.name,
+            "item_name": p.item_name,
+            "unit": p.unit,
+            "qty": qty_by_item.get(p.item_code, 0),
+        }
+        for p in spare_parts
+        if qty_by_item.get(p.item_code, 0) > 0
+    ]
+    items.sort(key=lambda x: x["item_name"] or "")
+    return {"warehouse": warehouse, "items": items}
+
+
+@frappe.whitelist()
 def submit_physical_audit(audit_id, items):
     """
     تحديث جماعي (Bulk) لبنود جرد مادي بمسودة Asset Physical Audit موجودة
