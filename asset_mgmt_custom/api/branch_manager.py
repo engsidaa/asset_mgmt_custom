@@ -316,6 +316,17 @@ def get_asset_detail(asset):
         "Asset Criticality Matrix", {"asset": asset}, "criticality_level"
     )
 
+    # قائمة قطع الغيار القياسية لفئة هذا الأصل (Asset Category.custom_standard_spare_parts)
+    # كانت قابلة للتعبئة من الديسك لكن لا شيء يقرأها فعلياً — يستخدمها
+    # تطبيق الموبايل الآن كاقتراحات سريعة عند طلب قطعة غيار (بدل البحث
+    # الحر في كل قطع الغيار المعروفة في كل مرة).
+    asset_doc["standard_spare_parts"] = frappe.get_all(
+        "Asset Category Spare Part",
+        filters={"parent": asset_doc.asset_category, "parenttype": "Asset Category"},
+        fields=["spare_part", "spare_part_name", "standard_qty"],
+        order_by="idx",
+    ) if asset_doc.get("asset_category") else []
+
     latest_inspection = frappe.db.get_value(
         "Asset Safety Inspection", {"asset": asset},
         ["name", "inspection_date", "overall_result", "next_inspection_date"],
