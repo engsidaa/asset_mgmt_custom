@@ -1,7 +1,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import add_to_date, cint, flt, get_datetime, now_datetime, today
+from frappe.utils import add_to_date, cint, flt, get_datetime, now_datetime, time_diff_in_hours, today
 
 from asset_mgmt_custom.overrides.asset_repair import _update_asset_maintenance_summary
 from asset_mgmt_custom.notifications import send_critical_alert
@@ -266,6 +266,9 @@ class AssetWorkOrder(Document):
         self.status = "مكتمل"
         if not self.completion_date:
             self.completion_date = today()
+        if not self.closed_at:
+            self.closed_at = now_datetime()
+            self.downtime_hours = flt(time_diff_in_hours(self.closed_at, self.creation), 2)
         self._check_sla_breach_on_completion()
         if self.get("cost_classification") == "Capitalized Overhaul":
             self._escalate_to_asset_repair()
@@ -292,7 +295,8 @@ class AssetWorkOrder(Document):
         """
         if self.sla_breached or not self.resolution_due_by:
             return
-        if now_datetime() <= get_datetime(self.resolution_due_by):
+        closed_moment = self.closed_at or now_datetime()
+        if get_datetime(closed_moment) <= get_datetime(self.resolution_due_by):
             return
         self.sla_breached = 1
         from asset_mgmt_custom.tasks import _propose_sla_penalty
