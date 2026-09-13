@@ -1,7 +1,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import add_to_date, cint, flt, now_datetime, today
+from frappe.utils import add_to_date, cint, flt, get_datetime, now_datetime, today
 
 from asset_mgmt_custom.overrides.asset_repair import _update_asset_maintenance_summary
 from asset_mgmt_custom.notifications import send_critical_alert
@@ -253,6 +253,7 @@ class AssetWorkOrder(Document):
         self.status = "مكتمل"
         if not self.completion_date:
             self.completion_date = today()
+        self._check_sla_breach_on_completion()
         if self.get("cost_classification") == "Capitalized Overhaul":
             self._escalate_to_asset_repair()
         self.save()
@@ -264,6 +265,25 @@ class AssetWorkOrder(Document):
                 reference_name=self.name,
             )
         return self.status
+
+    def _check_sla_breach_on_completion(self):
+        """
+        check_overdue_work_orders (tasks.py، الـcron اليومي) كانت الوسيلة
+        الوحيدة لضبط sla_breached — وهي مفلترة على completion_date IS NULL،
+        فأي أمر عمل أُغلق متأخراً عن مهلته لكن في نفس اليوم (أو قبل تشغيل
+        الـcron التالي) لم يكن يُسجَّل كخرق SLA إطلاقاً، رغم أنها الحالة
+        الأكثر شيوعاً في بيئة فرع (إغلاق نفس اليوم). يُفحَص الخرق الآن
+        لحظة الإتمام نفسها أيضاً، بمقارنة الوقت الفعلي (وليس completion_date
+        اليومي وحده) بالمهلة — بنفس منطق اقتراح الجزاء المستخدَم في المهمة
+        اليومية، ولمرة واحدة فقط (لا أثر لو كان قد سُجِّل بالفعل).
+        """
+        if self.sla_breached or not self.resolution_due_by:
+            return
+        if now_datetime() <= get_datetime(self.resolution_due_by):
+            return
+        self.sla_breached = 1
+        from asset_mgmt_custom.tasks import _propose_sla_penalty
+        _propose_sla_penalty(frappe._dict(name=self.name, asset=self.asset))
 
     def _escalate_to_asset_repair(self):
         """
