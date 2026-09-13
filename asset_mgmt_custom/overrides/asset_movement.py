@@ -7,18 +7,29 @@ Validate:
 
 On Submit:
   - Transfer / Receipt: تحديث cost_center في الأصل من حقل Location.custom_cost_center
-  - Transfer: ضبط custom_operational_status = In Transit + إشعار
+  - Transfer: ضبط custom_operational_status = In Transit + إشعار.
+    custom_branch لا يتحدَّث هنا — الأصل لسه في الطريق فعلياً، ولسه ولا
+    فرع أكَّد استلامه. يتحدَّث فقط داخل confirm_receipt() لحظة التأكيد
+    الفعلي، حتى لا يختفي الأصل من عرض فرع المصدر أو يظهر عند فرع الوجهة
+    قبل ما حد هناك يستلمه فعلياً.
   - Receipt مقصود (بدون reference_doctype) لأصل احتياطي: تفعيل الأصل +
-    مسح حالة In Transit — سند الـ Receipt التلقائي اللي ERPNext نفسه بينشئه
-    عند تقديم أي أصل (Asset.on_submit -> make_asset_movement) بيُستبعد
-    عمداً هنا لأنه دايماً بيحمل reference_doctype (Purchase Receipt/Invoice)
-    حتى لو الأصل احتياطي — التفعيل الحقيقي محتاج فعل مقصود، مش نتيجة جانبية
-    لتقديم الأصل نفسه.
+    مسح حالة In Transit + تحديث custom_branch — سند الـ Receipt التلقائي
+    اللي ERPNext نفسه بينشئه عند تقديم أي أصل (Asset.on_submit ->
+    make_asset_movement) بيُستبعد عمداً هنا لأنه دايماً بيحمل
+    reference_doctype (Purchase Receipt/Invoice) حتى لو الأصل احتياطي —
+    التفعيل الحقيقي محتاج فعل مقصود، مش نتيجة جانبية لتقديم الأصل نفسه.
+    Receipt (خلافاً لـTransfer) ما لهوش خطوة تأكيد منفصلة، فهو نفسه لحظة
+    الاستلام الفعلي — يصح تحديث الفرع فيه مباشرة.
   - تسجيل كل حدث في Asset Activity
 
 On Cancel:
   - استعادة cost_center من الموقع الأصلي
   - إعادة حالة In Transit إلى Operational عند الإلغاء
+  - استعادة custom_branch إلى الفرع الأصلي (من Asset Relocation History
+    التي سُجِّلت وقت التقديم) — لو كان قد تغيَّر فعلاً (بعد تأكيد استلام
+    أو Receipt)، وإلا فلا أثر (Transfer لم يُؤكَّد استلامه بعد فلم يتغيَّر
+    الفرع أصلاً). قبل هذا التصحيح كان الفرع لا يُستعاد أبداً عند الإلغاء،
+    فيبقى الأصل معلَّقاً على فرع الوجهة الملغاة بشكل دائم وصامت.
 """
 
 import frappe
@@ -86,7 +97,6 @@ def on_submit(doc, method=None):
     for item in doc.assets:
         _log_relocation_history(doc, item)
         _update_cost_center(doc, item)
-        _update_branch(item)
 
         if doc.purpose == "Transfer":
             _set_in_transit(item)
@@ -105,6 +115,7 @@ def on_submit(doc, method=None):
             if not doc.get("reference_doctype"):
                 _activate_spare_asset(doc, item)
             _clear_transit(item)
+            _update_branch(item)
 
 
 def _set_in_transit(item):
@@ -262,6 +273,7 @@ def on_cancel(doc, method=None):
         return
     for item in doc.assets:
         _revert_cost_center(item)
+        _revert_branch(doc, item)
         if doc.purpose == "Transfer":
             _revert_transit(item)
 
@@ -270,6 +282,29 @@ def _revert_transit(item):
     current = frappe.db.get_value("Asset", item.asset, "custom_operational_status")
     if current == "In Transit":
         frappe.db.set_value("Asset", item.asset, "custom_operational_status", "Operational", update_modified=False)
+
+
+def _revert_branch(doc, item):
+    """
+    يستعيد custom_branch إلى الفرع الأصلي (قبل هذه الحركة) عند الإلغاء —
+    لو كان قد تغيَّر فعلاً بسبب هذه الحركة تحديداً. المصدر: from_branch
+    المسجَّل في Asset Relocation History وقت التقديم (_log_relocation_history)،
+    قبل ما custom_branch يتغيَّر. لو الفرع الحالي مطابق أصلاً لـ from_branch
+    (حالة Transfer لم يُؤكَّد استلامه بعد، فلم يتغيَّر الفرع من الأساس)
+    فلا يوجد أثر يُستعاد.
+    """
+    from_branch = frappe.db.get_value(
+        "Asset Relocation History",
+        {"reference_doctype": "Asset Movement", "reference_document": doc.name, "asset": item.asset},
+        "from_branch",
+    )
+    if not from_branch:
+        return
+    current = frappe.db.get_value("Asset", item.asset, "custom_branch")
+    if current == from_branch:
+        return
+    frappe.db.set_value("Asset", item.asset, "custom_branch", from_branch, update_modified=False)
+    _log_activity(item.asset, "Branch reverted to {0} after cancellation".format(from_branch))
 
 
 def _revert_cost_center(item):
@@ -342,6 +377,7 @@ def confirm_receipt(movement_name):
             frappe.db.set_value("Asset", item.asset, {
                 "custom_operational_status": "Operational",
             }, update_modified=False)
+            _update_branch(item)
             _log_activity(item.asset, "Asset receipt confirmed at {0}. Status: Operational.".format(
                 item.target_location or "destination"))
             confirmed.append(item.asset)
