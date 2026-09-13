@@ -161,7 +161,11 @@ def check_app_version(current_build_number=0):
 
     return {
         "update_available": update_available,
-        "force_update": bool(update_available and settings.get("force_update")),
+        # get_singles_dict بلا cast=True يُعيد كل القيم كنص خام من جدول
+        # Singles — bool("0") == True في بايثون، فاستخدام bool() مباشرة
+        # هنا كان يجعل force_update يُفعَّل تلقائياً بمجرد وجود القيمة "0"
+        # محفوظة (أي حتى لو كانت خانة "تحديث إجباري" غير مفعَّلة فعلياً).
+        "force_update": bool(update_available and cint(settings.get("force_update"))),
         "latest_version_name": settings.get("latest_app_version_name"),
         "latest_build_number": latest_build,
         "download_url": settings.get("app_download_url"),
