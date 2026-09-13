@@ -1,0 +1,138 @@
+{
+ "doctype": "DocType",
+ "name": "Asset Scan Log",
+ "module": "Asset Mgmt Custom",
+ "is_submittable": 0,
+ "track_changes": 0,
+ "fields": [
+  {
+   "fieldname": "asset",
+   "fieldtype": "Link",
+   "options": "Asset",
+   "label": "الأصل",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "اسم الأصل",
+   "fetch_from": "asset.asset_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "scanned_by",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "الماسح",
+   "reqd": 1,
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "scan_time",
+   "fieldtype": "Datetime",
+   "label": "وقت المسح",
+   "reqd": 1,
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "sec_break_branch",
+   "fieldtype": "Section Break",
+   "label": "مطابقة الفرع"
+  },
+  {
+   "fieldname": "scan_branch",
+   "fieldtype": "Link",
+   "options": "Branch",
+   "label": "فرع الماسح وقت المسح",
+   "read_only": 1,
+   "in_list_view": 1,
+   "description": "الفرع الافتراضي للمستخدم الذي قام بالمسح — قد يكون فارغاً لو لم يُهيَّأ له فرع افتراضي"
+  },
+  {
+   "fieldname": "col_break_branch",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "registered_branch",
+   "fieldtype": "Link",
+   "options": "Branch",
+   "label": "فرع الأصل المسجَّل",
+   "fetch_from": "asset.custom_branch",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "branch_mismatch",
+   "fieldtype": "Check",
+   "label": "عدم تطابق الفرع",
+   "read_only": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "الأصل مُسجَّل في فرع مختلف عن فرع الماسح — احتمال نقل غير موثَّق (Asset Movement) لم يُسجَّل رسمياً"
+  },
+  {
+   "fieldname": "sec_break_resolution",
+   "fieldtype": "Section Break",
+   "label": "المتابعة"
+  },
+  {
+   "fieldname": "resolved",
+   "fieldtype": "Check",
+   "label": "تمت المعالجة",
+   "default": "0",
+   "in_standard_filter": 1,
+   "description": "علِّمها بعد التأكد من سبب عدم التطابق (نقل موثَّق فعلياً لاحقاً، أصل احتياطي متنقل، خطأ إدخال...)"
+  },
+  {
+   "fieldname": "resolution_notes",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات المعالجة"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Asset Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Branch Manager",
+   "read": 1,
+   "write": 1,
+   "report": 1
+  },
+  {
+   "role": "Asset Technician",
+   "read": 1
+  }
+ ],
+ "sort_field": "scan_time",
+ "sort_order": "DESC"
+}

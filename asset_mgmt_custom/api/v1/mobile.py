@@ -331,12 +331,113 @@ def scan_asset(identifier):
     استعلام فوري بمسح كود QR/باركود أو إدخال الكود يدوياً، ثم يُعيد نفس
     تفاصيل الأصل الكاملة المُستخدَمة أصلاً في بوابة مدير الفرع
     (get_asset_detail) — بلا تكرار.
+
+    EAM-5: كل مسح يُسجَّل تلقائياً في Asset Scan Log (تسجيل مستمر، بلا
+    حاجة لجلسة جرد فعلي رسمية) — انظر _log_asset_scan.
     """
     asset_name = resolve_asset_identifier(identifier)
     if not asset_name:
         frappe.throw(_("No asset found matching '{0}'.").format(identifier))
 
+    _log_asset_scan(asset_name)
     return get_asset_detail(asset_name)
+
+
+def _log_asset_scan(asset_name):
+    """
+    EAM-5: تسجيل مستمر لكل مسح فعلي لأصل — بناء سجل تدقيق مستمر بلا
+    حاجة لجلسة جرد فعلي رسمية (Asset Physical Audit) في كل مرة. لو فرع
+    الماسح الافتراضي (get_app_context.default_branch) يختلف عن الفرع
+    المسجَّل فعلياً على الأصل، يُعلَّم عدم التطابق تلقائياً — واحتمال
+    نقل غير موثَّق (Asset Movement لم يُسجَّل رسمياً) لو تكرر ذلك بنفس
+    فرع الماسح مرتين أو أكثر خلال آخر 14 يوماً، فيُخطَر مديرا الفرعين
+    (المسجَّل وفرع الماسح) — إخطار فقط، بلا أي إنشاء تلقائي لمستند نقل
+    حتى لا يتجاوز آلية الموافقة الحالية على Asset Movement.
+
+    مُغلَّف بالكامل في try/except — فشل التسجيل لا يجوز أن يمنع الفني
+    من رؤية تفاصيل الأصل الذي مسحه للتو.
+    """
+    try:
+        scan_branch = frappe.db.get_value(
+            "User Permission", {"user": frappe.session.user, "allow": "Branch"}, "for_value"
+        )
+        registered_branch = frappe.db.get_value("Asset", asset_name, "custom_branch")
+        mismatch = bool(scan_branch and registered_branch and scan_branch != registered_branch)
+
+        log = frappe.get_doc({
+            "doctype": "Asset Scan Log",
+            "asset": asset_name,
+            "scanned_by": frappe.session.user,
+            "scan_time": now_datetime(),
+            "scan_branch": scan_branch,
+            "branch_mismatch": 1 if mismatch else 0,
+        })
+        log.insert(ignore_permissions=True)
+
+        if not mismatch:
+            return
+
+        # نفس نمط النقل المتكرر: مرتين على الأقل بنفس زوج (الأصل/فرع
+        # الماسح) خلال آخر 14 يوماً قبل الإخطار — مسح عرضي واحد (زيارة
+        # فرع آخر لمهمة عابرة مثلاً) لا يستحق تنبيهاً بعد.
+        recent_mismatches = frappe.db.count(
+            "Asset Scan Log",
+            filters={
+                "asset": asset_name,
+                "scan_branch": scan_branch,
+                "branch_mismatch": 1,
+                "creation": [">=", add_days(now_datetime(), -14)],
+            },
+        )
+        if recent_mismatches < 2:
+            return
+
+        managers = set(frappe.get_all(
+            "Branch", filters={"name": ["in", [scan_branch, registered_branch]]}, pluck="custom_branch_manager"
+        )) - {None, ""}
+        for manager in managers:
+            notify_user(
+                manager,
+                _("مسح متكرر لأصل خارج فرعه المسجَّل: {0} — احتمال نقل غير موثَّق، راجع سجل المسح.").format(asset_name),
+                reference_doctype="Asset Scan Log",
+                reference_name=log.name,
+            )
+    except Exception:
+        frappe.log_error(title="Asset scan logging failed", message=frappe.get_traceback())
+
+
+@frappe.whitelist()
+def list_scan_mismatches(only_unresolved=True):
+    """
+    EAM-5: قائمة مراجعة لعدم تطابق الفرع — لمدير الفرع/مسؤول الصيانة.
+    تُقيَّد تلقائياً بفرع مدير الفرع عبر User Permission القياسي (نفس
+    آلية بقية بوابة مدير الفرع) لأن كلا الحقلين (scan_branch/
+    registered_branch) روابط لـ Branch.
+    """
+    filters = {"branch_mismatch": 1}
+    if cint(only_unresolved):
+        filters["resolved"] = 0
+
+    return frappe.get_list(
+        "Asset Scan Log",
+        filters=filters,
+        fields=["name", "asset", "asset_name", "scanned_by", "scan_time", "scan_branch", "registered_branch", "resolved"],
+        order_by="scan_time desc",
+        limit_page_length=100,
+    )
+
+
+@frappe.whitelist()
+def resolve_scan_mismatch(log_name, notes=None):
+    """EAM-5: تمييز بلاغ عدم تطابق كمُعالَج، مع ملاحظة اختيارية توضح السبب."""
+    if not ({"Branch Manager", "Asset Manager", "System Manager"} & set(frappe.get_roles())):
+        frappe.throw(_("Not permitted."), frappe.PermissionError)
+
+    frappe.db.set_value(
+        "Asset Scan Log", log_name,
+        {"resolved": 1, "resolution_notes": notes or ""},
+    )
+    return {"name": log_name, "resolved": 1}
 
 
 @frappe.whitelist()
@@ -763,6 +864,12 @@ def _get_branch_statistics():
     summary["total_assets"] = len(frappe.get_list("Asset", filters={"docstatus": 1}, pluck="name"))
     summary["operational_assets"] = len(frappe.get_list(
         "Asset", filters={"docstatus": 1, "custom_operational_status": "Operational"}, pluck="name"
+    ))
+    # EAM-5: بلاغات نقل غير موثَّق بانتظار المراجعة — نفس فلتر
+    # list_scan_mismatches(only_unresolved=True)، مُقيَّد تلقائياً بفرع
+    # مدير الفرع عبر User Permission (Branch) القياسي.
+    summary["scan_mismatches_open"] = len(frappe.get_list(
+        "Asset Scan Log", filters={"branch_mismatch": 1, "resolved": 0}, pluck="name"
     ))
     return summary
 
