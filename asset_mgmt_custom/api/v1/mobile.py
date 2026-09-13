@@ -14,9 +14,11 @@ Headless API — تطبيق Flutter الميداني (فنيّي/مورِّدي 
 """
 
 import json
+import math
 
 import frappe
 from frappe import _
+from frappe.utils import flt, now_datetime
 from frappe.utils.password import set_encrypted_password
 
 from asset_mgmt_custom.api.branch_manager import create_maintenance_request, get_asset_detail
@@ -119,6 +121,12 @@ def get_app_context():
     # هذا القسم فقط.
     user_is_it_technician = is_it_technician(user)
 
+    field_verification = frappe.db.get_value(
+        "Asset Mgmt Settings", None,
+        ["field_verification_enabled", "field_verification_radius_meters"],
+        as_dict=True,
+    ) or {}
+
     return {
         "user": user,
         "full_name": frappe.db.get_value("User", user, "full_name"),
@@ -130,6 +138,8 @@ def get_app_context():
         "managed_branches": managed_branches,
         "default_branch": default_branch,
         "is_it_technician": user_is_it_technician,
+        "field_verification_enabled": bool(field_verification.get("field_verification_enabled")),
+        "field_verification_radius_meters": flt(field_verification.get("field_verification_radius_meters")) or 200,
     }
 
 
@@ -222,6 +232,71 @@ def resolve_asset_identifier(identifier):
         or frappe.db.get_value("Asset", {"custom_iron_code": identifier})
         or frappe.db.get_value("Asset", {"custom_manufacturer_serial": identifier})
     )
+
+
+def _haversine_meters(lat1, lng1, lat2, lng2):
+    """المسافة الدائرية بين نقطتين (متر) — صيغة Haversine القياسية، بلا
+    أي مكتبة خارجية (كل ما نحتاجه حساب تقريبي بدقة كافية لمقارنة نصف
+    قطر بالأمتار، وليس ملاحة دقيقة)."""
+    earth_radius_m = 6371000
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    d_phi = math.radians(lat2 - lat1)
+    d_lambda = math.radians(lng2 - lng1)
+    a = math.sin(d_phi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(d_lambda / 2) ** 2
+    return 2 * earth_radius_m * math.asin(math.sqrt(a))
+
+
+@frappe.whitelist()
+def verify_field_location(work_order, latitude=None, longitude=None, rescanned_identifier=None):
+    """
+    EAM-2: تحقق ميداني اختياري (Asset Mgmt Settings.field_verification_enabled)
+    قبل إتمام أمر عمل — يُقارن موقع الفني الحالي (GPS من الجهاز) بموقع
+    الأصل المسجَّل (Asset.location -> Location.latitude/longitude، حقلا
+    core جاهزان بالفعل، بلا أي حقل جديد على الأصل نفسه)، ويتحقق اختيارياً
+    من تطابق كود مُعاد مسحه (QR/باركود) مع نفس الأصل عبر
+    resolve_asset_identifier الموجودة أصلاً.
+
+    **هذا تسجيل للتدقيق فقط — لا يمنع الإتمام مطلقاً** مهما كانت
+    النتيجة (Out of Range/Asset Mismatch)؛ القرار النهائي يبقى للفني،
+    وأي حالة مشبوهة تظهر لاحقاً بوضوح على أمر العمل نفسه لمسؤول الصيانة
+    (انظر الوصف الكامل على Asset Mgmt Settings.field_verification_enabled).
+    """
+    if not frappe.db.get_single_value("Asset Mgmt Settings", "field_verification_enabled"):
+        frappe.throw(_("Field verification is not enabled in Asset Mgmt Settings."))
+
+    doc = frappe.get_doc("Asset Work Order", work_order)
+    is_supervisor = bool({"Asset Manager", "System Manager"} & set(frappe.get_roles()))
+    if not is_supervisor and doc.assigned_technician and doc.assigned_technician != frappe.session.user:
+        frappe.throw(_("You can only verify work orders assigned to you."), frappe.PermissionError)
+
+    distance = None
+    status = "Not Attempted"
+
+    if doc.asset and latitude and longitude:
+        location = frappe.db.get_value("Asset", doc.asset, "location")
+        loc_lat, loc_lng = (None, None)
+        if location:
+            loc_lat, loc_lng = frappe.db.get_value("Location", location, ["latitude", "longitude"]) or (None, None)
+        if loc_lat and loc_lng:
+            distance = round(_haversine_meters(flt(latitude), flt(longitude), flt(loc_lat), flt(loc_lng)), 1)
+            radius = flt(frappe.db.get_single_value("Asset Mgmt Settings", "field_verification_radius_meters")) or 200
+            status = "Verified" if distance <= radius else "Out of Range"
+
+    if rescanned_identifier:
+        matched_asset = resolve_asset_identifier(rescanned_identifier)
+        if not matched_asset or matched_asset != doc.asset:
+            status = "Asset Mismatch"
+
+    frappe.db.set_value(
+        "Asset Work Order", work_order,
+        {
+            "field_verification_status": status,
+            "field_verification_distance_meters": distance,
+            "field_verified_at": now_datetime(),
+        },
+        update_modified=False,
+    )
+    return {"status": status, "distance_meters": distance}
 
 
 @frappe.whitelist()
