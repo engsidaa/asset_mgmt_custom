@@ -18,7 +18,7 @@ import math
 
 import frappe
 from frappe import _
-from frappe.utils import flt, now_datetime
+from frappe.utils import cint, flt, now_datetime
 from frappe.utils.password import set_encrypted_password
 
 from asset_mgmt_custom.api.branch_manager import create_maintenance_request, get_asset_detail
@@ -140,6 +140,31 @@ def get_app_context():
         "is_it_technician": user_is_it_technician,
         "field_verification_enabled": bool(field_verification.get("field_verification_enabled")),
         "field_verification_radius_meters": flt(field_verification.get("field_verification_radius_meters")) or 200,
+    }
+
+
+@frappe.whitelist()
+def check_app_version(current_build_number=0):
+    """
+    فحص إصدار تطبيق الموبايل — يُقارَن رقم البناء الحالي (PackageInfo.
+    buildNumber المُرسَل من العميل) برقم البناء الأحدث المسجَّل في
+    Asset Mgmt Settings (يرفعه الإدمن يدوياً بعد نشر إصدار جديد فعلياً،
+    ولا علاقة له بأي متجر تطبيقات — التطبيق يُوزَّع كملف APK مباشر).
+    force_update لا يُرفَع كـ True إلا لو كان هناك فعلاً إصدار أحدث،
+    حتى لا يمنع تطبيق محدَّث بالفعل من العمل بالخطأ لو تُرك الخيار
+    مفعَّلاً من تحديث سابق.
+    """
+    settings = frappe.db.get_singles_dict("Asset Mgmt Settings")
+    latest_build = cint(settings.get("latest_app_build_number"))
+    update_available = latest_build > cint(current_build_number)
+
+    return {
+        "update_available": update_available,
+        "force_update": bool(update_available and settings.get("force_update")),
+        "latest_version_name": settings.get("latest_app_version_name"),
+        "latest_build_number": latest_build,
+        "download_url": settings.get("app_download_url"),
+        "release_notes": settings.get("app_release_notes"),
     }
 
 
