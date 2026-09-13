@@ -13,32 +13,47 @@ def execute(filters=None):
          "options": "Asset Category", "width": 130},
         {"label": _("Branch / Cost Center"), "fieldname": "cost_center", "fieldtype": "Link",
          "options": "Cost Center", "width": 150},
-        {"label": _("Repair No"), "fieldname": "repair_name", "fieldtype": "Link",
-         "options": "Asset Repair", "width": 130},
-        {"label": _("Failure Date"), "fieldname": "failure_date",
-         "fieldtype": "Datetime", "width": 140},
+        {"label": _("Reference Type"), "fieldname": "reference_doctype", "fieldtype": "Link",
+         "options": "DocType", "width": 130},
+        {"label": _("Reference No"), "fieldname": "reference_name", "fieldtype": "Dynamic Link",
+         "options": "reference_doctype", "width": 130},
+        {"label": _("Failure/Open Date"), "fieldname": "failure_date",
+         "fieldtype": "Datetime", "width": 150},
         {"label": _("Completion Date"), "fieldname": "completion_date",
-         "fieldtype": "Datetime", "width": 140},
+         "fieldtype": "Datetime", "width": 150},
         {"label": _("Downtime (hrs)"), "fieldname": "downtime_hours",
          "fieldtype": "Float", "precision": 2, "width": 110},
-        {"label": _("Repair Cost"), "fieldname": "repair_cost",
+        {"label": _("Cost"), "fieldname": "cost",
          "fieldtype": "Currency", "width": 120},
-        {"label": _("Repair Status"), "fieldname": "repair_status",
+        {"label": _("Status"), "fieldname": "status",
          "fieldtype": "Data", "width": 100},
     ]
 
-    conditions = "WHERE ar.docstatus = 1"
+    # المصدر وُسِّع ليشمل Asset Work Order (مش بس Asset Repair) — الغالبية
+    # الساحقة من الصيانة التصحيحية الفعلية تمر عبر أمر العمل، وكانت مُغفَلة
+    # بالكامل من تقرير التوقف هذا. صف واحد لكل مستند من المصدرين معاً.
+    repair_conditions = "WHERE ar.docstatus = 1"
+    wo_conditions = (
+        "WHERE wo.docstatus = 1 AND wo.status = 'مكتمل' "
+        "AND IFNULL(wo.is_preventive_maintenance, 0) = 0"
+    )
+    params = dict(filters)
 
     if filters.get("company"):
-        conditions += " AND a.company = %(company)s"
+        repair_conditions += " AND a.company = %(company)s"
+        wo_conditions += " AND a.company = %(company)s"
     if filters.get("from_date"):
-        conditions += " AND DATE(ar.failure_date) >= %(from_date)s"
+        repair_conditions += " AND DATE(ar.failure_date) >= %(from_date)s"
+        wo_conditions += " AND DATE(wo.creation) >= %(from_date)s"
     if filters.get("to_date"):
-        conditions += " AND DATE(ar.failure_date) <= %(to_date)s"
+        repair_conditions += " AND DATE(ar.failure_date) <= %(to_date)s"
+        wo_conditions += " AND DATE(wo.creation) <= %(to_date)s"
     if filters.get("cost_center"):
-        conditions += " AND a.cost_center = %(cost_center)s"
+        repair_conditions += " AND a.cost_center = %(cost_center)s"
+        wo_conditions += " AND a.cost_center = %(cost_center)s"
     if filters.get("asset_category"):
-        conditions += " AND a.asset_category = %(asset_category)s"
+        repair_conditions += " AND a.asset_category = %(asset_category)s"
+        wo_conditions += " AND a.asset_category = %(asset_category)s"
 
     data = frappe.db.sql(f"""
         SELECT
@@ -46,16 +61,36 @@ def execute(filters=None):
             a.asset_name,
             a.asset_category,
             a.cost_center,
-            ar.name                                     AS repair_name,
+            'Asset Repair'                               AS reference_doctype,
+            ar.name                                      AS reference_name,
             ar.failure_date,
             ar.completion_date,
-            IFNULL(ar.custom_downtime_hours, 0)         AS downtime_hours,
-            ar.repair_cost,
-            ar.repair_status
+            IFNULL(ar.custom_downtime_hours, 0)          AS downtime_hours,
+            ar.repair_cost                                AS cost,
+            ar.repair_status                              AS status
         FROM `tabAsset Repair` ar
         JOIN `tabAsset` a ON a.name = ar.asset
-        {conditions}
-        ORDER BY a.cost_center, ar.asset, ar.failure_date DESC
-    """, filters, as_dict=True)
+        {repair_conditions}
+
+        UNION ALL
+
+        SELECT
+            wo.asset,
+            a.asset_name,
+            a.asset_category,
+            a.cost_center,
+            'Asset Work Order'                            AS reference_doctype,
+            wo.name                                       AS reference_name,
+            wo.creation                                   AS failure_date,
+            wo.closed_at                                  AS completion_date,
+            IFNULL(wo.downtime_hours, 0)                  AS downtime_hours,
+            IFNULL(NULLIF(wo.actual_cost, 0), IFNULL(wo.labor_cost, 0)) AS cost,
+            wo.status                                     AS status
+        FROM `tabAsset Work Order` wo
+        JOIN `tabAsset` a ON a.name = wo.asset
+        {wo_conditions}
+
+        ORDER BY cost_center, asset, failure_date DESC
+    """, params, as_dict=True)
 
     return columns, data

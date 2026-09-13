@@ -88,18 +88,32 @@ def get_data(filters):
     for t in targets:
         category = t.asset_category
 
+        # downtime النصي على Asset Repair لا شيء يملؤه فعلياً؛
+        # custom_downtime_hours هو الحقل الرقمي الحقيقي. ووُسِّع المصدر
+        # ليشمل Asset Work Order (التصحيحية فقط) — الغالبية الساحقة من
+        # الأعطال الفعلية تمر عبره لا عبر Asset Repair.
         repair_stats = frappe.db.sql("""
-            SELECT COUNT(r.name) AS failure_count, SUM(COALESCE(r.downtime, 0)) AS total_downtime
+            SELECT COUNT(r.name) AS failure_count, SUM(COALESCE(r.custom_downtime_hours, 0)) AS total_downtime
             FROM `tabAsset Repair` r
             JOIN `tabAsset` a ON a.name = r.asset
             WHERE a.asset_category = %(category)s AND r.docstatus = 1
               AND r.failure_date BETWEEN %(from_date)s AND %(to_date)s
         """, {"category": category, "from_date": fy_dates.year_start_date, "to_date": fy_dates.year_end_date}, as_dict=True)[0]
 
-        failure_count = cint(repair_stats.failure_count)
+        wo_stats = frappe.db.sql("""
+            SELECT COUNT(wo.name) AS failure_count, SUM(COALESCE(wo.downtime_hours, 0)) AS total_downtime
+            FROM `tabAsset Work Order` wo
+            JOIN `tabAsset` a ON a.name = wo.asset
+            WHERE a.asset_category = %(category)s AND wo.docstatus = 1
+              AND wo.status = 'مكتمل' AND IFNULL(wo.is_preventive_maintenance, 0) = 0
+              AND wo.creation BETWEEN %(from_date)s AND %(to_date)s
+        """, {"category": category, "from_date": fy_dates.year_start_date, "to_date": fy_dates.year_end_date}, as_dict=True)[0]
+
+        failure_count = cint(repair_stats.failure_count) + cint(wo_stats.failure_count)
+        total_downtime = flt(repair_stats.total_downtime) + flt(wo_stats.total_downtime)
         period_days = max(date_diff(fy_dates.year_end_date, fy_dates.year_start_date), 1)
         actual_mtbf = flt(period_days / failure_count, 1) if failure_count else None
-        actual_mttr = flt(flt(repair_stats.total_downtime) / failure_count, 1) if failure_count else None
+        actual_mttr = flt(total_downtime / failure_count, 1) if failure_count else None
 
         util = frappe.db.sql("""
             SELECT AVG(u.utilization_pct) AS avg_util, SUM(u.downtime_hours) AS total_downtime_month

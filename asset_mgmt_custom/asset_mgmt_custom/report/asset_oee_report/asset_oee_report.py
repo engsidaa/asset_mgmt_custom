@@ -2,7 +2,11 @@
 Asset OEE Report — Overall Equipment Effectiveness
 فعالية المعدات الشاملة
 OEE = Availability × Performance × Quality
-Source: Asset Utilization Log + Asset Repair (downtime)
+Source: Asset Utilization Log + Asset Repair + Asset Work Order (downtime)
+
+مصدر التوقف (downtime) وُسِّع ليشمل Asset Work Order (custom_downtime_hours
+على Asset Repair وحدها كانت تُغفِل الغالبية الساحقة من التوقف الفعلي، لأن
+أغلب الصيانة التصحيحية تمر عبر Asset Work Order لا Asset Repair).
 """
 import frappe
 from frappe import _
@@ -85,6 +89,27 @@ def get_data(filters):
     """, params, as_dict=True)
     for r in repair_data:
         downtime_map[r["asset"]] = flt(r["downtime_hours"])
+
+    # + Asset Work Order (التصحيحية فقط) — نفس التوسيع المطبَّق في تقرير
+    # MTBF/MTTR، لنفس السبب بالضبط.
+    wo_conditions = (
+        "WHERE wo.docstatus = 1 AND wo.status = 'مكتمل' "
+        "AND IFNULL(wo.is_preventive_maintenance, 0) = 0"
+    )
+    if filters.get("from_date"):
+        wo_conditions += " AND DATE(wo.creation) >= %(from_date)s"
+    if filters.get("to_date"):
+        wo_conditions += " AND DATE(wo.creation) <= %(to_date)s"
+
+    wo_data = frappe.db.sql(f"""
+        SELECT wo.asset, SUM(COALESCE(wo.downtime_hours, 0)) AS downtime_hours
+        FROM `tabAsset Work Order` wo
+        {wo_conditions}
+        GROUP BY wo.asset
+    """, params, as_dict=True)
+    for r in wo_data:
+        if r["asset"]:
+            downtime_map[r["asset"]] = downtime_map.get(r["asset"], 0) + flt(r["downtime_hours"])
 
     result = []
     for row in util_data:

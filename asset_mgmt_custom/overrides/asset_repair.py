@@ -180,7 +180,9 @@ def _update_asset_maintenance_summary(asset_name):
                      THEN IFNULL(NULLIF(actual_cost, 0), IFNULL(labor_cost, 0))
                      ELSE 0 END AS cost,
                 CASE WHEN status = 'مكتمل' THEN completion_date END AS last_date,
-                0 AS downtime
+                CASE WHEN status = 'مكتمل' AND IFNULL(is_preventive_maintenance, 0) = 0
+                     THEN IFNULL(downtime_hours, 0)
+                     ELSE 0 END AS downtime
             FROM `tabAsset Work Order`
             WHERE asset = %(asset)s AND docstatus = 1
         ) combined

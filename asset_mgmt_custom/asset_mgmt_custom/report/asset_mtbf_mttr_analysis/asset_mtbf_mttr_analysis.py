@@ -2,7 +2,15 @@
 Asset MTBF/MTTR Analysis
 Mean Time Between Failures (متوسط الوقت بين الأعطال)
 Mean Time To Repair (متوسط وقت الإصلاح)
-Source: Asset Repair (ERPNext built-in, docstatus=1)
+
+المصدر: Asset Repair + Asset Work Order (التصحيحية فقط) معاً — Asset
+Repair وحدها كانت تُغفِل الغالبية الساحقة من الأعطال الفعلية، لأن أغلب
+الصيانة التصحيحية اليومية تمر عبر Asset Work Order (المستخدَم في تطبيق
+الموبايل)، لا Asset Repair (نادراً ما يُنشأ إلا مباشرة أو عبر رسملة
+عمرة كبرى). عمود downtime تحديداً استُبدل بـ custom_downtime_hours
+(الحقل الرقمي الفعلي) لأن downtime الأساسي حقل نصي لا شيء يملؤه
+تلقائياً؛ وdowntime_hours على Asset Work Order (مُحتسَب تلقائياً عند
+الإتمام) هو المصدر الوحيد الموثوق فعلياً لغالبية الأعطال.
 """
 import frappe
 from frappe import _
@@ -35,37 +43,60 @@ def get_columns():
 
 
 def get_data(filters):
-    conditions = "WHERE r.docstatus = 1"
+    repair_conditions = "WHERE r.docstatus = 1"
+    wo_conditions = "WHERE wo.docstatus = 1 AND wo.status = 'مكتمل' AND IFNULL(wo.is_preventive_maintenance, 0) = 0"
     params = {}
 
     if filters.get("company"):
-        conditions += " AND r.company = %(company)s"
+        repair_conditions += " AND a.company = %(company)s"
+        wo_conditions += " AND a.company = %(company)s"
         params["company"] = filters["company"]
     if filters.get("asset_category"):
-        conditions += " AND a.asset_category = %(asset_category)s"
+        repair_conditions += " AND a.asset_category = %(asset_category)s"
+        wo_conditions += " AND a.asset_category = %(asset_category)s"
         params["asset_category"] = filters["asset_category"]
     if filters.get("from_date"):
-        conditions += " AND r.failure_date >= %(from_date)s"
+        repair_conditions += " AND r.failure_date >= %(from_date)s"
+        wo_conditions += " AND DATE(wo.creation) >= %(from_date)s"
         params["from_date"] = filters["from_date"]
     if filters.get("to_date"):
-        conditions += " AND r.failure_date <= %(to_date)s"
+        repair_conditions += " AND r.failure_date <= %(to_date)s"
+        wo_conditions += " AND DATE(wo.creation) <= %(to_date)s"
         params["to_date"] = filters["to_date"]
 
     raw = frappe.db.sql(f"""
         SELECT
-            r.asset AS asset,
-            a.asset_name,
-            a.asset_category,
-            a.purchase_date,
-            COUNT(r.name) AS failure_count,
-            SUM(COALESCE(r.downtime, 0)) AS total_downtime,
-            SUM(COALESCE(r.repair_cost, 0)) AS total_repair_cost,
-            MIN(r.failure_date) AS first_failure,
-            MAX(r.failure_date) AS last_failure
-        FROM `tabAsset Repair` r
-        JOIN `tabAsset` a ON a.name = r.asset
-        {conditions}
-        GROUP BY r.asset
+            asset,
+            asset_name,
+            asset_category,
+            purchase_date,
+            COUNT(*) AS failure_count,
+            SUM(downtime) AS total_downtime,
+            SUM(cost) AS total_repair_cost,
+            MIN(failure_date) AS first_failure,
+            MAX(failure_date) AS last_failure
+        FROM (
+            SELECT
+                r.asset AS asset, a.asset_name, a.asset_category, a.purchase_date,
+                r.failure_date AS failure_date,
+                IFNULL(r.custom_downtime_hours, 0) AS downtime,
+                IFNULL(r.repair_cost, 0) AS cost
+            FROM `tabAsset Repair` r
+            JOIN `tabAsset` a ON a.name = r.asset
+            {repair_conditions}
+
+            UNION ALL
+
+            SELECT
+                wo.asset AS asset, a.asset_name, a.asset_category, a.purchase_date,
+                DATE(wo.creation) AS failure_date,
+                IFNULL(wo.downtime_hours, 0) AS downtime,
+                IFNULL(NULLIF(wo.actual_cost, 0), IFNULL(wo.labor_cost, 0)) AS cost
+            FROM `tabAsset Work Order` wo
+            JOIN `tabAsset` a ON a.name = wo.asset
+            {wo_conditions}
+        ) combined
+        GROUP BY asset
         ORDER BY failure_count DESC
     """, params, as_dict=True)
 
