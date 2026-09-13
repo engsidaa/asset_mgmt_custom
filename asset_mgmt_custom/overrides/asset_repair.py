@@ -24,6 +24,9 @@ On Submit:
         على فئة الأصل) — وليس حساب موردين الشركة العام، لأن ERPNext يشترط
         تحديد طرف (Party) لأي قيد على حساب Payable، وإصلاح بدون فاتورة
         شراء ليس له مورد محدد أصلاً.
+      * اختياري (Asset Mgmt Settings.auto_clear_capital_wip، معطَّل افتراضياً):
+        عند الرسملة، يُضاف لنفس القيد تمدين WIP وإدانة حساب الالتزامات
+        المستحقة، فيتصفَّر رصيد WIP لكل عملية بدل تراكمه بلا حدود.
 
 On Cancel:
   - يُعيد حساب إجمالي التكلفة وتاريخ آخر صيانة بعد حذف هذا السند
@@ -293,6 +296,7 @@ def _post_repair_cost_gl_entry(doc):
             "credit_in_account_currency": total_cost,
             "cost_center": cost_center,
         })
+        _append_wip_clearing_lines(je, category_account, asset, company, cost_center, total_cost)
     else:
         expense_account = category_account.custom_maintenance_expense_account
         if not expense_account:
@@ -337,6 +341,41 @@ def _post_repair_cost_gl_entry(doc):
     je.submit()
 
     doc.db_set("custom_journal_entry", je.name, update_modified=False)
+
+
+def _append_wip_clearing_lines(je, category_account, asset, company, cost_center, total_cost):
+    """
+    اختياري (Asset Mgmt Settings.auto_clear_capital_wip، افتراضياً معطَّل):
+    حساب WIP يُدان دائماً عند الرسملة أعلاه ولا يتمدَّن أبداً بدون هذا —
+    فيتراكم رصيده بلا حدود. عند التفعيل، نضيف ضمن نفس القيد تمديناً لـ WIP
+    وإدانة لحساب الالتزامات المستحقة (نفس حساب OpEx) بنفس المبلغ، فيتصفَّر
+    WIP لكل عملية رسملة فور اكتمالها بدل تركه يتراكم إلى ما لا نهاية.
+    """
+    if not frappe.db.get_single_value("Asset Mgmt Settings", "auto_clear_capital_wip"):
+        return
+
+    accrued_account = category_account.custom_maintenance_accrued_liability_account
+    if not accrued_account:
+        frappe.throw(
+            _(
+                "'تسوية حساب WIP تلقائياً' مفعَّلة في إعدادات إدارة الأصول، لكن حساب "
+                "'التزامات صيانة مستحقة' غير مُعرَّف على Asset Category Account لفئة "
+                "{0} / شركة {1}."
+            ).format(asset.asset_category, company),
+            title=_("Missing Accrued Liability Account"),
+        )
+
+    wip_account = category_account.custom_capital_maintenance_wip_account
+    je.append("accounts", {
+        "account": wip_account,
+        "debit_in_account_currency": total_cost,
+        "cost_center": cost_center,
+    })
+    je.append("accounts", {
+        "account": accrued_account,
+        "credit_in_account_currency": total_cost,
+        "cost_center": cost_center,
+    })
 
 
 def _cancel_repair_cost_gl_entry(doc):
