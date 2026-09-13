@@ -576,13 +576,16 @@ def get_new_requisition_context(asset_category=None):
     if asset_category:
         asset_filters["asset_category"] = asset_category
 
-    pending_assets = frappe.get_list(
-        "Asset",
-        filters=asset_filters,
-        fields=["name", "asset_name", "asset_category", "custom_operational_status"],
-        order_by="creation desc",
-        limit_page_length=0,
-    )
+    if _apply_it_category_scope(asset_filters, asset_category):
+        pending_assets = []
+    else:
+        pending_assets = frappe.get_list(
+            "Asset",
+            filters=asset_filters,
+            fields=["name", "asset_name", "asset_category", "custom_operational_status"],
+            order_by="creation desc",
+            limit_page_length=0,
+        )
 
     return {
         "pending_requisitions": pending_requisitions,
@@ -802,8 +805,16 @@ def list_my_physical_audits():
     (وليس صلاحية doctype القياسية) هو معيار الوصول هنا لنفس السبب
     المذكور في submit_physical_audit — Branch Manager ليس له صلاحية
     قراءة أساسية على هذا الدكتايب أصلاً.
+
+    get_all (وليس get_list) عمداً هنا: get_list يتحقق أولاً من صلاحية
+    القراءة الأساسية على الدكتايب بالكامل قبل حتى تطبيق أي فلتر
+    (DatabaseQuery.check_read_permission)، فكان يرمي PermissionError
+    فوراً لأي مستخدم دوره الوحيد "Branch Manager" — بالضبط الشخص الذي
+    كُتبت هذه الدالة من أجله أصلاً — بدل تطبيق فلتر audited_by كما هو
+    مقصود. نفس نمط get_physical_audit_detail أسفل (فحص ملكية يدوي بدل
+    الاعتماد على صلاحية doctype القياسية).
     """
-    return frappe.get_list(
+    return frappe.get_all(
         "Asset Physical Audit",
         filters={"audited_by": frappe.session.user},
         fields=[
