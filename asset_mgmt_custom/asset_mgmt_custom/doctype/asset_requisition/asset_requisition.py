@@ -18,6 +18,15 @@ Asset Requisition — مصفوفة اعتماد من 3 مراحل متتالية
           تُتخطَّى هذه المرحلة تماماً وينتقل مباشرة لما يليها كالسابق)
       → (approve_category، أي فني تقنية معلومات — is_it_technician) → Pending Asset Manager Approval
       → (approve_asset_manager، دور Asset Manager) → Approved
+      → (create_asset_movement / create_purchase_requisition) → Ordered
+      → (الأصل يصير Operational فعلياً — set_operational/_activate_spare_asset) → Fulfilled
+
+"Ordered" مرحلة وسيطة أُضيفت لأن "Fulfilled" كانت تُضبَط لحظة إنشاء طلب
+الشراء/حركة النقل نفسها — أي قبل وجود الأصل فعلياً بأسابيع أحياناً (طلب
+شراء) أو قبل تسليم حركة النقل وتفعيلها (أصل احتياطي). "Fulfilled" الآن
+لا تُضبَط إلا لحظة صيرورة الأصل المرتبط Operational فعلياً (انظر
+overrides/asset.py: set_operational، وoverrides/asset_movement.py:
+_activate_spare_asset).
 
 مرحلة "مسؤول الفئة" (Category Owner) أُضيفت لاحقاً خصيصاً لطلبات فئات
 تقنية المعلومات — تسمح لأي فني IT (وليس دوراً وظيفياً واحداً محدداً،
@@ -347,7 +356,11 @@ class AssetRequisition(Document):
         doc.transaction_date = today()
         doc.append("assets", {"asset": self.spare_asset, "target_location": target_location})
         doc.insert(ignore_permissions=True)
-        self.db_set("status", "Fulfilled")
+        # "Fulfilled" لا تُضبَط هنا — الحركة لسه مسودة (لم تُسلَّم بعد)،
+        # والأصل الاحتياطي لسه مش مُفعَّل فعلياً حتى يُسلَّم هذا المستند
+        # ويُنشَّط عبر _activate_spare_asset (overrides/asset_movement.py)،
+        # وهي من تضبط "Fulfilled" عند حدوث ذلك فعلاً.
+        self.db_set("status", "Ordered")
         return doc.name
 
     @frappe.whitelist()
@@ -409,7 +422,11 @@ class AssetRequisition(Document):
 
         mr.insert(ignore_permissions=True)
         self.db_set("material_request", mr.name)
-        self.db_set("status", "Fulfilled")
+        # "Fulfilled" لا تُضبَط هنا — الأصل نفسه لسه مش موجود، وممكن ياخد
+        # أسابيع (شراء فعلي → استلام → ترميز → تفعيل). "Fulfilled" تُضبَط
+        # فقط لحظة صيرورة الأصل المرتبط Operational فعلياً (انظر
+        # overrides/asset.py: set_operational).
+        self.db_set("status", "Ordered")
         frappe.msgprint(
             f"تم إنشاء طلب الشراء: <a href='/app/material-request/{mr.name}'>{mr.name}</a>",
             alert=True, indicator="green"

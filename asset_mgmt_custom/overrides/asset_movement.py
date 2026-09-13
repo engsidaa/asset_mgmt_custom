@@ -248,6 +248,21 @@ def _activate_spare_asset(doc, item):
             item.asset, target or "unknown"),
         title=_("Spare Asset Activated"), indicator="blue",
     )
+    _fulfil_source_requisition_for_spare(item.asset)
+
+
+def _fulfil_source_requisition_for_spare(asset_name):
+    """
+    نظير _fulfil_source_requisition (overrides/asset.py) لمسار الأصل
+    الاحتياطي: Asset Requisition.create_asset_movement تضبط "Ordered" لا
+    "Fulfilled" — لأن الحركة كانت وقتها لا تزال مسودة والأصل لم يُنشَّط
+    بعد. الآن تصير "Fulfilled" هنا فقط، لحظة التنشيط الفعلي.
+    """
+    requisition = frappe.db.get_value(
+        "Asset Requisition", {"spare_asset": asset_name, "status": "Ordered"}, "name"
+    )
+    if requisition:
+        frappe.db.set_value("Asset Requisition", requisition, "status", "Fulfilled", update_modified=False)
 
 
 def _log_activity(asset, subject):

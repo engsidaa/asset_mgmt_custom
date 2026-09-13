@@ -302,6 +302,21 @@ def set_operational(asset_name):
         },
         update_modified=True,
     )
+    _fulfil_source_requisition(doc)
+
+
+def _fulfil_source_requisition(asset_doc):
+    """
+    Asset Requisition.status كان يُضبَط "Fulfilled" لحظة إنشاء طلب الشراء
+    نفسه (create_purchase_requisition) — أي قبل وجود الأصل فعلياً بأسابيع
+    أحياناً. الآن تنتقل إلى "Ordered" هناك، ولا تصير "Fulfilled" إلا هنا:
+    لحظة صيرورة الأصل المرتبط بها فعلياً Operational (مُرمَّز ومُفعَّل).
+    """
+    requisition = asset_doc.get("custom_source_requisition")
+    if not requisition:
+        return
+    if frappe.db.get_value("Asset Requisition", requisition, "status") == "Ordered":
+        frappe.db.set_value("Asset Requisition", requisition, "status", "Fulfilled", update_modified=False)
 
     _log_activity(asset_name, "Asset set to Operational by {0}".format(frappe.session.user))
 

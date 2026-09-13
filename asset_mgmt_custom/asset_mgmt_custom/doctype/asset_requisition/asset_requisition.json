@@ -51,7 +51,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "الحالة",
-   "options": "Draft\nPending Finance Approval\nPending Branch Manager Approval\nPending Category Approval\nPending Asset Manager Approval\nApproved\nRejected\nFulfilled",
+   "options": "Draft\nPending Finance Approval\nPending Branch Manager Approval\nPending Category Approval\nPending Asset Manager Approval\nApproved\nOrdered\nRejected\nFulfilled",
    "default": "Draft",
    "read_only": 1,
    "in_list_view": 1,
