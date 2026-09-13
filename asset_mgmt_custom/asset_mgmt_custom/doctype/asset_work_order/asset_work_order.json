@@ -289,6 +289,55 @@
    "allow_on_submit": 1
   },
   {
+   "fieldname": "sec_break_iso14224",
+   "fieldtype": "Section Break",
+   "label": "تصنيف العطل (ISO 14224) — اختياري",
+   "allow_on_submit": 1,
+   "depends_on": "eval:!doc.is_preventive_maintenance",
+   "description": "بديل منظَّم لملاحظات الإتمام النصية أعلاه — يُنشئ تلقائياً سجل Asset Failure Analysis عند الإتمام إن مُلئ رمز المشكلة، لإتاحة تحليل موثوق لأنماط الأعطال المتكررة (نفس الحقول المستخدمة في ذلك الدكتايب بالضبط)"
+  },
+  {
+   "fieldname": "problem_code",
+   "fieldtype": "Select",
+   "label": "رمز المشكلة (Problem Code)",
+   "options": "\nتوقف كامل عن العمل\nأداء ضعيف/بطء\nضوضاء أو اهتزاز غير طبيعي\nتسريب\nارتفاع درجة حرارة غير طبيعي\nرائحة احتراق/دخان\nخطأ/رسالة تنبيه\nكسر أو تلف مادي ظاهر\nأخرى",
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "cause_code",
+   "fieldtype": "Select",
+   "label": "رمز السبب الجذري (Cause Code)",
+   "options": "\nتآكل وتلف\nتشحيم غير كافٍ\nفشل كهربائي\nحمل زائد\nإهمال\nخطأ تشغيلي\nعيب تصنيع\nتلف بسبب حادث\nتسريب\nانسداد\nعطل برمجي/تحكم\nأخرى",
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "col_break_iso14224",
+   "fieldtype": "Column Break",
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "remedy_code",
+   "fieldtype": "Select",
+   "label": "رمز الإجراء التصحيحي (Remedy Code)",
+   "options": "\nاستبدال قطعة غيار\nإصلاح/تصنيع الجزء التالف\nتنظيف وتشحيم\nمعايرة/ضبط\nتحديث برمجي/إعادة تشغيل\nاستبدال الأصل بالكامل\nلا حاجة لإجراء فني (خطأ استخدام)\nأخرى",
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "root_cause_notes",
+   "fieldtype": "Small Text",
+   "label": "تفصيل إضافي للسبب الجذري",
+   "allow_on_submit": 1
+  },
+  {
+   "fieldname": "failure_analysis",
+   "fieldtype": "Link",
+   "label": "سجل تحليل العطل",
+   "options": "Asset Failure Analysis",
+   "read_only": 1,
+   "allow_on_submit": 1,
+   "description": "يُنشأ تلقائياً عند الإتمام إن مُلئ رمز المشكلة أعلاه"
+  },
+  {
    "fieldname": "sec_break_rejection",
    "fieldtype": "Section Break",
    "label": "الرفض",

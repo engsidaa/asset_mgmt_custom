@@ -274,6 +274,7 @@ class AssetWorkOrder(Document):
             self._escalate_to_asset_repair()
         self.save()
         self._complete_maintenance_log()
+        self._create_failure_analysis()
         if self.requested_by:
             notify_user(
                 self.requested_by,
@@ -317,6 +318,39 @@ class AssetWorkOrder(Document):
         except Exception:
             frappe.log_error(
                 title="Asset Maintenance Log completion failed",
+                message=frappe.get_traceback(),
+            )
+
+    def _create_failure_analysis(self):
+        """
+        EAM-3: إغلاق منظَّم بصيغة ISO 14224 بدل الاكتفاء بملاحظات نصية حرة
+        (completion_notes) — اختياري بالكامل: لا شيء يحدث إن لم يملأ
+        الفني problem_code (مثلاً كل صيانة وقائية، ومعظم الإصلاحات
+        البسيطة). لو مُلئ، يُنشأ سجل Asset Failure Analysis حقيقي (نفس
+        الدكتايب المستخدَم أصلاً في تقارير الموثوقية/AHI — انظر
+        Reliability 1) مربوطاً بأمر العمل، بدل ترك ذلك الدكتايب معزولاً
+        تماماً عن التدفق التشغيلي الفعلي كما كان.
+        """
+        if self.get("failure_analysis") or not self.get("problem_code"):
+            return
+        try:
+            fa = frappe.new_doc("Asset Failure Analysis")
+            fa.asset = self.asset
+            fa.failure_date = self.completion_date or today()
+            fa.analyzed_by = frappe.session.user
+            fa.problem_code = self.problem_code
+            fa.failure_mode = self.cause_code or "أخرى"
+            fa.remedy_code = self.remedy_code or "أخرى"
+            fa.root_cause = self.get("root_cause_notes") or self.get("completion_notes") or self.problem_code
+            fa.corrective_action = self.get("completion_notes")
+            fa.downtime_hours = self.get("downtime_hours")
+            fa.repair_cost = self.get("actual_cost")
+            fa.work_order = self.name
+            fa.insert(ignore_permissions=True)
+            self.db_set("failure_analysis", fa.name, update_modified=False)
+        except Exception:
+            frappe.log_error(
+                title="Auto Asset Failure Analysis creation failed",
                 message=frappe.get_traceback(),
             )
 

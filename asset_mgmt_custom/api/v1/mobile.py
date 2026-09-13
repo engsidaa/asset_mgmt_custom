@@ -531,6 +531,10 @@ def update_job_status(
     actual_cost=None,
     cost_classification=None,
     increase_in_asset_life_months=None,
+    problem_code=None,
+    cause_code=None,
+    remedy_code=None,
+    root_cause_notes=None,
 ):
     """
     معالجة (إتمام/رفض) أمر عمل — استدعاء واحد يُفوِّض مباشرة لنفس
@@ -570,6 +574,15 @@ def update_job_status(
             doc.cost_classification = cost_classification
         if increase_in_asset_life_months is not None:
             doc.increase_in_asset_life_months = increase_in_asset_life_months
+        # EAM-3: تصنيف ISO 14224 اختياري — انظر AssetWorkOrder._create_failure_analysis
+        if problem_code:
+            doc.problem_code = problem_code
+        if cause_code:
+            doc.cause_code = cause_code
+        if remedy_code:
+            doc.remedy_code = remedy_code
+        if root_cause_notes:
+            doc.root_cause_notes = root_cause_notes
         doc.complete_work_order()
     elif action == "reject":
         doc.reject_work_order(reason)
@@ -577,6 +590,59 @@ def update_job_status(
         frappe.throw(_("Unknown action '{0}'. Use 'complete' or 'reject'.").format(action))
 
     return {"name": doc.name, "status": doc.status}
+
+
+@frappe.whitelist()
+def get_pcr_options():
+    """
+    EAM-3: قوائم رموز ISO 14224 (Problem/Cause/Remedy Codes) — تُقرَأ من
+    تعريف حقول Asset Work Order نفسها (مصدر الحقيقة الوحيد، نفس القيم
+    المستخدَمة فعلياً في Asset Failure Analysis) بدل تكرارها حرفياً في
+    كود العميل، فلا يمكن أن تختلف القائمتان لاحقاً بمرور الوقت.
+    """
+    meta = frappe.get_meta("Asset Work Order")
+
+    def _options(fieldname):
+        field = meta.get_field(fieldname)
+        return [o for o in (field.options or "").split("\n") if o] if field else []
+
+    return {
+        "problem_codes": _options("problem_code"),
+        "cause_codes": _options("cause_code"),
+        "remedy_codes": _options("remedy_code"),
+    }
+
+
+@frappe.whitelist()
+def suggest_diagnosis(asset, problem_code):
+    """
+    EAM-3: مساعد تشخيص — بلا أي "ذكاء اصطناعي" فعلي، فقط تكرار أنماط
+    الأعطال المسجَّلة فعلاً (Asset Failure Analysis) على نفس فئة الأصل
+    لنفس رمز المشكلة، مرتَّبة بالأكثر تكراراً. يفيد الفني الجديد بمعرفة
+    "غالباً هذا هو السبب/الحل هنا" مبنية على تاريخ هذا الفرع/المنشأة
+    الفعلي، لا افتراضات عامة.
+    """
+    if not asset or not problem_code:
+        return []
+
+    asset_category = frappe.db.get_value("Asset", asset, "asset_category")
+    if not asset_category:
+        return []
+
+    return frappe.db.sql(
+        """
+        SELECT fa.failure_mode AS cause_code, fa.remedy_code, COUNT(*) AS occurrences
+        FROM `tabAsset Failure Analysis` fa
+        JOIN `tabAsset` a ON a.name = fa.asset
+        WHERE a.asset_category = %(asset_category)s
+          AND fa.problem_code = %(problem_code)s
+        GROUP BY fa.failure_mode, fa.remedy_code
+        ORDER BY occurrences DESC
+        LIMIT 5
+        """,
+        {"asset_category": asset_category, "problem_code": problem_code},
+        as_dict=True,
+    )
 
 
 @frappe.whitelist()
