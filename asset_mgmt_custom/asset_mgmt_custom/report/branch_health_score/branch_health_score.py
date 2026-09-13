@@ -68,7 +68,7 @@ def get_data(filters):
             IFNULL(SUM(a.custom_total_maintenance_cost), 0) AS total_maintenance_cost,
             IFNULL(SUM(IFNULL(a.value_after_depreciation, a.gross_purchase_amount)), 0) AS total_asset_value
         FROM `tabBranch` br
-        LEFT JOIN `tabAsset` a ON a.custom_branch = br.name AND a.docstatus < 2 {asset_condition}
+        LEFT JOIN `tabAsset` a ON a.custom_branch = br.name AND a.docstatus = 1 {asset_condition}
         GROUP BY br.name
         HAVING asset_count > 0
         """,

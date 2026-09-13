@@ -140,6 +140,21 @@ def _update_asset_maintenance_summary(asset_name):
     - إجمالي تكلفة جميع الإصلاحات وأوامر العمل المكتملة على الأصل
     - تاريخ آخر صيانة مكتملة (من أي من المصدرين)
     """
+    # التكلفة (والتوقف) لا تُحتسَب إلا للمستندات المكتملة فعلاً — كانت
+    # الاستعلامات القديمة تجمع تكلفة/توقف أي صف docstatus=1 بغض النظر عن
+    # حالته (بما فيها Asset Repair بحالة "Pending" أو Asset Work Order
+    # بحالة "قيد التنفيذ")، فكانت التكلفة تنتفخ قبل انتهاء العمل فعلياً —
+    # بينما last_date كان مفلتَراً على الاكتمال من الأساس. الفلترة الآن
+    # موحَّدة بنفس منطق last_date لكل الأعمدة الثلاثة.
+    #
+    # لـ Asset Work Order تحديداً: التكلفة = actual_cost (تجاوز يدوي) إن
+    # وُجدت، وإلا labor_cost — بنفس منطق fallback المستخدَم فعلياً في
+    # ترحيل القيد المحاسبي نفسه (_post_maintenance_cost_gl_entry)، وليس
+    # IFNULL(actual_cost, 0) وحده كما كان، والذي كان يُسقِط تكلفة أي أمر
+    # عمل مكتمل بـ labor_cost فقط (الحالة الشائعة) إلى صفر. spare_parts_cost
+    # متعمَّد استبعاده هنا لتفادي احتساب مزدوج — قطع الغيار تُحتسَب بشكل
+    # مستقل في تقرير التكلفة الإجمالية للملكية (TCO) من Asset Spare Part
+    # Request مباشرة.
     totals = frappe.db.sql(
         """
         SELECT
@@ -148,16 +163,22 @@ def _update_asset_maintenance_summary(asset_name):
             SUM(downtime) AS total_downtime
         FROM (
             SELECT
-                (total_repair_cost + IFNULL(custom_labor_cost, 0)) AS cost,
+                CASE WHEN repair_status = 'Completed'
+                     THEN (total_repair_cost + IFNULL(custom_labor_cost, 0))
+                     ELSE 0 END AS cost,
                 CASE WHEN repair_status = 'Completed' THEN DATE(completion_date) END AS last_date,
-                IFNULL(custom_downtime_hours, 0) AS downtime
+                CASE WHEN repair_status = 'Completed'
+                     THEN IFNULL(custom_downtime_hours, 0)
+                     ELSE 0 END AS downtime
             FROM `tabAsset Repair`
             WHERE asset = %(asset)s AND docstatus = 1
 
             UNION ALL
 
             SELECT
-                IFNULL(actual_cost, 0) AS cost,
+                CASE WHEN status = 'مكتمل'
+                     THEN IFNULL(NULLIF(actual_cost, 0), IFNULL(labor_cost, 0))
+                     ELSE 0 END AS cost,
                 CASE WHEN status = 'مكتمل' THEN completion_date END AS last_date,
                 0 AS downtime
             FROM `tabAsset Work Order`
