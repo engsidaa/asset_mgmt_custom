@@ -87,6 +87,36 @@ def _block_incomplete_asset_transfer(doc):
 
 
 # ---------------------------------------------------------------------------
+# On Update — إشعار السائق عند تعيينه على حركة أصل
+# ---------------------------------------------------------------------------
+
+def on_update(doc, method=None):
+    if not doc.get("custom_driver_employee"):
+        return
+    before = doc.get_doc_before_save()
+    prev_driver = before.get("custom_driver_employee") if before else None
+    if prev_driver == doc.custom_driver_employee:
+        return  # لم يتغير السائق
+
+    driver_user = frappe.db.get_value("Employee", doc.custom_driver_employee, "user_id")
+    if not driver_user:
+        return
+
+    asset_names = ", ".join(item.asset for item in doc.assets[:3])
+    if len(doc.assets) > 3:
+        asset_names += f" وغيرها ({len(doc.assets)} أصول)"
+
+    subject = f"طلب نقل أصول جديد مُعيَّن لك — {doc.name}"
+    body = f"نقل أصول من {doc.source_location or '—'} إلى {doc.target_location or '—'} | {asset_names}"
+
+    try:
+        from asset_mgmt_custom.utils.notify import notify_user
+        notify_user(driver_user, subject, reference_doctype="Asset Movement", reference_name=doc.name)
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), f"Driver notify failed for movement {doc.name}")
+
+
+# ---------------------------------------------------------------------------
 # On Submit
 # ---------------------------------------------------------------------------
 

@@ -94,6 +94,7 @@ doc_events = {
     },
     "Asset Movement": {
         "validate": "asset_mgmt_custom.overrides.asset_movement.validate",
+        "on_update": "asset_mgmt_custom.overrides.asset_movement.on_update",
         "on_submit": "asset_mgmt_custom.overrides.asset_movement.on_submit",
         "on_cancel": "asset_mgmt_custom.overrides.asset_movement.on_cancel",
     },
