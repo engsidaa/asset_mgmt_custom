@@ -128,17 +128,22 @@ def get_app_context():
         as_dict=True,
     ) or {}
 
+    user_roles = frappe.get_roles(user)
+    user_is_driver = "Driver" in user_roles
+
     return {
         "user": user,
         "full_name": frappe.db.get_value("User", user, "full_name"),
         "user_image": frappe.db.get_value("User", user, "user_image"),
         "email": frappe.db.get_value("User", user, "email"),
         "mobile_no": frappe.db.get_value("User", user, "mobile_no"),
-        "roles": frappe.get_roles(user),
+        "roles": user_roles,
         "employee": employee,
         "managed_branches": managed_branches,
         "default_branch": default_branch,
         "is_it_technician": user_is_it_technician,
+        "is_driver": user_is_driver,
+        "driver_employee": employee.get("name") if (employee and user_is_driver) else None,
         "field_verification_enabled": bool(field_verification.get("field_verification_enabled")),
         "field_verification_radius_meters": flt(field_verification.get("field_verification_radius_meters")) or 200,
     }

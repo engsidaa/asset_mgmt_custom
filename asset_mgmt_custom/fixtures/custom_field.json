@@ -1117,5 +1117,105 @@
   "no_copy": 1,
   "read_only": 1,
   "description": "رمز جهاز تطبيق الموبايل الحالي لإرسال تنبيهات نظام Firebase Cloud Messaging له — يُسجَّل تلقائياً بعد تسجيل الدخول (register_fcm_token)، ويُمسَح تلقائياً لو رفضته Firebase كرمز غير صالح (تطبيق أُزيل/أُعيد تثبيته)"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_driver_employee",
+  "dt": "Asset Movement",
+  "fieldname": "custom_driver_employee",
+  "fieldtype": "Link",
+  "options": "Employee",
+  "label": "السائق المُعيَّن (موظف)",
+  "insert_after": "custom_driver_name",
+  "depends_on": "eval:doc.purpose === 'Transfer'",
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_transit_status",
+  "dt": "Asset Movement",
+  "fieldname": "custom_transit_status",
+  "fieldtype": "Select",
+  "options": "Pending\nIn Transit\nDelivered\nException",
+  "label": "حالة النقل",
+  "insert_after": "custom_driver_employee",
+  "default": "Pending",
+  "depends_on": "eval:doc.purpose === 'Transfer'",
+  "in_list_view": 1,
+  "read_only": 1,
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_pickup_section",
+  "dt": "Asset Movement",
+  "fieldname": "custom_pickup_section",
+  "fieldtype": "Section Break",
+  "label": "تأكيد الاستلام من المخزن (السائق)",
+  "insert_after": "custom_transit_status",
+  "depends_on": "eval:doc.purpose === 'Transfer'",
+  "collapsible": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_pickup_datetime",
+  "dt": "Asset Movement",
+  "fieldname": "custom_pickup_datetime",
+  "fieldtype": "Datetime",
+  "label": "وقت الاستلام من المخزن",
+  "insert_after": "custom_pickup_section",
+  "read_only": 1,
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_pickup_photo",
+  "dt": "Asset Movement",
+  "fieldname": "custom_pickup_photo",
+  "fieldtype": "Attach Image",
+  "label": "صورة استلام الأصل",
+  "insert_after": "custom_pickup_datetime",
+  "read_only": 1,
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_pickup_col",
+  "dt": "Asset Movement",
+  "fieldname": "custom_pickup_col",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_pickup_photo"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_delivery_datetime",
+  "dt": "Asset Movement",
+  "fieldname": "custom_delivery_datetime",
+  "fieldtype": "Datetime",
+  "label": "وقت تسليم الأصل للمستلم",
+  "insert_after": "custom_pickup_col",
+  "read_only": 1,
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_delivery_photo",
+  "dt": "Asset Movement",
+  "fieldname": "custom_delivery_photo",
+  "fieldtype": "Attach Image",
+  "label": "صورة تسليم الأصل",
+  "insert_after": "custom_delivery_datetime",
+  "read_only": 1,
+  "reqd": 0
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Asset Movement-custom_transit_notes",
+  "dt": "Asset Movement",
+  "fieldname": "custom_transit_notes",
+  "fieldtype": "Small Text",
+  "label": "ملاحظات السائق",
+  "insert_after": "custom_delivery_photo",
+  "reqd": 0
  }
 ]
