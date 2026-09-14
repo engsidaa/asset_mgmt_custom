@@ -92,6 +92,18 @@ class AssetWorkOrder(Document):
         if PRIORITY_RANK.get(self.priority, 0) < PRIORITY_RANK[floor]:
             self.priority = floor
 
+    def before_cancel(self):
+        # Asset Failure Analysis carries a back-link (work_order → this AWO).
+        # Frappe's generic cancel guard sees it and refuses to proceed, while
+        # cancelling AFA first is also blocked (AWO.failure_analysis → AFA).
+        # Neither can go first — a classic circular cancel lock.
+        #
+        # AWO created the AFA (via _create_failure_analysis), so AWO is the
+        # owner and must cancel first.  Skipping AFA in the link check here
+        # is safe because on_cancel immediately clears both pointers so AFA
+        # becomes deletable with no dangling references afterwards.
+        self.flags.ignore_linked_doctypes = ["Asset Failure Analysis"]
+
     def before_submit(self):
         self._enforce_loto_gate()
 
@@ -233,8 +245,37 @@ class AssetWorkOrder(Document):
         self._cancel_maintenance_cost_gl_entry()
         self._cancel_linked_spare_part_requests()
         self._cancel_linked_asset_repair()
+        self._release_failure_analysis_backref()
         if self.asset:
             _update_asset_maintenance_summary(self.asset)
+
+    def _release_failure_analysis_backref(self):
+        """Clear the mutual pointers between this AWO and its Asset Failure Analysis.
+
+        After AWO is cancelled, AFA.work_order and AWO.failure_analysis would
+        both still point at each other.  Frappe refuses to save any doc whose
+        Link field points at a cancelled doc ("Cannot link cancelled document"),
+        and refuses to delete a doc that is still linked from another.  Clearing
+        both pointers here makes AFA freely deletable, and prevents any future
+        save of AWO from hitting the cancelled-link guard.
+        """
+        fa_name = self.get("failure_analysis")
+        if fa_name and frappe.db.exists("Asset Failure Analysis", fa_name):
+            try:
+                frappe.db.set_value(
+                    "Asset Failure Analysis", fa_name, "work_order", None,
+                    update_modified=False,
+                )
+            except Exception:
+                frappe.log_error(
+                    title=f"Could not clear Asset Failure Analysis {fa_name}.work_order on AWO cancel",
+                    message=frappe.get_traceback(),
+                )
+        if self.get("failure_analysis"):
+            frappe.db.set_value(
+                "Asset Work Order", self.name, "failure_analysis", None,
+                update_modified=False,
+            )
 
     def _cancel_linked_asset_repair(self):
         repair_name = self.get("asset_repair")
